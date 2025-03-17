@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,12 +12,11 @@ return new class extends Migration
     {
         Schema::create('armada', function (Blueprint $table) {
             $table->id();
-            $table->string('kode_armada');
+            $table->foreignId('id_user')->constrained('users');
             $table->string('jenis_kendaraan');
-            $table->string('kapasitas');
-            $table->enum('status', ['Aktif', 'Nonaktif']);
-            $table->string('jam_aktif');
-            $table->string('user_id'); //FK User(Petugas)
+            $table->integer('kapasitas');
+            $table->enum('status', ['Aktif', 'Tidak Aktif']);
+            $table->time('jam_aktif');
             $table->timestamps();
         });
     }

@@ -4,19 +4,19 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         Schema::create('master_data', function (Blueprint $table) {
-            $table->id();
-            $table->enum('kategori', ['Sampah', 'Armada', 'User', 'Lokasi', 'Rute', 'Laporan']);
-            $table->string('deskripsi');
+            $table->id('id_master');
+            $table->foreignId('id_user')->constrained('users');
+            $table->foreignId('id_sampah')->constrained('sampah');
             $table->timestamps();
         });
+
     }
 
     /**

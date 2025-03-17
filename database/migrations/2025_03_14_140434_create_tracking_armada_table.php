@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('tracking_armada', function (Blueprint $table) {
             $table->id();
-            $table->string('armada_id'); //FK Armada
-            $table->string('latitude');
-            $table->string('longtitude');
+            $table->foreignId('id_armada')->constrained('armada');
+            $table->foreignId('id_jadwal')->constrained('jadwal');
+            $table->timestamp('timestamp');
+            $table->decimal('latitude', 10, 7);
+            $table->decimal('longitude', 10, 7);
             $table->timestamps();
         });
     }

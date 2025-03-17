@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('sampah', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('id_lokasi')->constrained('lokasi');
+            $table->enum('jenis_sampah', ['Organik', 'Anorganik', 'B3', 'Plastik', 'Kertas', 'Elektronik']);
+            $table->float('berat');
+            $table->date('tanggal_pengangkutan');
+            $table->enum('status', ['Belum Diangkut', 'Diangkut']);
             $table->timestamps();
         });
     }

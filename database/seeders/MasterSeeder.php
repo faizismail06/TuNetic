@@ -36,7 +36,7 @@ class MasterSeeder extends Seeder
         ]);
 
         $submenu = Menu::create([
-            'nama_menu' => 'Manajemen Pengguna',
+            'nama_menu' => 'Master Data',
             'url' => '#',
             'icon' => 'fas fa-users-cog',
             'parent_id' => $menu->id,
@@ -105,14 +105,19 @@ class MasterSeeder extends Seeder
         DB::insert('insert into role_has_menus (menu_id, role_id) values (?, ?)', [7, 1]);
         DB::insert('insert into role_has_menus (menu_id, role_id) values (?, ?)', [8, 1]);
 
-        User::factory()->create([
-            'name' => 'Super Admin',
-            'email' => 'superadmin@gmail.com',
-            'password' => Hash::make("adminadmin")
+        User::create([
+            'nama' => 'Admin Utama',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('adminadmin'),
+            'alamat' => 'Jl. Contoh No. 123',
+            'role' => 'Admin',
+            'nomor' => '081234567890',
+            'email_verified_at' => now(),
         ]);
 
-        $superadmin = Role::create(['name' => 'superadmin']);
-        $superadmin->givePermissionTo(Permission::all());
-        User::firstWhere('email', 'superadmin@gmail.com')->assignRole('superadmin');
+        // Role setup
+        $adminRole = Role::create(['name' => 'admin']);
+        $adminRole->givePermissionTo(Permission::all());
+        User::firstWhere('email', 'admin@example.com')->assignRole('admin');
     }
 }

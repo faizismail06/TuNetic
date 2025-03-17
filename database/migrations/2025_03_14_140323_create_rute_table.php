@@ -4,19 +4,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('lokasi', function (Blueprint $table) {
+        Schema::create('rute', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_lokasi');
-            $table->string('latitude');
-            $table->string('longtitude');
-            $table->string('wilayah_id'); //FK Wilayah
+            $table->foreignId('id_lokasi')->constrained('lokasi');
+            $table->string('nama_rute');
+            $table->json('map');
+            $table->string('wilayah');
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('lokasi');
+        Schema::dropIfExists('rute');
     }
 };
