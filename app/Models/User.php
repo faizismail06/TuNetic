@@ -33,8 +33,6 @@ class User extends Authenticatable
         'password',
         'alamat',
         'role',
-        'nomor',
-        'email_verified_at',
     ];
 
     /**

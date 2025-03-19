@@ -5,26 +5,33 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Laporan extends Model
+class LaporanTps extends Model
 {
     use HasFactory;
 
-    protected $table = 'laporan';
+    protected $table = 'laporan_tps';
+    protected $primaryKey = 'id';
 
     protected $fillable = [
-        'id_user',
+        'id_driver',
         'id_jadwal',
         'total_sampah',
         'deskripsi',
+        'status',
+        'tanggal_pengangkutan',
     ];
 
     /**
      * Relasi ke User (Petugas).
      * Satu laporan dibuat oleh satu user.
      */
+    protected $casts = [
+        'status' => 'integer', // Pastikan status disimpan sebagai integer
+    ];
+
     public function user()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(Driver::class, 'id_driver');
     }
 
     /**

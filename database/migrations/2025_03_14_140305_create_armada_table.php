@@ -12,11 +12,10 @@ return new class extends Migration {
     {
         Schema::create('armada', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_user')->constrained('users');
             $table->string('jenis_kendaraan');
+            $table->string('merk_kendaraan');
+            $table->integer('no_polisi');
             $table->integer('kapasitas');
-            $table->enum('status', ['Aktif', 'Tidak Aktif']);
-            $table->time('jam_aktif');
             $table->timestamps();
         });
     }

@@ -5,31 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Prompts\Table;
-
 class Armada extends Model
 {
     use HasFactory;
 
-    protected $table = 'armada';
+    protected $table = 'armada'; // Nama tabel di database
 
     protected $fillable = [
-        'id_user',
         'jenis_kendaraan',
+        'merk_kendaraan',
+        'no_polisi',
         'kapasitas',
-        'status',
-        'jam_aktif',
-    ];
-
-    protected $casts = [
-        'jam_aktif' => 'datetime:H:i', // Mengubah format jam ke format waktu
     ];
 
     /**
-     * Relasi ke User (Petugas).
-     * Satu armada dimiliki oleh satu user.
+     * Cast atribut ke tipe data tertentu
      */
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'id_user');
-    }
+    protected $casts = [
+        'no_polisi' => 'string', // Jika nomor polisi mengandung huruf, ubah ke string
+    ];
 }

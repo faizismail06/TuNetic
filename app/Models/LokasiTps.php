@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Lokasi extends Model
+class LokasiTps extends Model
 {
     use HasFactory;
 
-    protected $table = 'lokasi';
+    protected $table = 'lokasi_tps';
 
     protected $fillable = [
         'nama_lokasi',
@@ -17,12 +17,8 @@ class Lokasi extends Model
         'longitude',
     ];
 
-    /**
-     * Relasi ke Rute.
-     * Satu lokasi bisa dimiliki oleh banyak rute.
-     */
-    public function rute()
-    {
-        return $this->hasMany(Rute::class, 'id_lokasi');
-    }
+    protected $casts = [
+        'latitude' => 'decimal:7',
+        'longitude' => 'decimal:7',
+    ];
 }

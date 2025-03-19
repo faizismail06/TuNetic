@@ -28,6 +28,6 @@ class Rute extends Model
      */
     public function lokasi()
     {
-        return $this->belongsTo(Lokasi::class, 'id_lokasi');
+        return $this->belongsTo(LokasiTps::class, 'id_lokasi');
     }
 }

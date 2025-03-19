@@ -10,12 +10,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('jadwal', function (Blueprint $table) {
+        Schema::create('laporan_warga', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_rute')->constrained('rute');
-            $table->date('tanggal');
-            $table->string('hari');
-            $table->enum('status', ['Belum Berjalan', 'Sedang Berjalan', 'Selesai']);
+            $table->foreignId('id_user')->constrained('drivers');
+            $table->foreignId('id_villages')->constrained('reg_villages');
+            $table->string('gambar')->nullable();
+            $table->text('deskripsi');
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('jadwal');
+        Schema::dropIfExists('laporan_warga');
     }
 };

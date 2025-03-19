@@ -12,32 +12,17 @@ class TrackingArmada extends Model
     protected $table = 'tracking_armada';
 
     protected $fillable = [
-        'id_armada',
-        'id_jadwal',
+        'id_jadwal_operasional',
         'timestamp',
         'latitude',
         'longitude',
     ];
 
-    protected $casts = [
-        'timestamp' => 'datetime',
-    ];
-
     /**
-     * Relasi ke Armada.
-     * Satu tracking hanya terkait dengan satu armada.
+     * Relasi ke Jadwal Operasional
      */
-    public function armada()
+    public function jadwalOperasional()
     {
-        return $this->belongsTo(Armada::class, 'id_armada');
-    }
-
-    /**
-     * Relasi ke Jadwal.
-     * Satu tracking hanya terkait dengan satu jadwal.
-     */
-    public function jadwal()
-    {
-        return $this->belongsTo(Jadwal::class, 'id_jadwal');
+        return $this->belongsTo(JadwalOperasional::class, 'id_jadwal_operasional');
     }
 }

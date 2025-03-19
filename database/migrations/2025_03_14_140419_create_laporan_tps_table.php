@@ -10,12 +10,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('laporan', function (Blueprint $table) {
+        Schema::create('laporan_tps', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_user')->constrained('users');
-            $table->foreignId('id_jadwal')->constrained('jadwal');
+            $table->foreignId('id_driver')->constrained('drivers');
             $table->float('total_sampah');
             $table->text('deskripsi');
+            $table->date('tanggal_pengangkutan')->nullable(); // Tambahkan kolom tanggal_pengangkutan
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }

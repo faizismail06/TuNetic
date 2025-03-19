@@ -10,13 +10,14 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('master_data', function (Blueprint $table) {
-            $table->id('id_master');
-            $table->foreignId('id_user')->constrained('users');
-            $table->foreignId('id_sampah')->constrained('sampah');
+        Schema::create('lokasi_tps', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama_lokasi');
+            $table->decimal('latitude', 10, 7);
+            $table->decimal('longitude', 10, 7);
+            // $table->string('wilayah_id'); //FK Wilayah
             $table->timestamps();
         });
-
     }
 
     /**
@@ -24,6 +25,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('master_data');
+        Schema::dropIfExists('lokasi_tps');
     }
 };
