@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('id_jadwal_operasional')->constrained('jadwal_operasional');
             $table->timestamp('timestamp');
             $table->decimal('latitude', 10, 7);
-            $table->decimal('longitude', 10, 7);
+            $table->decimal('longitude', 10, places: 7);
             $table->timestamps();
         });
     }

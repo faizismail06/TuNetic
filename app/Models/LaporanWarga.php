@@ -14,7 +14,7 @@ class LaporanWarga extends Model
     
     protected $fillable = [
         'id_user',
-        'id_villages',
+        'village_id',
         'gambar',
         'deskripsi',
         'status',
@@ -37,6 +37,6 @@ class LaporanWarga extends Model
      */
     public function village()
     {
-        return $this->belongsTo(Village::class, 'id_villages');
+        return $this->belongsTo(Village::class, 'village_id');
     }
 }

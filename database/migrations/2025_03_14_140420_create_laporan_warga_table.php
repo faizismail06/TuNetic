@@ -12,12 +12,14 @@ return new class extends Migration {
     {
         Schema::create('laporan_warga', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_user')->constrained('drivers');
-            $table->foreignId('id_villages')->constrained('reg_villages');
+            $table->foreignId('id_user')->constrained('users');
+            $table->char('village_id', 10);
             $table->string('gambar')->nullable();
             $table->text('deskripsi');
             $table->integer('status')->default(0);
             $table->timestamps();
+
+            $table->foreign('village_id')->references('id')->on('reg_villages')->onDelete('cascade');
         });
     }
 

@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('penugasan_armada', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_driver')->constrained('driver');
+            $table->foreignId('id_driver')->constrained('drivers');
             $table->foreignId('id_armada')->constrained('armada');
         });
     }

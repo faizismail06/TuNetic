@@ -111,8 +111,6 @@ class MasterSeeder extends Seeder
             'password' => Hash::make('adminadmin'),
             'alamat' => 'Jl. Contoh No. 123',
             'role' => 'Admin',
-            'nomor' => '081234567890',
-            'email_verified_at' => now(),
         ]);
 
         // Role setup
