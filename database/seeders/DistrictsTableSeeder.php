@@ -7293,8 +7293,19 @@ class DistrictsTableSeeder extends Seeder
             array('id' => '950832','regency_id' => '9508','name' => 'Pasir Putih')
         ];
 
-        foreach ($districts as $district) {
-            DB::table('reg_districts')->insert($district);
+         // Membagi data ke dalam batch (misalnya 1000 per batch)
+        $chunks = array_chunk($districts, 1000);
+
+        DB::beginTransaction();
+        try {
+            foreach ($chunks as $chunk) {
+                DB::table('reg_districts')->insert($chunk);
+            }
+            DB::commit();
+            echo "Seeder reg_districts berhasil dijalankan!";
+        } catch (\Exception $e) {
+            DB::rollback();
+            echo "Seeder gagal: " . $e->getMessage();
         }
     }
 }

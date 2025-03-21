@@ -106,11 +106,11 @@ class MasterSeeder extends Seeder
         DB::insert('insert into role_has_menus (menu_id, role_id) values (?, ?)', [8, 1]);
 
         User::create([
-            'nama' => 'Admin Utama',
+            'name' => 'Admin Utama',
             'email' => 'admin@example.com',
             'password' => Hash::make('adminadmin'),
             'alamat' => 'Jl. Contoh No. 123',
-            'role' => 'Admin',
+            // 'role' => 'Admin',
         ]);
 
         // Role setup

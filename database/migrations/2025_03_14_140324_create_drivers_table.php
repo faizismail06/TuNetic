@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('drivers', function (Blueprint $table) {
             $table->id();
             $table->string('email')->unique();
-            $table->string('nama');
+            $table->string('name');
+            $table->string('username');
             $table->string('password');
             $table->string('alamat')->nullable();
             $table->enum('role', ['Petugas'])->nullable();

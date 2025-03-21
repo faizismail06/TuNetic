@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,7 +16,7 @@ return new class extends Migration
             $table->enum('jenis_sampah', ['Organik', 'Anorganik', 'B3', 'Plastik', 'Kertas', 'Elektronik']);
             $table->float('berat');
             $table->date('tanggal_pengangkutan');
-            $table->enum('status', ['Unverified','Belum Diangkut', 'Diangkut']);
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }

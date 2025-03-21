@@ -530,8 +530,19 @@ class RegenciesTableSeeder extends Seeder
             array('id' => '9508','province_id' => '95','name' => 'KAB. NDUGA')
         ];
 
-        foreach ($regencies as $regencie) {
-            DB::table('reg_regencies')->insert($regencie);
+        // Membagi data ke dalam batch (misalnya 1000 per batch)
+        $chunks = array_chunk($regencies, 1000);
+
+        DB::beginTransaction();
+        try {
+            foreach ($chunks as $chunk) {
+                DB::table('reg_regencies')->insert($chunk);
+            }
+            DB::commit();
+            echo "Seeder reg_regencies berhasil dijalankan!";
+        } catch (\Exception $e) {
+            DB::rollback();
+            echo "Seeder gagal: " . $e->getMessage();
         }
     }
 }

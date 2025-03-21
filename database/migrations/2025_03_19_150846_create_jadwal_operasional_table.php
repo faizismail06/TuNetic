@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->foreignId('id_rute')->constrained('rute');
             $table->date('tanggal');
             $table->time('jam_aktif');
-            $table->enum('status', ['Belum Berjalan', 'Sedang Berjalan', 'Selesai']);
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }
