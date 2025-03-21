@@ -5,103 +5,73 @@ namespace App\Http\Controllers;
 use App\Models\Petugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
 
 class PetugasController extends Controller
 {
-    /**
-     * Menampilkan semua driver.
-     */
     public function index()
     {
-        return response()->json(Petugas::all());
+        return response()->json(Petugas::all(), 200);
     }
 
-    /**
-     * Menyimpan driver baru.
-     */
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'email' => 'required|email|unique:petugas,email',
-            'nama' => 'required|string|max:255',
-            'password' => 'required|min:6',
-            'alamat' => 'nullable|string',
-            'role' => 'nullable|in:Petugas',
+            'name' => 'required|string',
+            'username' => 'required|string',
+            'password' => 'required|string|min:8',
             'nomor' => 'nullable|numeric',
+            'tanggal_lahir' => 'nullable|date',
+            'alamat' => 'nullable|string',
             'sim_image' => 'nullable|string',
+            'alasan_bergabung' => 'required|string',
+            'role' => 'nullable|in:Petugas',
         ]);
 
-        $petugas = Petugas::create([
-            'email' => $request->email,
-            'nama' => $request->nama,
-            'password' => Hash::make($request->password),
-            'alamat' => $request->alamat,
-            'role' => $request->role,
-            'nomor' => $request->nomor,
-            'sim_image' => $request->sim_image,
-        ]);
+        $validatedData['password'] = Hash::make($validatedData['password']);
+
+        $petugas = Petugas::create($validatedData);
 
         return response()->json($petugas, 201);
     }
 
-    /**
-     * Menampilkan detail driver berdasarkan ID.
-     */
     public function show($id)
     {
-        $petugas = Petugas::find($id);
-
-        if (!$petugas) {
-            return response()->json(['message' => 'Driver tidak ditemukan'], 404);
-        }
-
-        return response()->json($petugas);
+        $petugas = Petugas::findOrFail($id);
+        return response()->json($petugas, 200);
     }
 
-    /**
-     * Memperbarui data driver.
-     */
     public function update(Request $request, $id)
     {
-        $petugas = Petugas::find($id);
-
-        if (!$petugas) {
-            return response()->json(['message' => 'Driver tidak ditemukan'], 404);
-        }
-
-        $request->validate([
-            'email' => 'email|unique:petugas,email,' . $id,
-            'nama' => 'string|max:255',
-            'password' => 'nullable|min:6',
-            'alamat' => 'nullable|string',
-            'role' => 'nullable|in:Petugas',
+        $petugas = Petugas::findOrFail($id);
+        
+        $validatedData = $request->validate([
+            'email' => 'sometimes|email|unique:petugas,email,' . $id,
+            'name' => 'sometimes|string',
+            'username' => 'sometimes|string',
+            'password' => 'sometimes|string|min:8',
             'nomor' => 'nullable|numeric',
+            'tanggal_lahir' => 'nullable|date',
+            'alamat' => 'nullable|string',
             'sim_image' => 'nullable|string',
+            'alasan_bergabung' => 'sometimes|string',
+            'role' => 'nullable|in:Petugas',
         ]);
 
-        if ($request->has('password')) {
-            $request->merge(['password' => Hash::make($request->password)]);
+        if (isset($validatedData['password'])) {
+            $validatedData['password'] = Hash::make($validatedData['password']);
         }
 
-        $petugas->update($request->all());
+        $petugas->update($validatedData);
 
-        return response()->json($petugas);
+        return response()->json($petugas, 200);
     }
 
-    /**
-     * Menghapus driver.
-     */
     public function destroy($id)
     {
-        $petugas = Petugas::find($id);
-
-        if (!$petugas) {
-            return response()->json(['message' => 'Driver tidak ditemukan'], 404);
-        }
-
+        $petugas = Petugas::findOrFail($id);
         $petugas->delete();
-
-        return response()->json(['message' => 'Driver berhasil dihapus']);
+        return response()->json(["message" => "Petugas berhasil dihapus"], 204);
     }
 }

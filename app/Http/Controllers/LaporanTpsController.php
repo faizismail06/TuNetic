@@ -2,74 +2,72 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\LaporanTps;
-use App\Models\Petugas;
+use Illuminate\Http\Request;
 
 class LaporanTpsController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan semua laporan TPS.
      */
     public function index()
     {
         $laporan = LaporanTps::with('petugas')->get();
-        return response()->json($laporan);
+        return response()->json($laporan, 200);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Menyimpan laporan TPS baru.
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'id_petugas' => 'required|exists:petugas,id',
-            'total_sampah' => 'required|numeric',
+            'total_sampah' => 'required|numeric|min:0',
             'deskripsi' => 'required|string',
             'tanggal_pengangkutan' => 'nullable|date',
-            'status' => 'integer|in:0,1',
+            'status' => 'required|integer|in:0,1,2',
         ]);
 
-        $laporan = LaporanTps::create($request->all());
+        $laporan = LaporanTps::create($validatedData);
         return response()->json($laporan, 201);
     }
 
     /**
-     * Display the specified resource.
+     * Menampilkan laporan TPS berdasarkan ID.
      */
     public function show($id)
     {
         $laporan = LaporanTps::with('petugas')->findOrFail($id);
-        return response()->json($laporan);
+        return response()->json($laporan, 200);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memperbarui laporan TPS.
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'id_petugas' => 'exists:petugas,id',
-            'total_sampah' => 'numeric',
-            'deskripsi' => 'string',
-            'tanggal_pengangkutan' => 'nullable|date',
-            'status' => 'integer|in:0,1',
+        $laporan = LaporanTps::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'id_petugas' => 'sometimes|exists:petugas,id',
+            'total_sampah' => 'sometimes|numeric|min:0',
+            'deskripsi' => 'sometimes|string',
+            'tanggal_pengangkutan' => 'sometimes|date',
+            'status' => 'sometimes|integer|in:0,1,2',
         ]);
 
-        $laporan = LaporanTps::findOrFail($id);
-        $laporan->update($request->all());
-
-        return response()->json($laporan);
+        $laporan->update($validatedData);
+        return response()->json($laporan, 200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Menghapus laporan TPS.
      */
     public function destroy($id)
     {
         $laporan = LaporanTps::findOrFail($id);
         $laporan->delete();
-
-        return response()->json(['message' => 'Laporan TPS deleted successfully']);
+        return response()->json(["message" => "Laporan TPS berhasil dihapus"], 204);
     }
 }

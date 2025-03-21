@@ -13,22 +13,28 @@ class PenugasanPetugas extends Model
 
     protected $fillable = [
         'id_petugas',
-        'id_armada',
+        'id_jadwal_operasional',
+        'tugas',
     ];
 
-    /**
-     * Relasi ke tabel petugas
-     */
     public function petugas()
     {
         return $this->belongsTo(Petugas::class, 'id_petugas');
     }
-
-    /**
-     * Relasi ke tabel Armada
-     */
-    public function armada()
+    public function jadwal_operasional()
     {
-        return $this->belongsTo(Armada::class, 'id_armada');
+        return $this->belongsTo(JadwalOperasional::class, 'id_jadwal_operasional');
+    }
+    public function getTugasAttribute($value)
+    {
+        return $value == 1 ? 'driver' : ($value == 2 ? 'picker' : 'undefined');
+    }
+    // Setter untuk memastikan hanya menerima 1 (driver) atau 2 (picker)
+    public function setTugasAttribute($value)
+    {
+        if (!in_array($value, [1, 2])) {
+            throw new \InvalidArgumentException('Tugas harus 1 (driver) atau 2 (picker)');
+        }
+        $this->attributes['tugas'] = $value;
     }
 }

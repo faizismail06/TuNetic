@@ -7,72 +7,49 @@ use Illuminate\Http\Request;
 
 class PenugasanPetugasController extends Controller
 {
-    /**
-     * Menampilkan semua data penugasan armada
-     */
     public function index()
     {
-        $penugasan = PenugasanPetugas::with(['petugas', 'armada'])->get();
-        return response()->json($penugasan);
+        return response()->json(PenugasanPetugas::all(), 200);
     }
 
-    /**
-     * Menyimpan data penugasan armada baru
-     */
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'id_petugas' => 'required|exists:petugas,id',
-            'id_armada' => 'required|exists:armada,id',
+            'id_jadwal_operasional' => 'required|exists:jadwal_operasional,id',
+            'tugas' => 'required|in:1,2', // Hanya menerima 1 (driver) atau 2 (picker)
         ]);
 
-        $penugasan = PenugasanPetugas::create($request->all());
+        $penugasan = PenugasanPetugas::create($validatedData);
 
-        return response()->json([
-            'message' => 'Penugasan armada berhasil ditambahkan!',
-            'data' => $penugasan
-        ], 201);
+        return response()->json($penugasan, 201);
     }
 
-    /**
-     * Menampilkan detail penugasan armada
-     */
     public function show($id)
     {
-        $penugasan = PenugasanPetugas::with(['petugas', 'armada'])->findOrFail($id);
-        return response()->json($penugasan);
+        $penugasan = PenugasanPetugas::findOrFail($id);
+        return response()->json($penugasan, 200);
     }
 
-    /**
-     * Memperbarui data penugasan armada
-     */
     public function update(Request $request, $id)
     {
         $penugasan = PenugasanPetugas::findOrFail($id);
 
-        $request->validate([
-            'id_petugas' => 'exists:petugas,id',
-            'id_armada' => 'exists:armada,id',
+        $validatedData = $request->validate([
+            'id_petugas' => 'sometimes|exists:petugas,id',
+            'id_jadwal_operasional' => 'sometimes|exists:jadwal_operasional,id',
+            'tugas' => 'sometimes|in:1,2', // Hanya menerima 1 (driver) atau 2 (picker)
         ]);
 
-        $penugasan->update($request->all());
+        $penugasan->update($validatedData);
 
-        return response()->json([
-            'message' => 'Penugasan armada berhasil diperbarui!',
-            'data' => $penugasan
-        ]);
+        return response()->json($penugasan, 200);
     }
 
-    /**
-     * Menghapus data penugasan armada
-     */
     public function destroy($id)
     {
         $penugasan = PenugasanPetugas::findOrFail($id);
         $penugasan->delete();
-
-        return response()->json([
-            'message' => 'Penugasan armada berhasil dihapus!'
-        ]);
+        return response()->json(["message" => "Penugasan berhasil dihapus"], 204);
     }
 }

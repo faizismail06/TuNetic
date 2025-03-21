@@ -12,7 +12,8 @@ class LokasiTpsController extends Controller
      */
     public function index()
     {
-        return response()->json(LokasiTps::all());
+        $lokasi = LokasiTps::all();
+        return response()->json($lokasi, 200);
     }
 
     /**
@@ -20,66 +21,59 @@ class LokasiTpsController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'nama_lokasi' => 'required|string|max:255',
+            'province_id' => 'required|exists:reg_provinces,id',
+            'regency_id' => 'required|exists:reg_regencies,id',
+            'district_id' => 'required|exists:reg_districts,id',
+            'village_id' => 'required|exists:reg_villages,id',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
         ]);
 
-        $lokasi = LokasiTps::create($request->all());
+        $lokasi = LokasiTps::create($validatedData);
 
         return response()->json($lokasi, 201);
     }
 
     /**
-     * Menampilkan detail lokasi TPS berdasarkan ID.
+     * Menampilkan lokasi TPS berdasarkan ID.
      */
     public function show($id)
     {
-        $lokasi = LokasiTps::find($id);
-
-        if (!$lokasi) {
-            return response()->json(['message' => 'Lokasi tidak ditemukan'], 404);
-        }
-
-        return response()->json($lokasi);
+        $lokasi = LokasiTps::findOrFail($id);
+        return response()->json($lokasi, 200);
     }
 
     /**
-     * Memperbarui lokasi TPS.
+     * Memperbarui lokasi TPS berdasarkan ID.
      */
     public function update(Request $request, $id)
     {
-        $lokasi = LokasiTps::find($id);
+        $lokasi = LokasiTps::findOrFail($id);
 
-        if (!$lokasi) {
-            return response()->json(['message' => 'Lokasi tidak ditemukan'], 404);
-        }
-
-        $request->validate([
-            'nama_lokasi' => 'string|max:255',
-            'latitude' => 'numeric|between:-90,90',
-            'longitude' => 'numeric|between:-180,180',
+        $validatedData = $request->validate([
+            'nama_lokasi' => 'sometimes|string|max:255',
+            'province_id' => 'sometimes|exists:reg_provinces,id',
+            'regency_id' => 'sometimes|exists:reg_regencies,id',
+            'district_id' => 'sometimes|exists:reg_districts,id',
+            'village_id' => 'sometimes|exists:reg_villages,id',
+            'latitude' => 'sometimes|numeric|between:-90,90',
+            'longitude' => 'sometimes|numeric|between:-180,180',
         ]);
 
-        $lokasi->update($request->all());
+        $lokasi->update($validatedData);
 
-        return response()->json($lokasi);
+        return response()->json($lokasi, 200);
     }
 
     /**
-     * Menghapus lokasi TPS.
+     * Menghapus lokasi TPS berdasarkan ID.
      */
     public function destroy($id)
     {
-        $lokasi = LokasiTps::find($id);
-
-        if (!$lokasi) {
-            return response()->json(['message' => 'Lokasi tidak ditemukan'], 404);
-        }
-
+        $lokasi = LokasiTps::findOrFail($id);
         $lokasi->delete();
-
-        return response()->json(['message' => 'Lokasi berhasil dihapus']);
+        return response()->json(["message" => "Lokasi TPS berhasil dihapus"], 204);
     }
 }

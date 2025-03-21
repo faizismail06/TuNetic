@@ -4,20 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LaporanWarga extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'laporan_warga';
     protected $primaryKey = 'id';
 
     protected $fillable = [
         'id_user',
-        // 'province_id',
-        // 'regency_id',
-        // 'district_id',
-        // 'village_id',
         'gambar',
         'deskripsi',
         'status',
@@ -38,26 +35,4 @@ class LaporanWarga extends Model
     {
         return $this->belongsTo(User::class, 'id_user');
     }
-
-    /**
-     * Relasi ke tabel reg_villages.
-     */
-    // public function province()
-    // {
-    //     return $this->belongsTo(Province::class, 'province_id');
-    // }
-
-    // public function regency()
-    // {
-    //     return $this->belongsTo(Regency::class, 'regency_id');
-    // }
-    // public function district()
-    // {
-    //     return $this->belongsTo(District::class, 'district_id');
-    // }
-    // public function village()
-    // {
-    //     return $this->belongsTo(Village::class, 'village_id');
-    // }
-
 }

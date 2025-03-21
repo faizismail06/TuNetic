@@ -14,32 +14,23 @@ class LaporanTps extends Model
 
     protected $fillable = [
         'id_petugas',
-        'id_jadwal',
         'total_sampah',
         'deskripsi',
-        'status',
         'tanggal_pengangkutan',
+        'status',
+    ];
+
+    protected $casts = [
+        'total_sampah' => 'float',
+        'tanggal_pengangkutan' => 'date',
+        'status' => 'integer',
     ];
 
     /**
-     * Relasi ke User (Petugas).
-     * Satu laporan dibuat oleh satu user.
+     * Relasi ke tabel petugas.
      */
-    protected $casts = [
-        'status' => 'integer', // Pastikan status disimpan sebagai integer
-    ];
-
-    public function user()
+    public function petugas()
     {
         return $this->belongsTo(Petugas::class, 'id_petugas');
-    }
-
-    /**
-     * Relasi ke Jadwal.
-     * Satu laporan terkait dengan satu jadwal.
-     */
-    public function jadwal()
-    {
-        return $this->belongsTo(Jadwal::class, 'id_jadwal');
     }
 }

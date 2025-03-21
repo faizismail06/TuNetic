@@ -13,8 +13,8 @@ class LaporanWargaController extends Controller
      */
     public function index()
     {
-        $laporan = LaporanWarga::with(['user', 'village'])->get();
-        return response()->json($laporan);
+        $laporan = LaporanWarga::with('user')->get();
+        return response()->json($laporan, 200);
     }
 
     /**
@@ -22,87 +22,67 @@ class LaporanWargaController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'id_user' => 'required|exists:users,id',
-            'id_villages' => 'required|exists:reg_villages,id',
-            'gambar' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'deskripsi' => 'required|string',
-            'status' => 'required|integer|in:0,1,2',
+            'status' => 'integer|in:0,1,2', // 0: Pending, 1: Diproses, 2: Selesai
         ]);
 
-        // Proses upload gambar jika ada
-        $gambarPath = null;
         if ($request->hasFile('gambar')) {
-            $gambarPath = $request->file('gambar')->store('laporan_warga', 'public');
+            $validatedData['gambar'] = $request->file('gambar')->store('laporan_warga', 'public');
         }
 
-        $laporan = LaporanWarga::create([
-            'id_user' => $request->id_user,
-            'id_villages' => $request->id_villages,
-            'gambar' => $gambarPath,
-            'deskripsi' => $request->deskripsi,
-            'status' => $request->status,
-        ]);
-
-        return response()->json(['message' => 'Laporan berhasil ditambahkan', 'data' => $laporan], 201);
+        $laporan = LaporanWarga::create($validatedData);
+        return response()->json($laporan, 201);
     }
 
     /**
-     * Menampilkan detail laporan warga berdasarkan ID.
+     * Menampilkan laporan berdasarkan ID.
      */
     public function show($id)
     {
-        $laporan = LaporanWarga::with(['user', 'village'])->findOrFail($id);
-        return response()->json($laporan);
+        $laporan = LaporanWarga::with('user')->findOrFail($id);
+        return response()->json($laporan, 200);
     }
 
     /**
-     * Memperbarui laporan warga berdasarkan ID.
+     * Memperbarui laporan warga.
      */
     public function update(Request $request, $id)
     {
         $laporan = LaporanWarga::findOrFail($id);
 
-        $request->validate([
-            'id_user' => 'required|exists:users,id',
-            'id_villages' => 'required|exists:reg_villages,id',
-            'gambar' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
-            'deskripsi' => 'required|string',
-            'status' => 'required|integer|in:0,1,2',
+        $validatedData = $request->validate([
+            'id_user' => 'sometimes|exists:users,id',
+            'latitude' => 'sometimes|numeric|between:-90,90',
+            'longitude' => 'sometimes|numeric|between:-180,180',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'deskripsi' => 'sometimes|string',
+            'status' => 'integer|in:0,1,2',
         ]);
 
-        // Proses upload gambar jika ada
         if ($request->hasFile('gambar')) {
+            // Hapus gambar lama jika ada
             if ($laporan->gambar) {
                 Storage::disk('public')->delete($laporan->gambar);
             }
-            $laporan->gambar = $request->file('gambar')->store('laporan_warga', 'public');
+            $validatedData['gambar'] = $request->file('gambar')->store('laporan_warga', 'public');
         }
 
-        $laporan->update([
-            'id_user' => $request->id_user,
-            'id_villages' => $request->id_villages,
-            'deskripsi' => $request->deskripsi,
-            'status' => $request->status,
-        ]);
-
-        return response()->json(['message' => 'Laporan berhasil diperbarui', 'data' => $laporan]);
+        $laporan->update($validatedData);
+        return response()->json($laporan, 200);
     }
 
     /**
-     * Menghapus laporan warga berdasarkan ID.
+     * Menghapus laporan warga (Soft Delete).
      */
     public function destroy($id)
     {
         $laporan = LaporanWarga::findOrFail($id);
-
-        // Hapus gambar jika ada
-        if ($laporan->gambar) {
-            Storage::disk('public')->delete($laporan->gambar);
-        }
-
         $laporan->delete();
-
-        return response()->json(['message' => 'Laporan berhasil dihapus']);
+        return response()->json(["message" => "Laporan berhasil dihapus"], 204);
     }
 }

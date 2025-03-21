@@ -8,79 +8,66 @@ use Illuminate\Http\Request;
 class JadwalOperasionalController extends Controller
 {
     /**
-     * Menampilkan semua jadwal operasional
+     * Menampilkan semua jadwal operasional.
      */
     public function index()
     {
-        $jadwal = JadwalOperasional::with(['penugasan', 'jadwal', 'rute'])->get();
-        return response()->json($jadwal);
+        $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->get();
+        return response()->json($jadwal, 200);
     }
 
     /**
-     * Menyimpan jadwal operasional baru
+     * Menyimpan jadwal operasional baru.
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'id_penugasan' => 'required|exists:penugasan_petugas,id',
+        $validatedData = $request->validate([
+            'id_armada' => 'required|exists:armada,id',
             'id_jadwal' => 'required|exists:jadwal,id',
-            'id_rute' => 'required|exists:rute,id',
-            'tanggal' => 'required|date',
-            'jam_aktif' => 'required|date_format:H:i',
-            'status' => 'required|in:Belum Berjalan,Sedang Berjalan,Selesai',
+            'id_rute_tps' => 'required|exists:rute_tps,id',
+            'jam_aktif' => 'required|date_format:H:i:s',
+            'status' => 'required|integer|in:0,1,2',
         ]);
 
-        $jadwal = JadwalOperasional::create($request->all());
-
-        return response()->json([
-            'message' => 'Jadwal operasional berhasil dibuat!',
-            'data' => $jadwal
-        ], 201);
+        $jadwal = JadwalOperasional::create($validatedData);
+        return response()->json($jadwal, 201);
     }
 
     /**
-     * Menampilkan detail jadwal operasional
+     * Menampilkan jadwal operasional berdasarkan ID.
      */
     public function show($id)
     {
-        $jadwal = JadwalOperasional::with(['penugasan', 'jadwal', 'rute'])->findOrFail($id);
-        return response()->json($jadwal);
+        $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->findOrFail($id);
+        return response()->json($jadwal, 200);
     }
 
     /**
-     * Memperbarui data jadwal operasional
+     * Memperbarui jadwal operasional.
      */
     public function update(Request $request, $id)
     {
         $jadwal = JadwalOperasional::findOrFail($id);
 
-        $request->validate([
-            'id_penugasan' => 'exists:penugasan_petugas,id',
-            'id_jadwal' => 'exists:jadwal,id',
-            'id_rute' => 'exists:rute,id',
-            'tanggal' => 'date',
-            'jam_aktif' => 'date_format:H:i',
-            'status' => 'in:Belum Berjalan,Sedang Berjalan,Selesai',
+        $validatedData = $request->validate([
+            'id_armada' => 'sometimes|exists:armada,id',
+            'id_jadwal' => 'sometimes|exists:jadwal,id',
+            'id_rute_tps' => 'sometimes|exists:rute_tps,id',
+            'jam_aktif' => 'sometimes|date_format:H:i:s',
+            'status' => 'sometimes|integer|in:0,1,2',
         ]);
 
-        $jadwal->update($request->all());
-
-        return response()->json([
-            'message' => 'Jadwal operasional berhasil diperbarui!',
-            'data' => $jadwal
-        ]);
+        $jadwal->update($validatedData);
+        return response()->json($jadwal, 200);
     }
 
     /**
-     * Menghapus data jadwal operasional
+     * Menghapus jadwal operasional.
      */
     public function destroy($id)
     {
         $jadwal = JadwalOperasional::findOrFail($id);
         $jadwal->delete();
-
-        return response()->json([
-            'message' => 'Jadwal operasional berhasil dihapus!'
-        ]);
+        return response()->json(["message" => "Jadwal operasional berhasil dihapus"], 204);
     }
 }

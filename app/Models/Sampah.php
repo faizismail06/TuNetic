@@ -12,8 +12,7 @@ class Sampah extends Model
     protected $table = 'sampah';
 
     protected $fillable = [
-        'id_lokasi',
-        'jenis_sampah',
+        'id_laporan_tps',
         'berat',
         'tanggal_pengangkutan',
         'status',
@@ -27,8 +26,8 @@ class Sampah extends Model
      * Relasi ke Lokasi.
      * Satu sampah berasal dari satu lokasi.
      */
-    public function lokasi()
+    public function laporantps()
     {
-        return $this->belongsTo(LokasiTps::class, 'id_lokasi');
+        return $this->belongsTo(LaporanTps::class, 'id_laporan_tps');
     }
 }

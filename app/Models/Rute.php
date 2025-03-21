@@ -12,7 +12,6 @@ class Rute extends Model
     protected $table = 'rute';
 
     protected $fillable = [
-        'id_lokasi',
         'nama_rute',
         'map',
         'wilayah',
@@ -26,8 +25,8 @@ class Rute extends Model
      * Relasi ke Lokasi.
      * Satu rute memiliki satu lokasi.
      */
-    public function lokasi()
-    {
-        return $this->belongsTo(LokasiTps::class, 'id_lokasi');
-    }
+    // public function lokasi()
+    // {
+    //     return $this->belongsTo(LokasiTps::class, 'id_lokasi');
+    // }
 }

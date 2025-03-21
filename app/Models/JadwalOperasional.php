@@ -15,13 +15,17 @@ class JadwalOperasional extends Model
         'id_armada',
         'id_jadwal',
         'id_rute_tps',
-        // 'tanggal',
         'jam_aktif',
         'status',
     ];
 
+    protected $casts = [
+        'jam_aktif' => 'time',
+        'status' => 'integer',
+    ];
+
     /**
-     * Relasi ke tabel PenugasanPetugas
+     * Relasi ke tabel Armada.
      */
     public function armada()
     {
@@ -29,7 +33,7 @@ class JadwalOperasional extends Model
     }
 
     /**
-     * Relasi ke tabel Jadwal
+     * Relasi ke tabel Jadwal.
      */
     public function jadwal()
     {
@@ -37,9 +41,9 @@ class JadwalOperasional extends Model
     }
 
     /**
-     * Relasi ke tabel Rute
+     * Relasi ke tabel Rute TPS.
      */
-    public function rute_tps()
+    public function ruteTps()
     {
         return $this->belongsTo(RuteTps::class, 'id_rute_tps');
     }

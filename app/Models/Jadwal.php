@@ -12,8 +12,7 @@ class Jadwal extends Model
     protected $table = 'jadwal';
 
     protected $fillable = [
-        'id_rute',
-        'id_armada',
+        // 'id_rute',
         'tanggal',
         'hari',
         'status',
@@ -27,17 +26,13 @@ class Jadwal extends Model
      * Relasi ke Rute.
      * Satu jadwal memiliki satu rute.
      */
-    public function rute()
-    {
-        return $this->belongsTo(Rute::class, 'id_rute');
-    }
+    // public function rute()
+    // {
+    //     return $this->belongsTo(Rute::class, 'id_rute');
+    // }
 
     /**
      * Relasi ke Armada.
      * Satu jadwal memiliki satu armada.
      */
-    public function armada()
-    {
-        return $this->belongsTo(Armada::class, 'id_armada');
-    }
 }

@@ -23,8 +23,7 @@ class SampahController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_lokasi' => 'required|exists:lokasi_tps,id',
-            'jenis_sampah' => 'required|string|max:255',
+            'id_laporan_tps' => 'required|exists:laporan_tps,id',
             'berat' => 'required|numeric|min:0',
             'tanggal_pengangkutan' => 'required|date',
             'status' => 'required|in:Belum Diangkut,Sedang Diangkut,Telah Diangkut',
@@ -55,8 +54,7 @@ class SampahController extends Controller
         $sampah = Sampah::findOrFail($id);
 
         $request->validate([
-            'id_lokasi' => 'sometimes|exists:lokasi_tps,id',
-            'jenis_sampah' => 'sometimes|string|max:255',
+            'id_laporan_tps' => 'sometimes|exists:laporan_tps,id',
             'berat' => 'sometimes|numeric|min:0',
             'tanggal_pengangkutan' => 'sometimes|date',
             'status' => 'sometimes|in:Belum Diangkut,Sedang Diangkut,Telah Diangkut',
