@@ -13,19 +13,13 @@ return new class extends Migration {
         Schema::create('laporan_warga', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_user')->constrained('users');
-            $table->char('province_id', 2); // Sesuai dengan tipe data di reg_provinces
-            $table->char('regency_id', 4); // Sesuai dengan tipe data di reg_regencies
-            $table->char('district_id', 7); // Sesuai dengan tipe data di reg_districts
-            $table->char('village_id', 10); // Sesuai dengan tipe data di reg_villages
+            $table->decimal('latitude', 10, 7);
+            $table->decimal('longitude', 10, places: 7);
             $table->string('gambar')->nullable();
             $table->text('deskripsi');
             $table->integer('status')->default(0);
             $table->timestamps();
 
-            $table->foreign('province_id')->references('id')->on('reg_provinces')->onDelete('cascade');
-            $table->foreign('regency_id')->references('id')->on('reg_regencies')->onDelete('cascade');
-            $table->foreign('district_id')->references('id')->on('reg_districts')->onDelete('cascade');
-            $table->foreign('village_id')->references('id')->on('reg_villages')->onDelete('cascade');
         });
     }
 

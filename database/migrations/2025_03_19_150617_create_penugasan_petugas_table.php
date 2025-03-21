@@ -10,12 +10,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('sampah', function (Blueprint $table) {
+        Schema::create('penugasan_petugas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_laporan_tps')->constrained('laporan_tps');
-            $table->float('berat');
-            $table->date('tanggal_pengangkutan');
-            $table->integer('status')->default(0);
+            $table->foreignId('id_petugas')->constrained('petugas');
+            $table->foreignId('id_jadwal_operasional')->constrained('armada');
+            $table->integer('tugas')->default(0);
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('sampah');
+        Schema::dropIfExists('penugasan_petugas');
     }
 };

@@ -12,7 +12,6 @@ return new class extends Migration {
     {
         Schema::create('jadwal', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_rute')->constrained('rute');
             $table->date('tanggal');
             $table->string('hari');
             $table->integer('status')->default(0);

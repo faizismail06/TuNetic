@@ -12,7 +12,6 @@ return new class extends Migration {
     {
         Schema::create('rute', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_lokasi')->constrained('lokasi_tps');
             $table->string('nama_rute');
             $table->json('map');
             $table->string('wilayah');

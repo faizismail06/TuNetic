@@ -11,17 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('drivers', function (Blueprint $table) {
+        Schema::create('petugas', function (Blueprint $table) {
             $table->id();
             $table->string('email')->unique();
             $table->string('name');
             $table->string('username');
             $table->string('password');
-            $table->string('alamat')->nullable();
-            $table->enum('role', ['Petugas'])->nullable();
             $table->bigInteger('nomor')->nullable();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->date('tanggal_lahir')->nullable(); // Tambahkan kolom tanggal_lahir
+            $table->string('alamat')->nullable();
             $table->string('sim_image')->nullable(); // Kolom untuk upload gambar SIM
+            $table->string('alasan bergabung');
+            $table->enum('role', ['Petugas'])->nullable();
+            $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
@@ -32,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('drivers');
+        Schema::dropIfExists('petugas');
     }
 };
