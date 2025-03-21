@@ -5,23 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PenugasanArmada extends Model
+class PenugasanPetugas extends Model
 {
     use HasFactory;
 
-    protected $table = 'penugasan_armada';
+    protected $table = 'penugasan_petugas';
 
     protected $fillable = [
-        'id_driver',
+        'id_petugas',
         'id_armada',
     ];
 
     /**
-     * Relasi ke tabel Driver
+     * Relasi ke tabel petugas
      */
-    public function driver()
+    public function petugas()
     {
-        return $this->belongsTo(Driver::class, 'id_driver');
+        return $this->belongsTo(Petugas::class, 'id_petugas');
     }
 
     /**

@@ -12,20 +12,20 @@ class JadwalOperasional extends Model
     protected $table = 'jadwal_operasional';
 
     protected $fillable = [
-        'id_penugasan',
+        'id_armada',
         'id_jadwal',
-        'id_rute',
-        'tanggal',
+        'id_rute_tps',
+        // 'tanggal',
         'jam_aktif',
         'status',
     ];
 
     /**
-     * Relasi ke tabel PenugasanArmada
+     * Relasi ke tabel PenugasanPetugas
      */
-    public function penugasan()
+    public function armada()
     {
-        return $this->belongsTo(PenugasanArmada::class, 'id_penugasan');
+        return $this->belongsTo(Armada::class, 'id_armada');
     }
 
     /**
@@ -39,8 +39,8 @@ class JadwalOperasional extends Model
     /**
      * Relasi ke tabel Rute
      */
-    public function rute()
+    public function rute_tps()
     {
-        return $this->belongsTo(Rute::class, 'id_rute');
+        return $this->belongsTo(RuteTps::class, 'id_rute_tps');
     }
 }

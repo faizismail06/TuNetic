@@ -7,10 +7,10 @@ use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ArmadaController;
-use App\Http\Controllers\DriverController;
+use App\Http\Controllers\PetugasController;
 use App\Http\Controllers\JadwalOperasionalController;
 use App\Http\Controllers\LokasiTpsController;
-use App\Http\Controllers\PenugasanArmadaController;
+use App\Http\Controllers\PenugasanPetugasController;
 use App\Http\Controllers\RuteController;
 use App\Http\Controllers\SampahController;
 use App\Http\Controllers\LaporanWargaController;
@@ -52,7 +52,7 @@ Route::resource('manage-permission', PermissionController::class)->only('store',
 Route::resource('armada', ArmadaController::class);
 
 // Driver Routes
-Route::resource('driver', DriverController::class);
+Route::resource('petugas', PetugasController::class);
 
 // Jadwal Operasional Routes
 Route::resource('jadwal-operasional', JadwalOperasionalController::class);
@@ -61,7 +61,7 @@ Route::resource('jadwal-operasional', JadwalOperasionalController::class);
 Route::resource('lokasi-tps', LokasiTpsController::class);
 
 // Penugasan Armada Routes
-Route::resource('penugasan-armada', PenugasanArmadaController::class);
+Route::resource('penugasan-petugas', PenugasanPetugasController::class);
 
 // Rute Routes
 Route::resource('rute', RuteController::class);

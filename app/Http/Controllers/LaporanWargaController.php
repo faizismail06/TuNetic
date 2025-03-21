@@ -23,7 +23,7 @@ class LaporanWargaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_user' => 'required|exists:drivers,id',
+            'id_user' => 'required|exists:users,id',
             'id_villages' => 'required|exists:reg_villages,id',
             'gambar' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
             'deskripsi' => 'required|string',
@@ -64,7 +64,7 @@ class LaporanWargaController extends Controller
         $laporan = LaporanWarga::findOrFail($id);
 
         $request->validate([
-            'id_user' => 'required|exists:drivers,id',
+            'id_user' => 'required|exists:users,id',
             'id_villages' => 'required|exists:reg_villages,id',
             'gambar' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
             'deskripsi' => 'required|string',

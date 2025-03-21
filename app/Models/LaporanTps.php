@@ -13,7 +13,7 @@ class LaporanTps extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'id_driver',
+        'id_petugas',
         'id_jadwal',
         'total_sampah',
         'deskripsi',
@@ -31,7 +31,7 @@ class LaporanTps extends Model
 
     public function user()
     {
-        return $this->belongsTo(Driver::class, 'id_driver');
+        return $this->belongsTo(Petugas::class, 'id_petugas');
     }
 
     /**

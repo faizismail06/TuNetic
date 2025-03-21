@@ -22,7 +22,7 @@ class JadwalOperasionalController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_penugasan' => 'required|exists:penugasan_armada,id',
+            'id_penugasan' => 'required|exists:penugasan_petugas,id',
             'id_jadwal' => 'required|exists:jadwal,id',
             'id_rute' => 'required|exists:rute,id',
             'tanggal' => 'required|date',
@@ -55,7 +55,7 @@ class JadwalOperasionalController extends Controller
         $jadwal = JadwalOperasional::findOrFail($id);
 
         $request->validate([
-            'id_penugasan' => 'exists:penugasan_armada,id',
+            'id_penugasan' => 'exists:penugasan_petugas,id',
             'id_jadwal' => 'exists:jadwal,id',
             'id_rute' => 'exists:rute,id',
             'tanggal' => 'date',

@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PenugasanArmada;
+use App\Models\PenugasanPetugas;
 use Illuminate\Http\Request;
 
-class PenugasanArmadaController extends Controller
+class PenugasanPetugasController extends Controller
 {
     /**
      * Menampilkan semua data penugasan armada
      */
     public function index()
     {
-        $penugasan = PenugasanArmada::with(['driver', 'armada'])->get();
+        $penugasan = PenugasanPetugas::with(['petugas', 'armada'])->get();
         return response()->json($penugasan);
     }
 
@@ -22,11 +22,11 @@ class PenugasanArmadaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_driver' => 'required|exists:driver,id',
+            'id_petugas' => 'required|exists:petugas,id',
             'id_armada' => 'required|exists:armada,id',
         ]);
 
-        $penugasan = PenugasanArmada::create($request->all());
+        $penugasan = PenugasanPetugas::create($request->all());
 
         return response()->json([
             'message' => 'Penugasan armada berhasil ditambahkan!',
@@ -39,7 +39,7 @@ class PenugasanArmadaController extends Controller
      */
     public function show($id)
     {
-        $penugasan = PenugasanArmada::with(['driver', 'armada'])->findOrFail($id);
+        $penugasan = PenugasanPetugas::with(['petugas', 'armada'])->findOrFail($id);
         return response()->json($penugasan);
     }
 
@@ -48,10 +48,10 @@ class PenugasanArmadaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $penugasan = PenugasanArmada::findOrFail($id);
+        $penugasan = PenugasanPetugas::findOrFail($id);
 
         $request->validate([
-            'id_driver' => 'exists:driver,id',
+            'id_petugas' => 'exists:petugas,id',
             'id_armada' => 'exists:armada,id',
         ]);
 
@@ -68,7 +68,7 @@ class PenugasanArmadaController extends Controller
      */
     public function destroy($id)
     {
-        $penugasan = PenugasanArmada::findOrFail($id);
+        $penugasan = PenugasanPetugas::findOrFail($id);
         $penugasan->delete();
 
         return response()->json([

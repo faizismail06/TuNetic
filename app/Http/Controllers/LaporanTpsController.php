@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\LaporanTps;
-use App\Models\Driver;
+use App\Models\Petugas;
 
 class LaporanTpsController extends Controller
 {
@@ -13,7 +13,7 @@ class LaporanTpsController extends Controller
      */
     public function index()
     {
-        $laporan = LaporanTps::with('driver')->get();
+        $laporan = LaporanTps::with('petugas')->get();
         return response()->json($laporan);
     }
 
@@ -23,7 +23,7 @@ class LaporanTpsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_driver' => 'required|exists:drivers,id',
+            'id_petugas' => 'required|exists:petugas,id',
             'total_sampah' => 'required|numeric',
             'deskripsi' => 'required|string',
             'tanggal_pengangkutan' => 'nullable|date',
@@ -39,7 +39,7 @@ class LaporanTpsController extends Controller
      */
     public function show($id)
     {
-        $laporan = LaporanTps::with('driver')->findOrFail($id);
+        $laporan = LaporanTps::with('petugas')->findOrFail($id);
         return response()->json($laporan);
     }
 
@@ -49,7 +49,7 @@ class LaporanTpsController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'id_driver' => 'exists:drivers,id',
+            'id_petugas' => 'exists:petugas,id',
             'total_sampah' => 'numeric',
             'deskripsi' => 'string',
             'tanggal_pengangkutan' => 'nullable|date',

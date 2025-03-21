@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Driver extends Authenticatable
+class Petugas extends Authenticatable
 {
     use HasFactory;
 
-    protected $table = 'drivers'; // Nama tabel di database
+    protected $table = 'petugas'; // Nama tabel di database
 
     protected $fillable = [
         'email',

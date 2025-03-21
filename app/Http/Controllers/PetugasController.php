@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Driver;
+use App\Models\Petugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
-class DriverController extends Controller
+class PetugasController extends Controller
 {
     /**
      * Menampilkan semua driver.
      */
     public function index()
     {
-        return response()->json(Driver::all());
+        return response()->json(Petugas::all());
     }
 
     /**
@@ -23,7 +23,7 @@ class DriverController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|unique:drivers,email',
+            'email' => 'required|email|unique:petugas,email',
             'nama' => 'required|string|max:255',
             'password' => 'required|min:6',
             'alamat' => 'nullable|string',
@@ -32,7 +32,7 @@ class DriverController extends Controller
             'sim_image' => 'nullable|string',
         ]);
 
-        $driver = Driver::create([
+        $petugas = Petugas::create([
             'email' => $request->email,
             'nama' => $request->nama,
             'password' => Hash::make($request->password),
@@ -42,7 +42,7 @@ class DriverController extends Controller
             'sim_image' => $request->sim_image,
         ]);
 
-        return response()->json($driver, 201);
+        return response()->json($petugas, 201);
     }
 
     /**
@@ -50,13 +50,13 @@ class DriverController extends Controller
      */
     public function show($id)
     {
-        $driver = Driver::find($id);
+        $petugas = Petugas::find($id);
 
-        if (!$driver) {
+        if (!$petugas) {
             return response()->json(['message' => 'Driver tidak ditemukan'], 404);
         }
 
-        return response()->json($driver);
+        return response()->json($petugas);
     }
 
     /**
@@ -64,14 +64,14 @@ class DriverController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $driver = Driver::find($id);
+        $petugas = Petugas::find($id);
 
-        if (!$driver) {
+        if (!$petugas) {
             return response()->json(['message' => 'Driver tidak ditemukan'], 404);
         }
 
         $request->validate([
-            'email' => 'email|unique:drivers,email,' . $id,
+            'email' => 'email|unique:petugas,email,' . $id,
             'nama' => 'string|max:255',
             'password' => 'nullable|min:6',
             'alamat' => 'nullable|string',
@@ -84,9 +84,9 @@ class DriverController extends Controller
             $request->merge(['password' => Hash::make($request->password)]);
         }
 
-        $driver->update($request->all());
+        $petugas->update($request->all());
 
-        return response()->json($driver);
+        return response()->json($petugas);
     }
 
     /**
@@ -94,13 +94,13 @@ class DriverController extends Controller
      */
     public function destroy($id)
     {
-        $driver = Driver::find($id);
+        $petugas = Petugas::find($id);
 
-        if (!$driver) {
+        if (!$petugas) {
             return response()->json(['message' => 'Driver tidak ditemukan'], 404);
         }
 
-        $driver->delete();
+        $petugas->delete();
 
         return response()->json(['message' => 'Driver berhasil dihapus']);
     }
