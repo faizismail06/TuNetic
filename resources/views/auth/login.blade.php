@@ -1,147 +1,117 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--favicon-->
-    <link rel="icon" href="{{ asset('') }}assets/images/favicon-32x32.png" type="image/png" />
-    <!-- loader-->
-    <link href="{{ asset('') }}assets/css/pace.min.css" rel="stylesheet" />
-    <script src="{{ asset('') }}assets/js/pace.min.js"></script>
-    <!-- Bootstrap CSS -->
-    <link href="{{ asset('') }}assets/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ asset('') }}assets/css/bootstrap-extended.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <link href="{{ asset('') }}assets/css/app.css" rel="stylesheet">
-    <link href="{{ asset('') }}assets/css/icons.css" rel="stylesheet">
-    <title>{{ env('APP_NAME', 'PBL IK-TI') }}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TuNetic</title>
+    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
-
-<body class="">
-    <!--wrapper-->
-    <div class="wrapper">
-        <div class="section-authentication-cover">
-            <div class="">
-                <div class="row g-0">
-
-                    <div
-                        class="col-12 col-xl-7 col-xxl-8 auth-cover-left align-items-center justify-content-center d-none d-xl-flex">
-
-                        <div class="card shadow-none bg-transparent shadow-none rounded-0 mb-0">
-                            <div class="card-body">
-                                <img src="{{ asset('') }}assets/images/login-images/login-cover.svg"
-                                    class="img-fluid auth-img-cover-login" width="500" alt="" />
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="col-12 col-xl-5 col-xxl-4 auth-cover-right align-items-center justify-content-center">
-                        <div class="card rounded-0 m-3 shadow-none bg-transparent mb-0">
-                            <div class="card-body p-sm-5">
-                                <div class="">
-                                    <div class="mb-3 text-center">
-                                        {{-- <img src="assets/images/logo-icon.png" width="60" alt=""> --}}
-                                    </div>
-                                    <div class="text-center mb-4">
-                                        <h3 class="">{{ env('APP_NAME', 'PBL IK-TI') }}</h3>
-                                        <p class="mb-0"></p>
-                                    </div>
-                                    <div class="form-body">
-                                        <form class="row g-3" action="{{ route('login') }}" method="POST">
-                                            @csrf
-                                            <div class="col-12">
-                                                <label for="inputEmailAddress" class="form-label">Alamat Email</label>
-                                                <input type="email" name="email"
-                                                    class="form-control @error('email') is-invalid @enderror"
-                                                    id="inputEmailAddress" placeholder="Alamat Email" value="{{ old('email') }}">
-                                                @error('email')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
-                                            </div>
-                                            <div class="col-12">
-                                                <label for="inputChoosePassword" class="form-label">Password</label>
-                                                <div class="input-group" id="show_hide_password">
-                                                    <input type="password" name="password"
-                                                        class="form-control border-end-0 @error('password') is-invalid @enderror"
-                                                        id="inputChoosePassword" value=""
-                                                        placeholder="Enter Password"> <a href="javascript:;"
-                                                        class="input-group-text bg-transparent"><i
-                                                            class="bx bx-hide"></i></a>
-                                                    @error('password')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input" type="checkbox"
-                                                        id="flexSwitchCheckChecked">
-                                                    <label class="form-check-label"
-                                                        for="flexSwitchCheckChecked">Remember Me</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 text-end"> <a
-                                                    href="{{ route('password.request') }}">Lupa password ?</a>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="d-grid">
-                                                    <button type="submit" class="btn btn-primary btn-sm">Masuk</button>
-                                                </div>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="text-center ">
-                                                    <p class="mb-0">Belum memuliki akun ? <a
-                                                            href="{{ route('register') }}">Klik daftar</a>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div class="form-box login">
+            <form action="{{ route('login') }}" method="POST">
+                @csrf
+                <h1>Login</h1>
+                <div class="input-box">
+                    <input type="email" name="email" placeholder="Alamat Email" required value="{{ old('email') }}">
+                    <i class='bx bxs-user'></i>
+                    @error('email')
+                        <span class="error">{{ $message }}</span>
+                    @enderror
                 </div>
-                <!--end row-->
+                <div class="input-box">
+                    <input type="password" name="password" placeholder="Password" required>
+                    <i class='bx bxs-lock-alt'></i>
+                    @error('password')
+                        <span class="error">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="forgot-link">
+                    <a href="{{ route('password.request') }}">Lupa Password?</a>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <p>or login with social platforms</p>
+                <div class="social-icons">
+                    <a href="#"><i class='bx bxl-google'></i></a>
+                    <a href="#"><i class='bx bxl-facebook'></i></a>
+                    <a href="#"><i class='bx bxl-github'></i></a>
+                    <a href="#"><i class='bx bxl-linkedin'></i></a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Register Form -->
+        <div class="form-box register">
+            <form action="{{ route('register') }}" method="POST">
+                @csrf
+                <h1>Registration</h1>
+                <div class="input-box">
+                    <input type="text" name="name" placeholder="Username" required value="{{ old('name') }}">
+                    <i class='bx bxs-user'></i>
+                    @error('name')
+                        <span class="error">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="input-box">
+                    <input type="email" name="email" placeholder="Email" required value="{{ old('email') }}">
+                    <i class='bx bxs-envelope'></i>
+                    @error('email')
+                        <span class="error">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="input-box">
+                    <input type="password" name="password" placeholder="Password" required>
+                    <i class='bx bxs-lock-alt'></i>
+                    @error('password')
+                        <span class="error">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="input-box">
+                    <input type="password" name="password_confirmation" placeholder="Confirm Password" required>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+                <button type="submit" class="btn">Register</button>
+                <p>or register with social platforms</p>
+                <div class="social-icons">
+                    <a href="#"><i class='bx bxl-google'></i></a>
+                    <a href="#"><i class='bx bxl-facebook'></i></a>
+                    <a href="#"><i class='bx bxl-github'></i></a>
+                    <a href="#"><i class='bx bxl-linkedin'></i></a>
+                </div>
+                <p class="switch-login">Already have an account? <a href="{{ route('login') }}">Login</a></p>
+            </form>
+        </div>
+
+        <!-- Toggle Box -->
+        <div class="toggle-box">
+            <div class="toggle-panel toggle-left">
+                <h1>Hello, Welcome!</h1>
+                <p>Don't have an account?</p>
+                <button class="btn register-btn">Register</button>
+            </div>
+            <div class="toggle-panel toggle-right">
+                <h1>Welcome Back!</h1>
+                <p>Already have an account?</p>
+                <button class="btn login-btn">Login</button>
             </div>
         </div>
     </div>
-    <!--end wrapper-->
-    <!-- Bootstrap JS -->
-    <script src="{{ asset('') }}assets/js/bootstrap.bundle.min.js"></script>
-    <!--plugins-->
-    <script src="{{ asset('') }}assets/js/jquery.min.js"></script>
-    <script src="{{ asset('') }}assets/plugins/simplebar/js/simplebar.min.js"></script>
-    <script src="{{ asset('') }}assets/plugins/metismenu/js/metisMenu.min.js"></script>
-    <script src="{{ asset('') }}assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
-    <!--Password show & hide js -->
-    <script>
-        $(document).ready(function() {
-            $("#show_hide_password a").on('click', function(event) {
-                event.preventDefault();
-                if ($('#show_hide_password input').attr("type") == "text") {
-                    $('#show_hide_password input').attr('type', 'password');
-                    $('#show_hide_password i').addClass("bx-hide");
-                    $('#show_hide_password i').removeClass("bx-show");
-                } else if ($('#show_hide_password input').attr("type") == "password") {
-                    $('#show_hide_password input').attr('type', 'text');
-                    $('#show_hide_password i').removeClass("bx-hide");
-                    $('#show_hide_password i').addClass("bx-show");
-                }
-            });
-        });
-    </script>
-    <!--app JS-->
-    <script src="{{ asset('') }}assets/js/app.js"></script>
-</body>
 
+    <script src="{{ asset('assets/js/main.js') }}"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const params = new URLSearchParams(window.location.search);
+        const mode = params.get("mode");
+
+        if (mode === "register") {
+            document.querySelector('.container').classList.add('active');
+        } else {
+            document.querySelector('.container').classList.remove('active');
+        }
+    });
+</script>
+
+</body>
 </html>

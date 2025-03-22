@@ -4,13 +4,42 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ env('APP_NAME', 'PBL IK-TI') }}</title>
+    <title>TuNetic</title>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <link rel="stylesheet" href="{{ asset('') }}plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('') }}plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
     @stack('css')
     <link rel="stylesheet" href="{{ asset('') }}dist/css/adminlte.min.css">
+
+    <style>
+    .main-sidebar {
+        background-color: #299e63 !important;
+    }
+
+    .main-header {
+        background-color: #299e63 !important;
+    }
+
+    /* .card-outline {
+        background-color: #299e63 !important;
+    } */
+
+     .main-sidebar .nav-sidebar > .nav-item > .nav-link.active {
+        background-color: #25a05b !important;
+        color: #fff !important;
+    }
+
+    /* .main-sidebar .nav-sidebar > .nav-item > .nav-link {
+        color: #fff !important;
+    }
+
+    .main-sidebar .nav-sidebar > .nav-item > .nav-link:hover {
+        background-color: #258d54 !important;
+        color: #fff !important;
+    } */ */
+</style>
+
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -89,7 +118,7 @@
                 <img src="{{ asset('') }}dist/img/logo-polines.png" alt="Logo Polines"
                     class="brand-image elevation-3" style="opacity: .8">
                 <span
-                    class="brand-text font-weight-light "><strong>{{ env('APP_NAME', 'PBL IK-TI Polines') }}</strong></span>
+                    class="brand-text font-weight-light "><strong>TuNetic</strong></span>
             </a>
             <div class="sidebar">
                 <nav class="mt-2">
@@ -116,7 +145,7 @@
             <div class="float-right d-none d-sm-block">
                 <b>Version</b> 1.0.0
             </div>
-            <strong>&copy; {{ date('Y') }} <i>Task Force</i> PBL IK-TRK Polines</strong>
+            <strong>&copy; {{ date('Y') }} <i>TuNetic </i> by Wizzy </strong>
         </footer>
     </div>
 

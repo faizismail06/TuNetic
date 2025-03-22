@@ -28,7 +28,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/login';
 
     /**
      * Create a new controller instance.
@@ -53,6 +53,12 @@ class RegisterController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
+    }
+
+    protected function registered($request, $user)
+    {
+        auth()->guard('web')->logout(); // Pastikan logout menggunakan guard yang benar
+        return redirect('/login')->with('success', 'Registrasi berhasil! Silakan login.');
     }
 
     /**
