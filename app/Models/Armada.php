@@ -21,7 +21,7 @@ class Armada extends Model
     /**
      * Cast atribut ke tipe data tertentu
      */
-    protected $casts = [
-        'no_polisi' => 'string', // Jika nomor polisi mengandung huruf, ubah ke string
-    ];
+    // protected $casts = [
+    //     'no_polisi' => 'string', // Jika nomor polisi mengandung huruf, ubah ke string
+    // ];
 }

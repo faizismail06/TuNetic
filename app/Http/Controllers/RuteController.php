@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Rute;
 use Illuminate\Http\Request;
+use Exception;
 
 class RuteController extends Controller
 {
@@ -12,7 +13,11 @@ class RuteController extends Controller
      */
     public function index()
     {
-        return response()->json(Rute::all(), 200);
+        try {
+            return response()->json(Rute::all(), 200);
+        } catch (Exception $e) {
+            return response()->json(["error" => "Gagal mengambil data rute", "message" => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -20,24 +25,39 @@ class RuteController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'nama_rute' => 'required|string|max:255',
-            'map' => 'required|json', // Pastikan map dalam format JSON
-            'wilayah' => 'required|json', // Pastikan wilayah dalam format GeoJSON
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'nama_rute' => 'required|string|max:255',
+                'map' => 'required|array', // Ubah dari json menjadi array
+                'wilayah' => 'required|string', // Pastikan string, bukan json
+            ]);
 
-        $rute = Rute::create($validatedData);
+            // Ubah array menjadi JSON string sebelum disimpan ke database
+            $validatedData['map'] = json_encode($validatedData['map']);
 
-        return response()->json($rute, 201);
+            $rute = Rute::create($validatedData);
+
+            return response()->json($rute, 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Gagal menyimpan rute',
+                'message' => $e->getMessage(),
+            ], 400);
+        }
     }
+
 
     /**
      * Menampilkan detail rute berdasarkan ID.
      */
     public function show($id)
     {
-        $rute = Rute::findOrFail($id);
-        return response()->json($rute, 200);
+        try {
+            $rute = Rute::findOrFail($id);
+            return response()->json($rute, 200);
+        } catch (Exception $e) {
+            return response()->json(["error" => "Rute tidak ditemukan", "message" => $e->getMessage()], 404);
+        }
     }
 
     /**
@@ -45,27 +65,47 @@ class RuteController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $rute = Rute::findOrFail($id);
+        try {
+            $rute = Rute::findOrFail($id); // Cari rute berdasarkan ID, jika tidak ditemukan akan return 404
 
-        $validatedData = $request->validate([
-            'nama_rute' => 'sometimes|string|max:255',
-            'map' => 'sometimes|json', // Opsional, harus JSON jika dikirim
-            'wilayah' => 'sometimes|json', // Opsional, harus GeoJSON jika dikirim
-        ]);
+            $validatedData = $request->validate([
+                'nama_rute' => 'sometimes|string|max:255',
+                'map' => 'sometimes|array', // Pastikan map dikirim sebagai array
+                'wilayah' => 'sometimes|string', // Wilayah tetap berupa string
+            ]);
 
-        $rute->update($validatedData);
+            // Ubah array menjadi JSON sebelum menyimpan ke database
+            if (isset($validatedData['map'])) {
+                $validatedData['map'] = json_encode($validatedData['map']);
+            }
 
-        return response()->json($rute, 200);
+            $rute->update($validatedData);
+
+            return response()->json([
+                'message' => 'Rute berhasil diperbarui',
+                'data' => $rute
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Gagal mengupdate rute',
+                'message' => $e->getMessage(),
+            ], 400);
+        }
     }
+
 
     /**
      * Menghapus rute berdasarkan ID.
      */
     public function destroy($id)
     {
-        $rute = Rute::findOrFail($id);
-        $rute->delete();
+        try {
+            $rute = Rute::findOrFail($id);
+            $rute->delete();
 
-        return response()->json(["message" => "Rute berhasil dihapus"], 204);
+            return response()->json(["message" => "Rute berhasil dihapus"], 200);
+        } catch (Exception $e) {
+            return response()->json(["error" => "Gagal menghapus rute", "message" => $e->getMessage()], 500);
+        }
     }
 }

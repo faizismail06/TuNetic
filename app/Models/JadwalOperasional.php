@@ -15,13 +15,10 @@ class JadwalOperasional extends Model
         'id_armada',
         'id_jadwal',
         'id_rute_tps',
-        'jam_aktif',
-        'status',
     ];
 
     protected $casts = [
-        'jam_aktif' => 'time',
-        'status' => 'integer',
+        'jam_aktif' => 'string',
     ];
 
     /**

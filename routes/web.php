@@ -9,13 +9,16 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ArmadaController;
 use App\Http\Controllers\PetugasController;
 use App\Http\Controllers\JadwalOperasionalController;
+use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\LokasiTpsController;
 use App\Http\Controllers\PenugasanPetugasController;
 use App\Http\Controllers\RuteController;
+use App\Http\Controllers\RuteTpsController;
 use App\Http\Controllers\SampahController;
 use App\Http\Controllers\LaporanWargaController;
 use App\Http\Controllers\LaporanTpsController;
 use App\Http\Controllers\TrackingArmadaController;
+use App\Http\Controllers\ArtikelController;
 
 // Route untuk halaman utama
 Route::get('/', function () {
@@ -54,6 +57,9 @@ Route::resource('armada', ArmadaController::class);
 // Driver Routes
 Route::resource('petugas', PetugasController::class);
 
+// Jadwal Routes
+Route::resource('jadwal', JadwalController::class);
+
 // Jadwal Operasional Routes
 Route::resource('jadwal-operasional', JadwalOperasionalController::class);
 
@@ -66,6 +72,9 @@ Route::resource('penugasan-petugas', PenugasanPetugasController::class);
 // Rute Routes
 Route::resource('rute', RuteController::class);
 
+// Rute Routes
+Route::resource('rute-tps', RuteTpsController::class);
+
 // Sampah Routes
 Route::resource('sampah', SampahController::class);
 
@@ -77,5 +86,6 @@ Route::resource('laporan-tps', LaporanTpsController::class);
 
 Route::resource('tracking-armada', TrackingArmadaController::class)->only(['index', 'store', 'destroy']);
 
+Route::apiResource('artikel', ArtikelController::class);
 
 Route::get('dbbackup', [DBBackupController::class, 'DBDataBackup']);

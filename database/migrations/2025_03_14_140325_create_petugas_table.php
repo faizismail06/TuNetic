@@ -21,7 +21,7 @@ return new class extends Migration
             $table->date('tanggal_lahir')->nullable(); // Tambahkan kolom tanggal_lahir
             $table->string('alamat')->nullable();
             $table->string('sim_image')->nullable(); // Kolom untuk upload gambar SIM
-            $table->string('alasan bergabung');
+            $table->string('alasan_bergabung');
             $table->enum('role', ['Petugas'])->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();

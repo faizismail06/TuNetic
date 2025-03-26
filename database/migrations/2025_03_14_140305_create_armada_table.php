@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('jenis_kendaraan');
             $table->string('merk_kendaraan');
-            $table->integer('no_polisi');
+            $table->string('no_polisi', 15)->unique();
             $table->integer('kapasitas');
             $table->timestamps();
         });

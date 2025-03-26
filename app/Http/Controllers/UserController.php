@@ -51,6 +51,7 @@ class UserController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|email:rfc|unique:users',
             'role' => 'nullable',
+            'alamat' => 'nullable|string',
             'verified' => 'nullable|string',
         ]);
 
@@ -117,6 +118,7 @@ class UserController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|email:rfc',
             'role' => 'nullable',
+            'alamat' => 'nullable|string',
             'verified' => 'nullable|string',
         ]);
 
