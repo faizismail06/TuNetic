@@ -89,3 +89,9 @@ Route::resource('tracking-armada', TrackingArmadaController::class)->only(['inde
 Route::apiResource('artikel', ArtikelController::class);
 
 Route::get('dbbackup', [DBBackupController::class, 'DBDataBackup']);
+
+Route::get('/register', [UserController::class, 'showRegistrationForm'])->name('register');
+Route::get('/get-regencies/{province_id}', [UserController::class, 'getRegencies']);
+Route::get('/get-districts/{regency_id}', [UserController::class, 'getDistricts']);
+Route::get('/get-villages/{district_id}', [UserController::class, 'getVillages']);
+Route::post('/register', [UserController::class, 'storePublic'])->name('register.store');
