@@ -59,7 +59,8 @@ class UserController extends Controller
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
-        };
+        }
+        ;
         try {
             $data = User::create(
                 [
@@ -73,6 +74,7 @@ class UserController extends Controller
             toastr()->success('Pengguna baru berhasil disimpan');
             return redirect()->route('manage-user.index');
         } catch (\Throwable $th) {
+            dd($th);
             toastr()->warning('Terdapat masalah diserver');
             return redirect()->route('manage-user.index');
         }
@@ -123,7 +125,8 @@ class UserController extends Controller
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
-        };
+        }
+        ;
 
         try {
             $user = User::findorfail($id);
@@ -134,7 +137,7 @@ class UserController extends Controller
                 'password' => Hash::make($request->password),
                 'email_verified_at' => !blank($request->verified) ? now() : null
             ];
-            if(empty($request->password)){
+            if (empty($request->password)) {
                 unset($update_data['password']);
             }
             $user->update($update_data);

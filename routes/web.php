@@ -6,6 +6,22 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ArmadaController;
+use App\Http\Controllers\PetugasController;
+use App\Http\Controllers\JadwalOperasionalController;
+use App\Http\Controllers\LokasiTpsController;
+use App\Http\Controllers\PenugasanPetugasController;
+use App\Http\Controllers\RuteController;
+use App\Http\Controllers\SampahController;
+use App\Http\Controllers\LaporanWargaController;
+use App\Http\Controllers\LaporanTpsController;
+use App\Http\Controllers\TrackingArmadaController;
+
+// Route untuk halaman utama
+Route::get('/', function () {
+    return view('welcome');
+});
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -20,21 +36,46 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::permanentRedirect('/', '/login');
+// Route::permanentRedirect('/', '/login');
 
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::resource('profil', ProfilController::class)->except('destroy');
 
+Route::resource('profil', ProfilController::class)->except('destroy');
 Route::resource('manage-user', UserController::class);
 Route::resource('manage-role', RoleController::class);
 Route::resource('manage-menu', MenuController::class);
 Route::resource('manage-permission', PermissionController::class)->only('store', 'destroy');
+
+// Armada Routes
+Route::resource('armada', ArmadaController::class);
+
+// Driver Routes
+Route::resource('petugas', PetugasController::class);
+
+// Jadwal Operasional Routes
+Route::resource('jadwal-operasional', JadwalOperasionalController::class);
+
+// Lokasi TPS Routes
+Route::resource('lokasi-tps', LokasiTpsController::class);
+
+// Penugasan Armada Routes
+Route::resource('penugasan-petugas', PenugasanPetugasController::class);
+
+// Rute Routes
+Route::resource('rute', RuteController::class);
+
+// Sampah Routes
+Route::resource('sampah', SampahController::class);
+
+// Laporan Warga Routes
+Route::resource('laporan-warga', LaporanWargaController::class);
+
+// Laporan TPS Routes
+Route::resource('laporan-tps', LaporanTpsController::class);
+
+Route::resource('tracking-armada', TrackingArmadaController::class)->only(['index', 'store', 'destroy']);
 
 
 Route::get('dbbackup', [DBBackupController::class, 'DBDataBackup']);

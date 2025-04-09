@@ -10,7 +10,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6 text-uppercase">
-                    <h4 class="m-0">manajemen pengguna</h4>
+                    <h4 class="m-0">master data</h4>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -23,7 +23,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card card-primary card-outline">
+                    <div class="card card-success card-outline">
                         <div class="card-header">
                             <h3 class="card-title">Data Pengguna</h3>
                             <div class="card-tools">

@@ -19,7 +19,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card card-primary card-outline">
+                    <div class="card card-success card-outline">
                         <div class="card-header">
                         </div>
                         <form method="post" action="{{ route('profil.update', auth()->user()->id) }}"

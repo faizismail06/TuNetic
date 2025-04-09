@@ -10,7 +10,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6 text-uppercase">
-                    <h4 class="m-0">manajemen pengguna</h4>
+                    <h4 class="m-0">master data</h4>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -23,7 +23,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card card-primary card-outline">
+                    <div class="card card-success card-outline">
                         <div class="card-header">
                             <h5 class="m-0"></h5>
                             <div class="card-tools">
@@ -59,8 +59,7 @@
                                                             action="{{ route('manage-permission.destroy', $permission->id) }}">
                                                             @csrf
                                                             @method('DELETE')
-                                                            {{ $permission->name }} <a class="text-danger confirm-button"
-                                                                href="#">x</a>
+                                                            {{ $permission->name }} <a class="text-danger confirm-button" href="#">x</a>
 
                                                         </form>
                                                     @endforeach
@@ -73,16 +72,15 @@
                                                 <div class="dropdown-menu" role="menu">
                                                     <a class="dropdown-item"
                                                         href="{{ route('manage-menu.edit', $item->id) }}">Edit</a>
-                                                    <form method="POST"
-                                                        action="{{ route('manage-menu.destroy', $item->id) }}">
+                                                    <form method="POST" action="{{ route('manage-menu.destroy', $item->id) }}">
                                                         @csrf
                                                         @method('DELETE')
                                                         <a class="dropdown-item confirm-button" href="#">Hapus</a>
                                                     </form>
                                                     <div class="dropdown-divider"></div>
                                                     <a class="dropdown-item" data-toggle="modal"
-                                                        data-target="#modal-default{{ $item->id }}"
-                                                        href="#">Tambah Permission</a>
+                                                        data-target="#modal-default{{ $item->id }}" href="#">Tambah
+                                                        Permission</a>
 
                                             </td>
                                         </tr>
@@ -99,10 +97,9 @@
                                                     <form action="{{ route('manage-permission.store') }}" method="post">
                                                         <div class="modal-body">
                                                             @csrf
-                                                            <input type="text" name="menu_id"
-                                                                value="{{ $item->id }}" hidden>
-                                                            <input type="text" name="permission" value=""
-                                                                class="form-control" placeholder="Permission">
+                                                            <input type="text" name="menu_id" value="{{ $item->id }}" hidden>
+                                                            <input type="text" name="permission" value="" class="form-control"
+                                                                placeholder="Permission">
 
                                                         </div>
                                                         <div class="modal-footer justify-content-between">
