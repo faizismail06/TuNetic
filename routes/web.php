@@ -39,7 +39,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::permanentRedirect('/', '/login');
+// Route::permanentRedirect('/', '/login');
 
 Auth::routes();
 
