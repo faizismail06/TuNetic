@@ -36,7 +36,7 @@ use Illuminate\Support\Facades\Route;
 // Route untuk halaman utama
 Route::get('/', function () {
     return view('welcome');
-});
+}); 
 
 Route::permanentRedirect('/', '/login');
 
