@@ -10,12 +10,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('armada', function (Blueprint $table) {
+        Schema::create('laporan_tps', function (Blueprint $table) {
             $table->id();
-            $table->string('jenis_kendaraan');
-            $table->string('merk_kendaraan');
-            $table->string('no_polisi', 15)->unique();
-            $table->integer('kapasitas');
+            $table->foreignId('id_petugas')->constrained('petugas');
+            $table->float('total_sampah');
+            $table->text('deskripsi');
+            $table->date('tanggal_pengangkutan')->nullable(); // Tambahkan kolom tanggal_pengangkutan
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('armada');
+        Schema::dropIfExists('laporan');
     }
 };

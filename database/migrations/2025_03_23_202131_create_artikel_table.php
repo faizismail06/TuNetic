@@ -11,10 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rute_tps', function (Blueprint $table) {
+        Schema::create('artikel', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_rute')->constrained('rute');
-            $table->foreignId('id_lokasi_tps')->constrained('lokasi_tps');
+            $table->string('judul_artikel');
+            $table->date('tanggal_publikasi'); // Tambahkan kolom tanggal_pengangkutan
+            $table->string('deskripsi_singkat');
+            $table->string('gambar');
+            $table->string('link_artikel');
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }
@@ -24,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rute_tps');
+        Schema::dropIfExists('artikel');
     }
 };

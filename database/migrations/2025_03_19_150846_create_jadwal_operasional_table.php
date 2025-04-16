@@ -17,7 +17,6 @@ return new class extends Migration {
             $table->foreignId('id_rute_tps')->constrained('rute_tps');
             // $table->date('tanggal');
             $table->time('jam_aktif');
-            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }
