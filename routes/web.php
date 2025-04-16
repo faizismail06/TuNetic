@@ -20,11 +20,6 @@ use App\Http\Controllers\LaporanTpsController;
 use App\Http\Controllers\TrackingArmadaController;
 use App\Http\Controllers\ArtikelController;
 
-// Route untuk halaman utama
-Route::get('/', function () {
-    return view('welcome');
-});
-
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -38,8 +33,12 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+// Route untuk halaman utama
+Route::get('/', function () {
+    return view('welcome');
+});
 
-// Route::permanentRedirect('/', '/login');
+Route::permanentRedirect('/', '/login');
 
 Auth::routes();
 
@@ -63,8 +62,16 @@ Route::resource('jadwal', JadwalController::class);
 // Jadwal Operasional Routes
 Route::resource('jadwal-operasional', JadwalOperasionalController::class);
 
-// Lokasi TPS Routes
-Route::resource('lokasi-tps', LokasiTpsController::class);
+// Route untuk menampilkan halaman peta dan daftar lokasi TPS
+Route::get('/lokasi-tps', [LokasiTpsController::class, 'index'])->name('lokasi-tps.index');
+
+// Route berikut dapat diaktifkan jika Anda ingin menggunakan fitur CRUD
+Route::get('/lokasi-tps/create', [LokasiTpsController::class, 'create'])->name('lokasi-tps.create');
+Route::post('/lokasi-tps', [LokasiTpsController::class, 'store'])->name('lokasi-tps.store');
+Route::get('/lokasi-tps/{lokasiTps}/edit', [LokasiTpsController::class, 'edit'])->name('lokasi-tps.edit');
+Route::put('/lokasi-tps/{lokasiTps}', [LokasiTpsController::class, 'update'])->name('lokasi-tps.update');
+Route::delete('/lokasi-tps/{lokasiTps}', [LokasiTpsController::class, 'destroy'])->name('lokasi-tps.destroy');
+
 
 // Penugasan Armada Routes
 Route::resource('penugasan-petugas', PenugasanPetugasController::class);
@@ -89,9 +96,3 @@ Route::resource('tracking-armada', TrackingArmadaController::class)->only(['inde
 Route::apiResource('artikel', ArtikelController::class);
 
 Route::get('dbbackup', [DBBackupController::class, 'DBDataBackup']);
-
-Route::get('/register', [UserController::class, 'showRegistrationForm'])->name('register');
-Route::get('/get-regencies/{province_id}', [UserController::class, 'getRegencies']);
-Route::get('/get-districts/{regency_id}', [UserController::class, 'getDistricts']);
-Route::get('/get-villages/{district_id}', [UserController::class, 'getVillages']);
-Route::post('/register', [UserController::class, 'storePublic'])->name('register.store');
