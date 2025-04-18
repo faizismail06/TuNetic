@@ -121,29 +121,52 @@ class LokasiTpsController extends Controller
     }
 
     /**
-     * Memperbarui lokasi TPS berdasarkan ID.
-     */
-    public function update(Request $request, $id)
-    {
-        try {
-            $lokasi = LokasiTps::findOrFail($id);
+ * Menampilkan form edit lokasi TPS.
+ */
+public function edit($id)
+{
+    try {
+        $lokasiTps = LokasiTps::findOrFail($id);
 
-            $validatedData = $request->validate([
-                'nama_lokasi' => 'sometimes|string|max:255',
-                'province_id' => 'sometimes|exists:reg_provinces,id',
-                'regency_id' => 'sometimes|exists:reg_regencies,id',
-                'district_id' => 'sometimes|exists:reg_districts,id',
-                'village_id' => 'sometimes|exists:reg_villages,id',
-                'latitude' => 'sometimes|numeric|between:-90,90',
-                'longitude' => 'sometimes|numeric|between:-180,180',
-            ]);
+        $provinces = Province::all();
+        $regencies = Regency::where('province_id', $lokasiTps->province_id)->get();
+        $districts = District::where('regency_id', $lokasiTps->regency_id)->get();
+        $villages = Village::where('district_id', $lokasiTps->district_id)->get();
 
-            $lokasi->update($validatedData);
-            return response()->json($lokasi, 200);
-        } catch (Exception $e) {
-            return response()->json(["error" => $e->getMessage()], 500);
-        }
+        return view('adminpusat.lokasi-tps.edit', compact(
+            'lokasiTps', 'provinces', 'regencies', 'districts', 'villages'
+        ));
+    } catch (Exception $e) {
+        return back()->with('error', 'Gagal memuat data untuk diedit: ' . $e->getMessage());
     }
+}
+
+/**
+ * Memperbarui lokasi TPS berdasarkan ID.
+ */
+public function update(Request $request, $id)
+{
+    try {
+        $lokasi = LokasiTps::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'nama_lokasi' => 'required|string|max:255',
+            'province_id' => 'required|exists:reg_provinces,id',
+            'regency_id' => 'required|exists:reg_regencies,id',
+            'district_id' => 'required|exists:reg_districts,id',
+            'village_id' => 'required|exists:reg_villages,id',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+        ]);
+
+        $lokasi->update($validatedData);
+
+        return redirect()->route('lokasi-tps.index')->with('success', 'Lokasi TPS berhasil diperbarui.');
+    } catch (Exception $e) {
+        return back()->withInput()->with('error', 'Gagal memperbarui lokasi TPS: ' . $e->getMessage());
+    }
+}
+
 
     /**
      * Menghapus lokasi TPS berdasarkan ID.

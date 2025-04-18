@@ -91,7 +91,7 @@
                 $('#datatable-main').DataTable().clear().destroy();
             }
 
-            
+
         });
     </script>
 
