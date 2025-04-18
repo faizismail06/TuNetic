@@ -36,7 +36,7 @@ use Illuminate\Support\Facades\Route;
 // Route untuk halaman utama
 Route::get('/', function () {
     return view('welcome');
-}); 
+});
 
 Route::permanentRedirect('/', '/login');
 
@@ -71,7 +71,9 @@ Route::post('/lokasi-tps', [LokasiTpsController::class, 'store'])->name('lokasi-
 Route::get('/lokasi-tps/{lokasiTps}/edit', [LokasiTpsController::class, 'edit'])->name('lokasi-tps.edit');
 Route::put('/lokasi-tps/{lokasiTps}', [LokasiTpsController::class, 'update'])->name('lokasi-tps.update');
 Route::delete('/lokasi-tps/{lokasiTps}', [LokasiTpsController::class, 'destroy'])->name('lokasi-tps.destroy');
-
+Route::get('lokasi-tps/get-regencies', [LokasiTpsController::class, 'getRegencies'])->name('lokasi-tps.getRegencies');
+Route::get('lokasi-tps/get-districts', [LokasiTpsController::class, 'getDistricts'])->name('lokasi-tps.getDistricts');
+Route::get('lokasi-tps/get-villages', [LokasiTpsController::class, 'getVillages'])->name('lokasi-tps.getVillages');
 
 // Penugasan Armada Routes
 Route::resource('penugasan-petugas', PenugasanPetugasController::class);

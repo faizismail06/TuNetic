@@ -19,32 +19,32 @@ class MasterSeeder extends Seeder
      */
     public function run()
     {
-        // Buat Menu Utama
-        $menuManajemen = Menu::create([
-            'nama_menu' => 'Menu Manajemen',
+        // ==================== MENU ADMIN PUSAT ====================
+        $menuAdminPusat = Menu::create([
+            'nama_menu' => 'Menu Admin Pusat',
             'url' => '#',
             'icon' => 'fas fa-cogs',
             'parent_id' => '0',
             'urutan' => 1
         ]);
 
-        // Dashboard Menu
-        $dashboardMenu = Menu::create([
+        // Dashboard Admin Pusat
+        $dashboardAdmin = Menu::create([
             'nama_menu' => 'Dashboard',
-            'url' => 'home',
+            'url' => 'admin/home',
             'icon' => 'fas fa-home',
-            'parent_id' => $menuManajemen->id,
+            'parent_id' => $menuAdminPusat->id,
             'urutan' => 1
         ]);
 
-        Permission::create(['name' => 'access_dashboard', 'menu_id' => $dashboardMenu->id]);
+        Permission::create(['name' => 'access_dashboard', 'menu_id' => $dashboardAdmin->id]);
 
         // Manajemen Data Menu
         $manajemenData = Menu::create([
             'nama_menu' => 'Manajemen Data',
             'url' => '#',
             'icon' => 'fas fa-users-cog',
-            'parent_id' => $menuManajemen->id,
+            'parent_id' => $menuAdminPusat->id,
             'urutan' => 2
         ]);
 
@@ -118,7 +118,7 @@ class MasterSeeder extends Seeder
             'nama_menu' => 'Laporan Pengaduan',
             'url' => 'laporan-pengaduan',
             'icon' => 'far fa-comment',
-            'parent_id' => $menuManajemen->id,
+            'parent_id' => $menuAdminPusat->id,
             'urutan' => 3
         ]);
 
@@ -131,7 +131,7 @@ class MasterSeeder extends Seeder
             'nama_menu' => 'Artikel',
             'url' => 'artikel',
             'icon' => 'fas fa-newspaper',
-            'parent_id' => $menuManajemen->id,
+            'parent_id' => $menuAdminPusat->id,
             'urutan' => 4
         ]);
 
@@ -145,7 +145,7 @@ class MasterSeeder extends Seeder
             'nama_menu' => 'Jadwal Armada',
             'url' => '#',
             'icon' => 'fas fa-truck',
-            'parent_id' => $menuManajemen->id,
+            'parent_id' => $menuAdminPusat->id,
             'urutan' => 5
         ]);
 
@@ -175,12 +175,25 @@ class MasterSeeder extends Seeder
         Permission::create(['name' => 'update_jadwal_operasional', 'menu_id' => $jadwalOperasional->id]);
         Permission::create(['name' => 'delete_jadwal_operasional', 'menu_id' => $jadwalOperasional->id]);
 
+        // Petugas Armada (New)
+        // $petugasArmada = Menu::create([
+        //     'nama_menu' => 'Petugas Armada',
+        //     'url' => 'petugas-armada',
+        //     'parent_id' => $jadwalArmada->id,
+        //     'urutan' => 3
+        // ]);
+
+        // Permission::create(['name' => 'create_petugas_armada', 'menu_id' => $petugasArmada->id]);
+        // Permission::create(['name' => 'read_petugas_armada', 'menu_id' => $petugasArmada->id]);
+        // Permission::create(['name' => 'update_petugas_armada', 'menu_id' => $petugasArmada->id]);
+        // Permission::create(['name' => 'delete_petugas_armada', 'menu_id' => $petugasArmada->id]);
+
         // Perhitungan Sampah
         $perhitunganSampah = Menu::create([
             'nama_menu' => 'Perhitungan Sampah',
             'url' => 'perhitungan-sampah',
             'icon' => 'fas fa-calculator',
-            'parent_id' => $menuManajemen->id,
+            'parent_id' => $menuAdminPusat->id,
             'urutan' => 6
         ]);
 
@@ -190,24 +203,24 @@ class MasterSeeder extends Seeder
         Permission::create(['name' => 'delete_perhitungan', 'menu_id' => $perhitunganSampah->id]);
 
         // Profile
-        $profile = Menu::create([
+        $profileAdmin = Menu::create([
             'nama_menu' => 'Profile',
-            'url' => 'profile',
+            'url' => 'admin/profile',
             'icon' => 'fas fa-user',
-            'parent_id' => $menuManajemen->id,
+            'parent_id' => $menuAdminPusat->id,
             'urutan' => 7
         ]);
 
-        Permission::create(['name' => 'access_profile', 'menu_id' => $profile->id]);
-        Permission::create(['name' => 'update_profile', 'menu_id' => $profile->id]);
+        Permission::create(['name' => 'access_profile', 'menu_id' => $profileAdmin->id]);
+        Permission::create(['name' => 'update_profile', 'menu_id' => $profileAdmin->id]);
 
         // Backup Server Menu (Admin Only)
         $backupServer = Menu::create([
             'nama_menu' => 'Backup Server',
             'url' => '#',
             'icon' => 'fas fa-server',
-            'parent_id' => '0',
-            'urutan' => 2
+            'parent_id' => $menuAdminPusat->id,
+            'urutan' => 8
         ]);
 
         $backupDatabase = Menu::create([
@@ -220,7 +233,65 @@ class MasterSeeder extends Seeder
 
         Permission::create(['name' => 'backup_database', 'menu_id' => $backupDatabase->id]);
 
-        // Buat petugas menu
+        // ==================== MENU ADMIN TPST ====================
+        $menuAdminTpst = Menu::create([
+            'nama_menu' => 'Menu Admin TPST',
+            'url' => '#',
+            'icon' => 'fas fa-recycle',
+            'parent_id' => '0',
+            'urutan' => 2
+        ]);
+
+        // Dashboard Admin TPST
+        $dashboardAdminTpst = Menu::create([
+            'nama_menu' => 'Dashboard',
+            'url' => 'tpst/home',
+            'icon' => 'fas fa-home',
+            'parent_id' => $menuAdminTpst->id,
+            'urutan' => 1
+        ]);
+
+        Permission::create(['name' => 'access_tpst_dashboard', 'menu_id' => $dashboardAdminTpst->id]);
+
+        // Jadwal & Rute
+        $jadwalRuteTpst = Menu::create([
+            'nama_menu' => 'Jadwal & Rute',
+            'url' => 'tpst/jadwal-rute',
+            'icon' => 'fas fa-route',
+            'parent_id' => $menuAdminTpst->id,
+            'urutan' => 2
+        ]);
+
+        Permission::create(['name' => 'read_jadwal_rute_tpst', 'menu_id' => $jadwalRuteTpst->id]);
+        Permission::create(['name' => 'update_jadwal_rute_tpst', 'menu_id' => $jadwalRuteTpst->id]);
+
+        // Perhitungan Sampah TPST
+        $perhitunganSampahTpst = Menu::create([
+            'nama_menu' => 'Perhitungan Sampah',
+            'url' => 'tpst/perhitungan-sampah',
+            'icon' => 'fas fa-calculator',
+            'parent_id' => $menuAdminTpst->id,
+            'urutan' => 3
+        ]);
+
+        Permission::create(['name' => 'create_perhitungan_tpst', 'menu_id' => $perhitunganSampahTpst->id]);
+        Permission::create(['name' => 'read_perhitungan_tpst', 'menu_id' => $perhitunganSampahTpst->id]);
+        Permission::create(['name' => 'update_perhitungan_tpst', 'menu_id' => $perhitunganSampahTpst->id]);
+        Permission::create(['name' => 'delete_perhitungan_tpst', 'menu_id' => $perhitunganSampahTpst->id]);
+
+        // Profile Admin TPST
+        $profileAdminTpst = Menu::create([
+            'nama_menu' => 'Profile',
+            'url' => 'tpst/profile',
+            'icon' => 'fas fa-user',
+            'parent_id' => $menuAdminTpst->id,
+            'urutan' => 4
+        ]);
+
+        Permission::create(['name' => 'access_tpst_profile', 'menu_id' => $profileAdminTpst->id]);
+        Permission::create(['name' => 'update_tpst_profile', 'menu_id' => $profileAdminTpst->id]);
+
+        // ==================== MENU PETUGAS ====================
         $menuPetugas = Menu::create([
             'nama_menu' => 'Menu Petugas',
             'url' => '#',
@@ -231,7 +302,7 @@ class MasterSeeder extends Seeder
 
         // Dashboard Petugas
         $dashboardPetugas = Menu::create([
-            'nama_menu' => 'Dashboard',
+            'nama_menu' => 'Home',
             'url' => 'petugas/home',
             'icon' => 'fas fa-home',
             'parent_id' => $menuPetugas->id,
@@ -240,29 +311,29 @@ class MasterSeeder extends Seeder
 
         Permission::create(['name' => 'access_petugas_dashboard', 'menu_id' => $dashboardPetugas->id]);
 
-        // Jadwal Tugas
-        $jadwalTugas = Menu::create([
-            'nama_menu' => 'Jadwal Tugas',
+        // Jadwal Pengambilan
+        $jadwalPengambilan = Menu::create([
+            'nama_menu' => 'Jadwal Pengambilan',
             'url' => 'petugas/jadwal',
             'icon' => 'fas fa-calendar-alt',
             'parent_id' => $menuPetugas->id,
             'urutan' => 2
         ]);
 
-        Permission::create(['name' => 'read_jadwal_tugas', 'menu_id' => $jadwalTugas->id]);
+        Permission::create(['name' => 'read_jadwal_pengambilan', 'menu_id' => $jadwalPengambilan->id]);
 
-        // Laporan Aktivitas
-        $laporanAktivitas = Menu::create([
-            'nama_menu' => 'Laporan Aktivitas',
-            'url' => 'petugas/laporan',
+        // Lapor Sampah
+        $laporSampah = Menu::create([
+            'nama_menu' => 'Lapor Sampah',
+            'url' => 'petugas/lapor',
             'icon' => 'fas fa-clipboard-list',
             'parent_id' => $menuPetugas->id,
             'urutan' => 3
         ]);
 
-        Permission::create(['name' => 'create_laporan_aktivitas', 'menu_id' => $laporanAktivitas->id]);
-        Permission::create(['name' => 'read_laporan_aktivitas', 'menu_id' => $laporanAktivitas->id]);
-        Permission::create(['name' => 'update_laporan_aktivitas', 'menu_id' => $laporanAktivitas->id]);
+        Permission::create(['name' => 'create_laporan_sampah', 'menu_id' => $laporSampah->id]);
+        Permission::create(['name' => 'read_laporan_sampah', 'menu_id' => $laporSampah->id]);
+        Permission::create(['name' => 'update_laporan_sampah', 'menu_id' => $laporSampah->id]);
 
         // Profile Petugas
         $profilePetugas = Menu::create([
@@ -276,51 +347,143 @@ class MasterSeeder extends Seeder
         Permission::create(['name' => 'access_petugas_profile', 'menu_id' => $profilePetugas->id]);
         Permission::create(['name' => 'update_petugas_profile', 'menu_id' => $profilePetugas->id]);
 
-// Setup for role_has_menus - Admin (exclude Menu Petugas)
-        $adminMenuIds = Menu::where(function ($query) use ($menuManajemen, $backupServer, $manajemenData, $jadwalArmada) {
-            $query->where('parent_id', 0)
-                ->where('nama_menu', '!=', 'Menu Petugas') // exclude Menu Petugas
+        // ==================== MENU USER BIASA/MASYARAKAT ====================
+        $menuUser = Menu::create([
+            'nama_menu' => 'Menu User',
+            'url' => '#',
+            'icon' => 'fas fa-users',
+            'parent_id' => '0',
+            'urutan' => 4
+        ]);
+
+        // Home User
+        $homeUser = Menu::create([
+            'nama_menu' => 'Home',
+            'url' => 'user/home',
+            'icon' => 'fas fa-home',
+            'parent_id' => $menuUser->id,
+            'urutan' => 1
+        ]);
+
+        Permission::create(['name' => 'access_user_home', 'menu_id' => $homeUser->id]);
+
+        // Laporan Sampah
+        $laporanSampahUser = Menu::create([
+            'nama_menu' => 'Laporan Sampah',
+            'url' => 'user/laporan-sampah',
+            'icon' => 'fas fa-trash',
+            'parent_id' => $menuUser->id,
+            'urutan' => 2
+        ]);
+
+        Permission::create(['name' => 'create_laporan_sampah_user', 'menu_id' => $laporanSampahUser->id]);
+        Permission::create(['name' => 'read_laporan_sampah_user', 'menu_id' => $laporanSampahUser->id]);
+
+        // Rute Armada
+        $ruteArmadaUser = Menu::create([
+            'nama_menu' => 'Rute Armada',
+            'url' => 'user/rute-armada',
+            'icon' => 'fas fa-route',
+            'parent_id' => $menuUser->id,
+            'urutan' => 3
+        ]);
+
+        Permission::create(['name' => 'view_rute_armada', 'menu_id' => $ruteArmadaUser->id]);
+
+        // Profile User
+        $profileUser = Menu::create([
+            'nama_menu' => 'Profile',
+            'url' => 'user/profile',
+            'icon' => 'fas fa-user',
+            'parent_id' => $menuUser->id,
+            'urutan' => 4
+        ]);
+
+        Permission::create(['name' => 'access_user_profile', 'menu_id' => $profileUser->id]);
+        Permission::create(['name' => 'update_user_profile', 'menu_id' => $profileUser->id]);
+
+        // ==================== ROLE MANAGEMENT ====================
+
+        // Get menu IDs for each role
+        $adminPusatMenuIds = Menu::where(function ($query) use ($menuAdminPusat, $manajemenData, $jadwalArmada, $backupServer) {
+            $query->where('id', $menuAdminPusat->id)
+                ->orWhere('parent_id', $menuAdminPusat->id)
                 ->orWhereIn('parent_id', [
-                    $menuManajemen->id,
-                    $backupServer->id,
                     $manajemenData->id,
-                    $jadwalArmada->id
+                    $jadwalArmada->id,
+                    $backupServer->id
                 ]);
-        })
-        ->pluck('id');
+        })->pluck('id');
 
+        $adminTpstMenuIds = Menu::where(function ($query) use ($menuAdminTpst) {
+            $query->where('id', $menuAdminTpst->id)
+                ->orWhere('parent_id', $menuAdminTpst->id);
+        })->pluck('id');
 
-        // Setup for role_has_menus - Petugas
-        $petugasMenuIds = Menu::where('parent_id', $menuPetugas->id)->pluck('id');
-        $petugasMenuIds[] = $menuPetugas->id;
+        $petugasMenuIds = Menu::where(function ($query) use ($menuPetugas) {
+            $query->where('id', $menuPetugas->id)
+                ->orWhere('parent_id', $menuPetugas->id);
+        })->pluck('id');
 
-        // Create admin role with level 1
-        $adminRole = Role::create(['name' => 'admin', 'level' => 1]);
+        $userMenuIds = Menu::where(function ($query) use ($menuUser) {
+            $query->where('id', $menuUser->id)
+                ->orWhere('parent_id', $menuUser->id);
+        })->pluck('id');
 
-        // Create petugas role with level 2
+        // Create roles with levels
+        $adminPusatRole = Role::create(['name' => 'admin_pusat', 'level' => 1]);
+        $adminTpstRole = Role::create(['name' => 'admin_tpst', 'level' => 2]);
         $petugasRole = Role::create(['name' => 'petugas', 'level' => 3]);
+        $userRole = Role::create(['name' => 'user', 'level' => 4]);
 
-        // Assign all permissions to admin
-        $adminPermissions = Permission::all();
-        $adminRole->givePermissionTo($adminPermissions);
+        // Get all permissions
+        $allPermissions = Permission::all();
 
-        // Assign petugas-specific permissions
-        $petugasPermissions = Permission::whereIn('name', [
-            'access_petugas_dashboard',
-            'read_jadwal_tugas',
-            'create_laporan_aktivitas',
-            'read_laporan_aktivitas',
-            'update_laporan_aktivitas',
-            'access_petugas_profile',
-            'update_petugas_profile'
+        // Get permissions for each role
+        $adminPusatPermissions = Permission::whereNotIn('name', [
+            'access_tpst_dashboard', 'read_jadwal_rute_tpst', 'update_jadwal_rute_tpst',
+            'create_perhitungan_tpst', 'read_perhitungan_tpst', 'update_perhitungan_tpst', 'delete_perhitungan_tpst',
+            'access_tpst_profile', 'update_tpst_profile',
+            'access_petugas_dashboard', 'read_jadwal_pengambilan', 'create_laporan_sampah',
+            'read_laporan_sampah', 'update_laporan_sampah', 'access_petugas_profile', 'update_petugas_profile',
+            'access_user_home', 'create_laporan_sampah_user', 'read_laporan_sampah_user',
+            'view_rute_armada', 'access_user_profile', 'update_user_profile'
         ])->get();
+
+        $adminTpstPermissions = Permission::whereIn('name', [
+            'access_tpst_dashboard', 'read_jadwal_rute_tpst', 'update_jadwal_rute_tpst',
+            'create_perhitungan_tpst', 'read_perhitungan_tpst', 'update_perhitungan_tpst', 'delete_perhitungan_tpst',
+            'access_tpst_profile', 'update_tpst_profile'
+        ])->get();
+
+        $petugasPermissions = Permission::whereIn('name', [
+            'access_petugas_dashboard', 'read_jadwal_pengambilan', 'create_laporan_sampah',
+            'read_laporan_sampah', 'update_laporan_sampah', 'access_petugas_profile', 'update_petugas_profile'
+        ])->get();
+
+        $userPermissions = Permission::whereIn('name', [
+            'access_user_home', 'create_laporan_sampah_user', 'read_laporan_sampah_user',
+            'view_rute_armada', 'access_user_profile', 'update_user_profile'
+        ])->get();
+
+        // Assign permissions to roles
+        $adminPusatRole->givePermissionTo($adminPusatPermissions);
+        $adminTpstRole->givePermissionTo($adminTpstPermissions);
         $petugasRole->givePermissionTo($petugasPermissions);
+        $userRole->givePermissionTo($userPermissions);
 
         // Assign menus to roles
-        foreach ($adminMenuIds as $menuId) {
+        foreach ($adminPusatMenuIds as $menuId) {
             DB::table('role_has_menus')->insert([
                 'menu_id' => $menuId,
-                'role_id' => $adminRole->id
+                'role_id' => $adminPusatRole->id
+            ]);
+        }
+
+        foreach ($adminTpstMenuIds as $menuId) {
+            DB::table('role_has_menus')->insert([
+                'menu_id' => $menuId,
+                'role_id' => $adminTpstRole->id
             ]);
         }
 
@@ -331,24 +494,48 @@ class MasterSeeder extends Seeder
             ]);
         }
 
-        // Create admin user
-        $admin = User::create([
-            'name' => 'Admin Utama',
-            'email' => 'admin@example.com',
+        foreach ($userMenuIds as $menuId) {
+            DB::table('role_has_menus')->insert([
+                'menu_id' => $menuId,
+                'role_id' => $userRole->id
+            ]);
+        }
+
+        // Create sample users for each role
+        $adminPusat = User::create([
+            'name' => 'Admin Pusat',
+            'email' => 'admin.pusat@example.com',
             'password' => Hash::make('adminadmin'),
-            'alamat' => 'Jl. Contoh No. 123',
+            'alamat' => 'Jl. Pusat No. 123',
             'level' => 1,
         ]);
-        $admin->assignRole('admin');
+        $adminPusat->assignRole('admin_pusat');
 
-        // Create petugas user
+        $adminTpst = User::create([
+            'name' => 'Admin TPST',
+            'email' => 'admin.tpst@example.com',
+            'password' => Hash::make('admintpst'),
+            'alamat' => 'Jl. TPST No. 45',
+            'level' => 2,
+        ]);
+        $adminTpst->assignRole('admin_tpst');
+
         $petugas = User::create([
             'name' => 'Petugas Sampah',
             'email' => 'petugas@example.com',
             'password' => Hash::make('petugaspetugas'),
-            'alamat' => 'Jl. Kebersihan No. 45',
+            'alamat' => 'Jl. Kebersihan No. 67',
             'level' => 3,
         ]);
         $petugas->assignRole('petugas');
+
+        $user = User::create([
+            'name' => 'User Biasa',
+            'email' => 'user@example.com',
+            'password' => Hash::make('useruser'),
+            'alamat' => 'Jl. Warga No. 89',
+            'level' => 4,
+        ]);
+        $user->assignRole('user');
     }
 }

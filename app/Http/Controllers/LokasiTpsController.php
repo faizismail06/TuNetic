@@ -149,6 +149,36 @@ class LokasiTpsController extends Controller
         }
     }
 
+    /**
+ * Mendapatkan daftar kabupaten berdasarkan provinsi
+ */
+    public function getRegencies(Request $request)
+    {
+        $provinceId = $request->province_id;
+        $regencies = Regency::where('province_id', $provinceId)->get();
+        return response()->json($regencies);
+    }
+
+    /**
+     * Mendapatkan daftar kecamatan berdasarkan kabupaten
+     */
+    public function getDistricts(Request $request)
+    {
+        $regencyId = $request->regency_id;
+        $districts = District::where('regency_id', $regencyId)->get();
+        return response()->json($districts);
+    }
+
+    /**
+     * Mendapatkan daftar desa berdasarkan kecamatan
+     */
+    public function getVillages(Request $request)
+    {
+        $districtId = $request->district_id;
+        $villages = Village::where('district_id', $districtId)->get();
+        return response()->json($villages);
+    }
+
     public function indexView()
     {
         // Ambil data TPS dari database (opsional jika ingin menampilkan data di peta)
