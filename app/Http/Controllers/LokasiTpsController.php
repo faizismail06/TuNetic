@@ -25,6 +25,16 @@ class LokasiTpsController extends Controller
         }
     }
 
+    public function ruteArmada()
+    {
+        try {
+            $ruteArmada = LokasiTps::with(['province', 'regency', 'district', 'village'])->get();
+            return view('user.rute-armada.index', compact('ruteArmada'));
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
     /**
      * Menampilkan form create lokasi TPS.
      */
@@ -94,8 +104,8 @@ class LokasiTpsController extends Controller
             * cos(radians(longitude) - radians(?))
             + sin(radians(?)) * sin(radians(latitude)))) AS distance
         ", [$latitude, $longitude, $latitude])
-        ->orderByRaw("distance ASC")
-        ->first();
+            ->orderByRaw("distance ASC")
+            ->first();
 
         if (!$nearestTps) {
             return response()->json(["message" => "Tidak ada TPS terdekat ditemukan"], 404);
@@ -143,15 +153,17 @@ class LokasiTpsController extends Controller
         try {
             $lokasi = LokasiTps::findOrFail($id);
             $lokasi->delete();
-            return response()->json(["message" => "Lokasi TPS berhasil dihapus"], 200);
+            return redirect()
+                ->route('lokasi-tps.index')
+                ->with('success', 'Lokasi TPS berhasil dihapus.');
         } catch (Exception $e) {
             return response()->json(["error" => $e->getMessage()], 500);
         }
     }
 
     /**
- * Mendapatkan daftar kabupaten berdasarkan provinsi
- */
+     * Mendapatkan daftar kabupaten berdasarkan provinsi
+     */
     public function getRegencies(Request $request)
     {
         $provinceId = $request->province_id;
@@ -187,5 +199,4 @@ class LokasiTpsController extends Controller
         // Menampilkan view dengan data TPS
         return view('adminpusat.lokasi-tps.index', compact('lokasi'));
     }
-
 }

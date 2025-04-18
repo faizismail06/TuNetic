@@ -75,6 +75,8 @@ Route::get('lokasi-tps/get-regencies', [LokasiTpsController::class, 'getRegencie
 Route::get('lokasi-tps/get-districts', [LokasiTpsController::class, 'getDistricts'])->name('lokasi-tps.getDistricts');
 Route::get('lokasi-tps/get-villages', [LokasiTpsController::class, 'getVillages'])->name('lokasi-tps.getVillages');
 
+Route::get('user/rute-armada', [LokasiTpsController::class, 'ruteArmada'])->name('rute-armada.index');
+
 // Penugasan Armada Routes
 Route::resource('penugasan-petugas', PenugasanPetugasController::class);
 
