@@ -70,13 +70,16 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \App\Models\User
      */
-    protected function create(array $data)
+        protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'level' => 4,
         ]);
+
+        $user->assignRole('user'); // Ini WAJIB untuk assign permission
+        return $user;
     }
 }

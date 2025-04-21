@@ -146,10 +146,11 @@ class UserController extends Controller
                     'district_id' => $request->district_id,
                     'village_id' => $request->village_id,
                     'alamat' => $request->alamat,
+                    'level' => 4,
                     'email_verified_at' => !blank($request->verified) ? now() : null
                 ]
             );
-            $data->assignRole(!blank($request->role) ? $request->role : array());
+            $data->assignRole('user'); // Tambahkan ini agar user mendapat permission-nya
             toastr()->success('Pengguna baru berhasil disimpan');
             return redirect()->route('login');
         } catch (\Throwable $th) {
