@@ -48,7 +48,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="card card-warning card-outline">
+                    <div class="card card-success card-outline">
                         <div class="card-header">
                             <h3 class="card-title">Form Edit Lokasi TPS</h3>
                         </div>

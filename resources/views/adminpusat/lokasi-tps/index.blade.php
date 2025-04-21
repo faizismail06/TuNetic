@@ -23,7 +23,7 @@
 
     <div class="content">
         <div class="container-fluid mt-4">
-            <div class="card card-primary card-outline">
+            <div class="card card-success card-outline">
                 <div class="card-header">
                     <h5 class="m-0">Daftar Lokasi TPS</h5>
                     <div class="card-tools">
@@ -58,12 +58,14 @@
                                         {{ $item->province->name ?? '-' }}
                                     </td>
                                     <td>
+                                        <div class="text-center">
                                         <a href="{{ route('lokasi-tps.edit', $item->id) }}" class="btn btn-sm btn-warning">Edit</a>
                                         <form action="{{ route('lokasi-tps.destroy', $item->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button class="btn btn-sm btn-danger confirm-button">Hapus</button>
                                         </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

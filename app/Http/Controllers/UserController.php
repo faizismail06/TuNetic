@@ -193,12 +193,11 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'email' => 'required|string|email:rfc',
             'role' => 'nullable',
-            'alamat' => 'nullable|string',
-            'level' => 'required|integer|in:1,2,3,4',
             'verified' => 'nullable|string',
         ]);
 
@@ -217,7 +216,6 @@ class UserController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'level' => $request->level,
                 'email_verified_at' => !blank($request->verified) ? now() : null
             ];
             if (empty($request->password)) {
