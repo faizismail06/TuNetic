@@ -30,7 +30,8 @@ class JadwalOperasionalController extends Controller
                 'id_jadwal' => 'required|exists:jadwal,id',
                 'id_rute_tps' => 'required|exists:rute_tps,id',
                 'jam_aktif' => 'required|date_format:H:i:s',
-        
+                'status' => 'required|integer|in:0,1,2', // 0 = Belum berjalan, 1 = Sedang Berjalan, 2 = Selesai
+
             ]);
 
             // Simpan ke database
@@ -80,6 +81,7 @@ class JadwalOperasionalController extends Controller
                 'id_jadwal' => 'sometimes|exists:jadwal,id',
                 'id_rute_tps' => 'sometimes|exists:rute_tps,id',
                 'jam_aktif' => 'sometimes|date_format:H:i:s',
+                'status' => 'sometimes|integer|in:0,1,2', // 0 = Belum berjalan, 1 = Sedang Berjalan, 2 = Selesai
             ]);
 
             $jadwal->update($validatedData);
