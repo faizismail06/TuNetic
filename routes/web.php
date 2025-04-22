@@ -22,6 +22,8 @@ use App\Http\Controllers\ArtikelController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,7 +42,9 @@ Route::get('/', function () {
 
 Route::permanentRedirect('/', '/login');
 
-Auth::routes();
+// Auth::routes();
+Auth::routes(['verify' => true]);
+
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -100,3 +104,17 @@ Route::resource('tracking-armada', TrackingArmadaController::class)->only(['inde
 Route::apiResource('artikel', ArtikelController::class);
 
 Route::get('dbbackup', [DBBackupController::class, 'DBDataBackup']);
+
+Route::get('/email/verify', function () {
+    return view('auth.verify'); // atau view lain sesuai struktur kamu
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill(); // Verifikasi email user
+    return redirect('/home'); // Atau arahkan ke halaman sukses lainnya
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('resent', true);
+})->middleware(['auth', 'throttle:6,1'])->name('verification.resend');
