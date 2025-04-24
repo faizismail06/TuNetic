@@ -11,6 +11,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 
 
+
 class RegisterController extends Controller
 {
     /*
@@ -42,7 +43,7 @@ class RegisterController extends Controller
     {
         $this->middleware('guest');
     }
-    
+
     /**
      * Get a validator for an incoming registration request.
      *
@@ -57,14 +58,6 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }
-
-//     protected function registered($request, $user)
-// {
-//     auth()->guard('web')->logout(); // Pastikan logout menggunakan guard yang benar
-//     return redirect('/login')->with('success', 'Registrasi berhasil! Silakan login.');
-// }
-
-    
 
     /**
      * Create a new user instance after a valid registration.
