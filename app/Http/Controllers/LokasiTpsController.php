@@ -25,6 +25,16 @@ class LokasiTpsController extends Controller
         }
     }
 
+    public function ruteArmada()
+    {
+        try {
+            $ruteArmada = LokasiTps::with(['province', 'regency', 'district', 'village'])->get();
+            return view('user.rute-armada.index', compact('ruteArmada'));
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
     /**
      * Menampilkan form create lokasi TPS.
      */
@@ -94,8 +104,8 @@ class LokasiTpsController extends Controller
             * cos(radians(longitude) - radians(?))
             + sin(radians(?)) * sin(radians(latitude)))) AS distance
         ", [$latitude, $longitude, $latitude])
-        ->orderByRaw("distance ASC")
-        ->first();
+            ->orderByRaw("distance ASC")
+            ->first();
 
         if (!$nearestTps) {
             return response()->json(["message" => "Tidak ada TPS terdekat ditemukan"], 404);
@@ -111,29 +121,52 @@ class LokasiTpsController extends Controller
     }
 
     /**
-     * Memperbarui lokasi TPS berdasarkan ID.
-     */
-    public function update(Request $request, $id)
-    {
-        try {
-            $lokasi = LokasiTps::findOrFail($id);
+ * Menampilkan form edit lokasi TPS.
+ */
+public function edit($id)
+{
+    try {
+        $lokasiTps = LokasiTps::findOrFail($id);
 
-            $validatedData = $request->validate([
-                'nama_lokasi' => 'sometimes|string|max:255',
-                'province_id' => 'sometimes|exists:reg_provinces,id',
-                'regency_id' => 'sometimes|exists:reg_regencies,id',
-                'district_id' => 'sometimes|exists:reg_districts,id',
-                'village_id' => 'sometimes|exists:reg_villages,id',
-                'latitude' => 'sometimes|numeric|between:-90,90',
-                'longitude' => 'sometimes|numeric|between:-180,180',
-            ]);
+        $provinces = Province::all();
+        $regencies = Regency::where('province_id', $lokasiTps->province_id)->get();
+        $districts = District::where('regency_id', $lokasiTps->regency_id)->get();
+        $villages = Village::where('district_id', $lokasiTps->district_id)->get();
 
-            $lokasi->update($validatedData);
-            return response()->json($lokasi, 200);
-        } catch (Exception $e) {
-            return response()->json(["error" => $e->getMessage()], 500);
-        }
+        return view('adminpusat.lokasi-tps.edit', compact(
+            'lokasiTps', 'provinces', 'regencies', 'districts', 'villages'
+        ));
+    } catch (Exception $e) {
+        return back()->with('error', 'Gagal memuat data untuk diedit: ' . $e->getMessage());
     }
+}
+
+/**
+ * Memperbarui lokasi TPS berdasarkan ID.
+ */
+public function update(Request $request, $id)
+{
+    try {
+        $lokasi = LokasiTps::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'nama_lokasi' => 'required|string|max:255',
+            'province_id' => 'required|exists:reg_provinces,id',
+            'regency_id' => 'required|exists:reg_regencies,id',
+            'district_id' => 'required|exists:reg_districts,id',
+            'village_id' => 'required|exists:reg_villages,id',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+        ]);
+
+        $lokasi->update($validatedData);
+
+        return redirect()->route('lokasi-tps.index')->with('success', 'Lokasi TPS berhasil diperbarui.');
+    } catch (Exception $e) {
+        return back()->withInput()->with('error', 'Gagal memperbarui lokasi TPS: ' . $e->getMessage());
+    }
+}
+
 
     /**
      * Menghapus lokasi TPS berdasarkan ID.
@@ -143,10 +176,42 @@ class LokasiTpsController extends Controller
         try {
             $lokasi = LokasiTps::findOrFail($id);
             $lokasi->delete();
-            return response()->json(["message" => "Lokasi TPS berhasil dihapus"], 200);
+            return redirect()
+                ->route('lokasi-tps.index')
+                ->with('success', 'Lokasi TPS berhasil dihapus.');
         } catch (Exception $e) {
             return response()->json(["error" => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Mendapatkan daftar kabupaten berdasarkan provinsi
+     */
+    public function getRegencies(Request $request)
+    {
+        $provinceId = $request->province_id;
+        $regencies = Regency::where('province_id', $provinceId)->get();
+        return response()->json($regencies);
+    }
+
+    /**
+     * Mendapatkan daftar kecamatan berdasarkan kabupaten
+     */
+    public function getDistricts(Request $request)
+    {
+        $regencyId = $request->regency_id;
+        $districts = District::where('regency_id', $regencyId)->get();
+        return response()->json($districts);
+    }
+
+    /**
+     * Mendapatkan daftar desa berdasarkan kecamatan
+     */
+    public function getVillages(Request $request)
+    {
+        $districtId = $request->district_id;
+        $villages = Village::where('district_id', $districtId)->get();
+        return response()->json($villages);
     }
 
     public function indexView()
@@ -157,5 +222,4 @@ class LokasiTpsController extends Controller
         // Menampilkan view dengan data TPS
         return view('adminpusat.lokasi-tps.index', compact('lokasi'));
     }
-
 }

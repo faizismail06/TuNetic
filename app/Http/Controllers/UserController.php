@@ -146,10 +146,11 @@ class UserController extends Controller
                     'district_id' => $request->district_id,
                     'village_id' => $request->village_id,
                     'alamat' => $request->alamat,
+                    'level' => 4,
                     'email_verified_at' => !blank($request->verified) ? now() : null
                 ]
             );
-            $data->assignRole(!blank($request->role) ? $request->role : array());
+            $data->assignRole('user'); // Tambahkan ini agar user mendapat permission-nya
             toastr()->success('Pengguna baru berhasil disimpan');
             return redirect()->route('login');
         } catch (\Throwable $th) {
@@ -192,12 +193,11 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'email' => 'required|string|email:rfc',
             'role' => 'nullable',
-            'alamat' => 'nullable|string',
-            'level' => 'required|integer|in:1,2,3,4',
             'verified' => 'nullable|string',
         ]);
 
@@ -216,7 +216,6 @@ class UserController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'level' => $request->level,
                 'email_verified_at' => !blank($request->verified) ? now() : null
             ];
             if (empty($request->password)) {
