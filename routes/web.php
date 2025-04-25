@@ -19,7 +19,7 @@ use App\Http\Controllers\LaporanWargaController;
 use App\Http\Controllers\LaporanTpsController;
 use App\Http\Controllers\TrackingArmadaController;
 use App\Http\Controllers\ArtikelController;
-
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -47,6 +47,7 @@ Auth::routes(['verify' => true]);
 
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::resource('admin/home', DashboardController::class);
 
 Route::resource('profil', ProfilController::class)->except('destroy');
 Route::resource('manage-user', UserController::class);
