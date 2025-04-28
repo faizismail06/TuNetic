@@ -79,3 +79,30 @@ Route::resource('tracking-armada', TrackingArmadaController::class)->only(['inde
 
 
 Route::get('dbbackup', [DBBackupController::class, 'DBDataBackup']);
+
+Route::get('/masyarakat', [LaporanWargaController::class, 'index'])->middleware('auth');
+
+Route::get('/lapor', function () {
+    return view('masyarakat.lapor');
+})->name('lapor');
+
+Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
+
+
+Route::get('/armada', function () {
+    return view('armada');
+})->name('armada');
+
+Route::get('/lacak', function () {
+    return view('masyarakat.lacak');
+})->name('masyarakat.lacak');
+
+Route::get('/lapor', function () {return view('masyarakat.lapor');})->name('lapor');
+
+Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
+Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
+Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview'])->middleware('auth');
+
+
+
+
