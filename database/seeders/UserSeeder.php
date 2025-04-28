@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
         //     'updated_at' => now(),
         // ]);
 
-        User::create([
+        $petugas1 = User::create([
             'name' => 'Petugas1 ResQ',
             'email' => 'petugas1@resq.local',
             'password' => Hash::make('password'),
@@ -35,10 +35,11 @@ class UserSeeder extends Seeder
             'district_id' => '110101',
             'village_id' => '1101012001',
             'alamat' => 'Jl. Contoh No. 123',
-            'level' => 1,
+            'level' => 3,
         ]);
+        $petugas1->assignRole('petugas');
 
-        User::create([
+        $petugas2 = User::create([
             'name' => 'Petugas2 ResQ',
             'email' => 'petugas2@resq.local',
             'password' => Hash::make('password'),
@@ -47,7 +48,9 @@ class UserSeeder extends Seeder
             'district_id' => '110101',
             'village_id' => '1101012001',
             'alamat' => 'Jl. Contoh No. 123',
-            'level' => 1,
+            'level' => 3,
         ]);
+        $petugas2->assignRole('petugas');
+
     }
 }
