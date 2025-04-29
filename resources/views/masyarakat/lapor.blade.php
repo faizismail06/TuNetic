@@ -37,6 +37,13 @@
                         class="material-icons icon">my_location</span>Lokasi Terkini</button>
                 <input type="hidden" name="latitude" id="latitude" required>
                 <input type="hidden" name="longitude" id="longitude" required>
+                <div id="alamat-wrapper" style="display: none;">
+                    <div class="alamat-box">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="alamat">Alamat akan ditampilkan di sini</span>
+                    </div>
+                </div>
+
 
                 <label for="deskripsi"
                     style="font-size: 1rem; margin-top: 20px; font-weight: 550; display: block;">Deskripsi</label>
@@ -74,14 +81,28 @@
         function getLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
-                    console.log("Latitude: " + position.coords.latitude);
-                    console.log("Longitude: " + position.coords.longitude);
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
 
-                    document.getElementById('latitude').value = position.coords.latitude;
-                    document.getElementById('longitude').value = position.coords.longitude;
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lon;
+
+                    // Pakai OSM Nominatim untuk reverse geocoding
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const displayName = data.display_name;
+                            document.getElementById('alamat').textContent = displayName;
+                            document.getElementById('alamat-wrapper').style.display = 'block';
+                        })
+
+                        .catch(error => {
+                            document.getElementById('alamat').textContent = "Gagal mengambil alamat.";
+                            console.error("Nominatim error:", error);
+                        });
+
                     alert('Lokasi berhasil ditambahkan!');
-                }, 
-                function (error) {
+                }, function (error) {
                     switch (error.code) {
                         case error.PERMISSION_DENIED:
                             alert("Pengguna menolak permintaan Geolokasi.");
@@ -101,8 +122,8 @@
                 alert("Browser tidak mendukung Geolokasi.");
             }
         }
-
     </script>
+
 
     @if(session('success'))
         <script>
@@ -241,6 +262,27 @@
             color: orange;
             margin-right: 8px;
         }
+
+        .alamat-box {
+            margin-top: 20px;
+            background-color: #ffffff;
+            border-left: 5px solid #299E63;
+            padding: 15px 20px;
+            border-radius: 13px;
+            font-size: 0.95rem;
+            color: #299E63;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alamat-box i {
+            color: #FFB800;
+            font-size: 1.2rem;
+        }
+
 
         .buttons {
             display: flex;
