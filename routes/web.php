@@ -35,12 +35,12 @@ use Illuminate\Http\Request;
 | contains the "web" middleware group. Now create something great!
 |
 */
-// Route untuk halaman utama
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::permanentRedirect('/', '/login');
+// Route::permanentRedirect('/', '/login');
+
+Route::get('/', function () {
+    return view('landing-page');
+});
 
 // Auth::routes();
 Auth::routes(['verify' => true]);
