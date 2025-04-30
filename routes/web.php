@@ -54,7 +54,6 @@ Route::resource('manage-user', UserController::class);
 Route::resource('manage-role', RoleController::class);
 Route::resource('manage-menu', MenuController::class);
 Route::resource('manage-petugas', PetugasController::class);
-Route::resource('manage-user', ManageUserController::class);
 Route::resource('manage-permission', PermissionController::class)->only('store', 'destroy');
 Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
 Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
