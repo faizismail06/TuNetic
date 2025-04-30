@@ -51,20 +51,8 @@
                                 <input type="text" class="form-control" id="tanggal_lahir" value="{{ $petugas->tanggal_lahir ?? '' }}" readonly>
                             </div>
                             <div class="form-group">
-                                <label for="provinsi">Provinsi</label>
-                                <input type="text" class="form-control" id="provinsi" value="{{ $petugas->provinsi ?? '' }}" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="kabupaten_kota">Kabupaten/Kota</label>
-                                <input type="text" class="form-control" id="kabupaten_kota" value="{{ $petugas->kabupaten_kota ?? '' }}" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="kecamatan">Kecamatan</label>
-                                <input type="text" class="form-control" id="kecamatan" value="{{ $petugas->kecamatan ?? '' }}" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="desa_kelurahan">Desa/Kelurahan</label>
-                                <input type="text" class="form-control" id="desa_kelurahan" value="{{ $petugas->desa_kelurahan ?? '' }}" readonly>
+                                <label for="provinsi">Alamat</label>
+                                <input type="text" class="form-control" id="alamat" value="{{ $petugas->alamat ?? '' }}" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="sim_petugas">SIM Petugas</label>
@@ -83,8 +71,7 @@
                             <div class="row mt-4">
                                 <div class="col-12">
                                     <button type="button" class="btn btn-success">Setujui</button>
-                                    <button type="button" class="btn btn-warning ml-2">Tolak</button>
-                                    <button type="button" class="btn btn-danger ml-2">Hapus</button>
+                                    <button type="button" class="btn btn-danger ml-2">Tolak</button>
                                 </div>
                             </div>
                         </div>
