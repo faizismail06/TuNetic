@@ -35,12 +35,12 @@ use Illuminate\Http\Request;
 | contains the "web" middleware group. Now create something great!
 |
 */
-// Route untuk halaman utama
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::permanentRedirect('/', '/login');
+// Route::permanentRedirect('/', '/login');
+
+Route::get('/', function () {
+    return view('landing-page');
+});
 
 // Auth::routes();
 Auth::routes(['verify' => true]);
@@ -53,7 +53,13 @@ Route::resource('profil', ProfilController::class)->except('destroy');
 Route::resource('manage-user', UserController::class);
 Route::resource('manage-role', RoleController::class);
 Route::resource('manage-menu', MenuController::class);
+Route::resource('manage-petugas', PetugasController::class);
 Route::resource('manage-permission', PermissionController::class)->only('store', 'destroy');
+Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
+Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
+Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
+Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
+Route::post('petugas', [PetugasController::class, 'store'])->name('petugas.store');
 
 // Armada Routes
 Route::resource('armada', ArmadaController::class);
@@ -107,6 +113,33 @@ Route::resource('tracking-armada', TrackingArmadaController::class)->only(['inde
 Route::apiResource('artikel', ArtikelController::class);
 
 Route::get('dbbackup', [DBBackupController::class, 'DBDataBackup']);
+
+Route::get('/masyarakat', [LaporanWargaController::class, 'index'])->middleware('auth');
+
+Route::get('/lapor', function () {
+    return view('masyarakat.lapor');
+})->name('lapor');
+
+Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
+
+
+Route::get('/armada', function () {
+    return view('armada');
+})->name('armada');
+
+Route::get('/lacak', function () {
+    return view('masyarakat.lacak');
+})->name('masyarakat.lacak');
+
+Route::get('/lapor', function () {return view('masyarakat.lapor');})->name('lapor');
+
+Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
+Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
+Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview'])->middleware('auth');
+
+
+
+
 
 Route::get('/email/verify', function () {
     return view('auth.verify'); // atau view lain sesuai struktur kamu

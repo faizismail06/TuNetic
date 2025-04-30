@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('laporan_warga', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_user')->constrained('users');
+            $table->string('judul')->nullable();
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, places: 7);
             $table->string('gambar')->nullable();
