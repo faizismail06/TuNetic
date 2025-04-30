@@ -13,12 +13,15 @@ return new class extends Migration
     {
         Schema::create('petugas', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
             $table->string('email')->unique();
             $table->string('name');
             $table->string('username');
             $table->string('password');
             $table->bigInteger('nomor')->nullable();
-            $table->date('tanggal_lahir')->nullable(); // Tambahkan kolom tanggal_lahir
+            $table->date('tanggal_lahir')->nullable();
             $table->string('alamat')->nullable();
             $table->string('sim_image')->nullable(); // Kolom untuk upload gambar SIM
             $table->string('alasan_bergabung');

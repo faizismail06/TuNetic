@@ -23,7 +23,7 @@ class RuteTpsController extends Controller
     {
         $validatedData = $request->validate([
             'id_rute' => 'required|exists:rute,id',
-            'id_lokasi' => 'required|exists:lokasi_tps,id',
+            'id_lokasi_tps' => 'required|exists:lokasi_tps,id',
         ]);
 
         $ruteTps = RuteTps::create($validatedData);
@@ -49,7 +49,7 @@ class RuteTpsController extends Controller
 
         $validatedData = $request->validate([
             'id_rute' => 'sometimes|exists:rute,id',
-            'id_lokasi' => 'sometimes|exists:lokasi_tps,id',
+            'id_lokasi_tps' => 'sometimes|exists:lokasi_tps,id',
         ]);
 
         $ruteTps->update($validatedData);

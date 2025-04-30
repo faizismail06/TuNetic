@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -12,8 +11,9 @@ class Petugas extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $table = 'petugas';
-    
+
     protected $fillable = [
+        'user_id',
         'email',
         'name',
         'username',
@@ -30,4 +30,9 @@ class Petugas extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

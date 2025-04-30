@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LaporanWarga;
+use App\Models\LokasiTps;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
@@ -44,11 +45,22 @@ class LaporanWargaController extends Controller
         ]);
 
         if ($request->hasFile('gambar')) {
-            $validatedData['gambar'] = $request->file('gambar')->store('laporan_warga', 'public');
+            $path = $request->file('gambar')->store('laporan_warga', 'public');
+            $validatedData['gambar'] = asset('storage/' . $path);
         }
 
         $laporan = LaporanWarga::create($validatedData);
         return redirect()->back()->with('success', 'Laporan berhasil dikirim!');
+
+        // Cari TPS terdekat berdasarkan latitude & longitude laporan
+        $nearestTps = $this->findNearestTps($request->latitude, $request->longitude);
+
+        // return response()->json([
+        //     "message" => "Laporan warga berhasil disimpan",
+        //     "data" => $laporan,
+        //     "tps_terdekat" => $nearestTps
+        // ], 201);
+
     }
 
     /**
@@ -78,11 +90,11 @@ class LaporanWargaController extends Controller
         ]);
 
         if ($request->hasFile('gambar')) {
-            // Hapus gambar lama jika ada
             if ($laporan->gambar) {
-                Storage::disk('public')->delete($laporan->gambar);
+                Storage::disk('public')->delete(str_replace(asset('storage/'), '', $laporan->gambar));
             }
-            $validatedData['gambar'] = $request->file('gambar')->store('laporan_warga', 'public');
+            $path = $request->file('gambar')->store('laporan_warga', 'public');
+            $validatedData['gambar'] = asset('storage/' . $path);
         }
 
         $laporan->update($validatedData);
@@ -154,7 +166,41 @@ class LaporanWargaController extends Controller
     public function destroy($id)
     {
         $laporan = LaporanWarga::findOrFail($id);
+
+        if ($laporan->gambar) {
+            Storage::disk('public')->delete(str_replace(asset('storage/'), '', $laporan->gambar));
+        }
+
         $laporan->delete();
         return response()->json(["message" => "Laporan berhasil dihapus"], 204);
+    }
+
+    /**
+     * Mencari TPS terdekat berdasarkan latitude & longitude.
+     */
+    private function findNearestTps($latitude, $longitude)
+    {
+        $nearestTps = LokasiTps::selectRaw("
+            id, nama_lokasi, province_id, regency_id, district_id, village_id, latitude, longitude,
+            (6371 * acos(cos(radians(?)) * cos(radians(latitude)) 
+            * cos(radians(longitude) - radians(?)) 
+            + sin(radians(?)) * sin(radians(latitude)))) AS distance
+        ", [$latitude, $longitude, $latitude])
+            ->orderByRaw("distance ASC")
+            ->first();
+
+        if (!$nearestTps) {
+            return null;
+        }
+
+        return [
+            "tps" => [
+                "id" => $nearestTps->id,
+                "nama_lokasi" => $nearestTps->nama_lokasi,
+                "latitude" => $nearestTps->latitude,
+                "longitude" => $nearestTps->longitude,
+            ],
+            "desa" => $nearestTps->village ? $nearestTps->village->name : null // Ambil nama desa
+        ];
     }
 }

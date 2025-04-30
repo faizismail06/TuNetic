@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('penugasan_petugas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_petugas')->constrained('petugas');
-            $table->foreignId('id_jadwal_operasional')->constrained('armada');
+            $table->foreignId('id_jadwal_operasional')->constrained('jadwal_operasional')->onDelete('cascade');
             $table->integer('tugas')->default(0);
             $table->timestamps();
         });
