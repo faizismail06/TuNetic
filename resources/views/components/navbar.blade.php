@@ -234,7 +234,7 @@
     <div class="navbar" style="padding: 12px 50px;">
         <div style="width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 40px;">
             <div class="logo">
-                <a href="{{ url('/home') }}">
+                <a href="{{ url('/masyarakat') }}">
                     <img src="{{ asset('assets/images/Masyarakat/logo.png') }}" alt="Logo" style="height: 50px;">
                 </a>
             </div>
@@ -306,7 +306,7 @@
             @yield('content')
             <!-- Logout Modal -->
             <div class="modal" id="modal-logout" style="z-index: 9999">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -369,7 +369,7 @@
                         <li style="margin-bottom: 10px;"><a href="#"
                                 style="color: white; text-decoration: none;">Jemput
                                 Sampah</a></li>
-                        <li style="margin-bottom: 10px;"><a href="{{ url('/lapor') }}"
+                        <li style="margin-bottom: 10px;"><a href="{{ url('/masyarakat/lapor') }}"
                                 style="color: white; text-decoration: none;">Lapor
                                 Sampah</a></li>
                     </ul>

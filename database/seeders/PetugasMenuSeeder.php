@@ -19,7 +19,7 @@ class PetugasMenuSeeder extends Seeder
         $menuPetugas = Menu::create([
             'nama_menu' => 'Menu Petugas',
             'url' => '#',
-            'icon' => 'fas fa-user-hard-hat',
+            'icon' => '',
             'parent_id' => '0',
             'urutan' => 3
         ]);
@@ -28,7 +28,7 @@ class PetugasMenuSeeder extends Seeder
         $dashboardPetugas = Menu::create([
             'nama_menu' => 'Home',
             'url' => 'petugas/home',
-            'icon' => 'fas fa-home',
+            'icon' => '',
             'parent_id' => $menuPetugas->id,
             'urutan' => 1
         ]);
@@ -39,7 +39,7 @@ class PetugasMenuSeeder extends Seeder
         $jadwalPengambilan = Menu::create([
             'nama_menu' => 'Jadwal Pengambilan',
             'url' => '/petugas/jadwal-pengambilan/auto-tracking',
-            'icon' => 'fas fa-calendar-alt',
+            'icon' => '',
             'parent_id' => $menuPetugas->id,
             'urutan' => 2
         ]);
@@ -50,7 +50,7 @@ class PetugasMenuSeeder extends Seeder
         $laporSampah = Menu::create([
             'nama_menu' => 'Lapor Sampah',
             'url' => 'petugas/lapor',
-            'icon' => 'fas fa-clipboard-list',
+            'icon' => '',
             'parent_id' => $menuPetugas->id,
             'urutan' => 3
         ]);
@@ -63,7 +63,7 @@ class PetugasMenuSeeder extends Seeder
         $profilePetugas = Menu::create([
             'nama_menu' => 'Profile',
             'url' => 'petugas/profile',
-            'icon' => 'fas fa-user',
+            'icon' => '',
             'parent_id' => $menuPetugas->id,
             'urutan' => 4
         ]);
