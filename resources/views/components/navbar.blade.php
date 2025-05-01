@@ -112,6 +112,7 @@
             flex: 1;
             min-width: 0;
             justify-content: flex-end;
+            cursor: pointer;
         }
 
         .profile img {
@@ -122,26 +123,26 @@
 
         .profile:hover {
             opacity: 0.8;
-            cursor: pointer;
         }
 
-        .dropdown {
+        .user-dropdown {
             position: relative;
             display: inline-block;
         }
 
-        .dropdown-content {
+        .user-dropdown-content {
             display: none;
             position: absolute;
+            right: 0;
             background-color: #f9f9f9;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            min-width: 180px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
             z-index: 1;
             border-radius: 8px;
             overflow: hidden;
         }
 
-        .dropdown-content a {
+        .user-dropdown-content a {
             color: black;
             padding: 12px 16px;
             text-decoration: none;
@@ -149,11 +150,11 @@
             transition: background 0.3s;
         }
 
-        .dropdown-content a:hover {
+        .user-dropdown-content a:hover {
             background-color: #f1f1f1;
         }
 
-        .dropdown:hover .dropdown-content {
+        .user-dropdown:hover .user-dropdown-content {
             display: block;
         }
 
@@ -165,6 +166,66 @@
             cursor: pointer;
             color: #333;
         }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-dialog {
+            margin: 15% auto;
+            max-width: 300px;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: #fefefe;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .modal-body {
+            text-align: center;
+            padding: 10px 0 20px 0;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 1px solid #e9e9e9;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            font-weight: 500;
+        }
+
+        .btn-default {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .btn-info {
+            background-color: #299E63;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+        }
     </style>
 </head>
 
@@ -173,7 +234,7 @@
     <div class="navbar" style="padding: 12px 50px;">
         <div style="width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 40px;">
             <div class="logo">
-                <a href="{{ url('/masyarakat') }}">
+                <a href="{{ url('/home') }}">
                     <img src="{{ asset('assets/images/Masyarakat/logo.png') }}" alt="Logo" style="height: 50px;">
                 </a>
             </div>
@@ -183,101 +244,86 @@
             </button>
 
             <div class="nav-links" id="navLinks">
-                @php
-                    $menus = json_decode(MenuHelper::Menu());
-                    $userMenu = null;
-
-                    // Find the user menu
-                    foreach($menus as $menu) {
-                        if($menu->nama_menu === 'Menu User') {
-                            $userMenu = $menu;
-                            break;
-                        }
-                    }
-                @endphp
-
-                @if($userMenu)
-                    @foreach($userMenu->submenus as $submenu)
-                        @php
-                            // Extract route path
-                            $route = $submenu->url;
-                            $routeSegment = explode('/', $route)[1] ?? '';
-
-                            // Check if current route matches this menu item
-                            $isActive = Request::segment(1) === $routeSegment;
-
-                            // // Map menu items to icons
-                            // $iconMap = [
-                            //     'Home' => '',
-                            //     'Laporan Sampah' => '',
-                            //     'Rute Armada' => 'fas fa-route',
-                            //     'Profile' => 'fas fa-user'
-                            // ];
-
-                            $icon = $iconMap[$submenu->nama_menu] ?? $submenu->icon;
-                        @endphp
-
-                        @if(count($submenu->submenus) == 0)
-                            <a href="{{ url($submenu->url) }}" class="{{ $isActive ? 'active' : '' }}">
-                                <i class="{{ $icon }}"></i> {{ $submenu->nama_menu }}
+                @foreach (json_decode(MenuHelper::Menu()) as $menu)
+                    @foreach ($menu->submenus as $submenu)
+                        @if (count($submenu->submenus) == '0')
+                            <a href="{{ url($submenu->url) }}"
+                                class="nav-link {{ Request::segment(1) == $submenu->url ? 'active' : '' }}">
+                                <i class="{{ $submenu->icon }}"></i>
+                                {{ ucwords($submenu->nama_menu) }}
                             </a>
                         @else
+                            @php
+                                $urls = [];
+                                foreach ($submenu->submenus as $url) {
+                                    $urls[] = $url->url;
+                                }
+                            @endphp
                             <div class="dropdown">
-                                <a href="#" class="{{ $isActive ? 'active' : '' }}">
-                                    <i class="{{ $icon }}"></i> {{ $submenu->nama_menu }}
+                                <a href="#" class="{{ in_array(Request::segment(1), $urls) ? 'active' : '' }}">
+                                    <i class="{{ $submenu->icon }}"></i>
+                                    {{ ucwords($submenu->nama_menu) }}
                                 </a>
                                 <div class="dropdown-content">
-                                    @foreach($submenu->submenus as $childMenu)
-                                        <a href="{{ url($childMenu->url) }}">
-                                            <i class="{{ $childMenu->icon }}"></i> {{ $childMenu->nama_menu }}
+                                    @foreach ($submenu->submenus as $endmenu)
+                                        <a href="{{ url($endmenu->url) }}"
+                                            class="{{ Request::segment(1) == $endmenu->url ? 'active' : '' }}">
+                                            <i class="far fa-circle"></i>
+                                            {{ ucwords($endmenu->nama_menu) }}
                                         </a>
                                     @endforeach
                                 </div>
                             </div>
                         @endif
                     @endforeach
-                @else
-                    <!-- Fallback navigation if menu structure isn't found -->
-                    <a href="{{ url('/masyarakat') }}" class="{{ Request::is('masyarakat') ? 'active' : '' }}">
-                        <i class=""></i> Home
-                    </a>
-                    <a href="{{ url('/masyarakat/lapor') }}" class="{{ Request::is('lapor*') ? 'active' : '' }}">
-                        <i class=""></i> Lapor Sampah
-                    </a>
-                    <a href="{{ url('/armada') }}" class="{{ Request::is('armada*') ? 'active' : '' }}">
-                        <i class=""></i> Rute Armada
-                    </a>
-                    <div class="dropdown">
-                        <a href="#" class="{{ Request::is('profile*') ? 'active' : '' }}">
-                            <i class=""></i> Profile
-                        </a>
-                        <div class="dropdown-content">
-                            <a href="{{ url('/user/profile') }}">
-                                <i class="fas fa-id-card"></i> Lihat Profile
-                            </a>
-                            <a href="{{ url('/user/settings') }}">
-                                <i class="fas fa-cog"></i> Pengaturan
-                            </a>
-                            <a href="{{ url('/logout') }}" style="color: #dc3545;">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a>
-                        </div>
-                    </div>
-                @endif
+                @endforeach
             </div>
 
-            <!-- User Profile Picture & Name -->
-            <a href="{{ url('/user/profile') }}" class="profile">
-                <span>{{ Auth::user()->name ?? 'Fulan Andi Prasetyo' }}</span>
-                <img src="{{ Auth::user()->profile_photo_url ?? 'https://randomuser.me/api/portraits/men/32.jpg' }}" alt="Profile">
-            </a>
+            <!-- User Profile Dropdown -->
+            <div class="user-dropdown">
+                <div class="profile">
+                    <span>{{ Auth::user()->name ?? 'Fulan Andi Prasetyo' }}</span>
+                    <img src="{{ Auth::user()->profile_photo_url ?? 'https://randomuser.me/api/portraits/men/32.jpg' }}"
+                        alt="Profile">
+                </div>
+                <div class="user-dropdown-content">
+                    <a href="{{ url('/user/profile') }}">
+                        <i class="fas fa-user"></i> Profil
+                    </a>
+                    <a href="#" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Keluar
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
+
+
 
     <!-- Content -->
     <main>
         <div style="padding: 0">
             @yield('content')
+            <!-- Logout Modal -->
+            <div class="modal" id="modal-logout" style="z-index: 9999">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <div class="modal-body">
+                                <h5>Apakah anda ingin keluar?</h5>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" id="cancelLogout">Tidak</button>
+                                <a class="btn btn-info" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault(); this.closest('form').submit();">
+                                    Ya, Keluar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -320,9 +366,11 @@
                 <div>
                     <h4 style="margin-bottom: 15px;">Layanan</h4>
                     <ul style="list-style: none; padding: 0; margin: 0;">
-                        <li style="margin-bottom: 10px;"><a href="#" style="color: white; text-decoration: none;">Jemput
+                        <li style="margin-bottom: 10px;"><a href="#"
+                                style="color: white; text-decoration: none;">Jemput
                                 Sampah</a></li>
-                        <li style="margin-bottom: 10px;"><a href="{{ url('/masyarakat/lapor') }}" style="color: white; text-decoration: none;">Lapor
+                        <li style="margin-bottom: 10px;"><a href="{{ url('/lapor') }}"
+                                style="color: white; text-decoration: none;">Lapor
                                 Sampah</a></li>
                     </ul>
                 </div>
@@ -348,6 +396,26 @@
                     navLinks.classList.toggle('active');
                 });
             }
+
+            // Logout modal functionality
+            const logoutBtn = document.getElementById('logoutBtn');
+            const logoutModal = document.getElementById('modal-logout');
+            const cancelLogout = document.getElementById('cancelLogout');
+
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutModal.style.display = "block";
+            });
+
+            cancelLogout.addEventListener('click', function() {
+                logoutModal.style.display = "none";
+            });
+
+            window.addEventListener('click', function(event) {
+                if (event.target == logoutModal) {
+                    logoutModal.style.display = "none";
+                }
+            });
         });
     </script>
 
