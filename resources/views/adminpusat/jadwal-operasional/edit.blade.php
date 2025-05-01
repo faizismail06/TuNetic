@@ -117,6 +117,11 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label for="tanggal">Tanggal</label>
+                                    <input type="date" name="tanggal" class="form-control" required value="{{ old('tanggal', $jadwalOperasional->tanggal ?? '') }}">
+                                </div>
+
+                                <div class="form-group">
                                     <label>Armada</label>
                                     <select name="id_armada" class="form-control">
                                         @foreach ($armadas as $armada)

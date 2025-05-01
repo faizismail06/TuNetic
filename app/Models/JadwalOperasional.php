@@ -24,6 +24,7 @@ class JadwalOperasional extends Model
         'id_armada',
         'id_jadwal',
         'id_rute_tps',
+        'tanggal',
         'jam_aktif',
         'status',
     ];
