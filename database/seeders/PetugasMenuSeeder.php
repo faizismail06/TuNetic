@@ -38,7 +38,7 @@ class PetugasMenuSeeder extends Seeder
         // Jadwal Pengambilan
         $jadwalPengambilan = Menu::create([
             'nama_menu' => 'Jadwal Pengambilan',
-            'url' => 'petugas/jadwal-pengambilan',
+            'url' => '/petugas/jadwal-pengambilan/auto-tracking',
             'icon' => 'fas fa-calendar-alt',
             'parent_id' => $menuPetugas->id,
             'urutan' => 2

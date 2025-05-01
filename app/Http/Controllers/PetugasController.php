@@ -6,6 +6,7 @@ use App\Models\Petugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class PetugasController extends Controller
 {
@@ -45,7 +46,7 @@ class PetugasController extends Controller
     public function update(Request $request, $id)
     {
         $petugas = Petugas::findOrFail($id);
-        
+
         $validatedData = $request->validate([
             'email' => 'sometimes|email|unique:petugas,email,' . $id,
             'name' => 'sometimes|string',
@@ -73,5 +74,23 @@ class PetugasController extends Controller
         $petugas = Petugas::findOrFail($id);
         $petugas->delete();
         return response()->json(["message" => "Petugas berhasil dihapus"], 204);
+    }
+
+    public function redirectToDashboard()
+    {
+        $user = Auth::user();
+
+        // Jika user memiliki petugas terkait, cek levelnya
+        if ($user->level == 3) {
+            // Cek apakah user ada di tabel petugas
+            $petugas = $user->petugas;
+
+            if ($petugas) {
+                return redirect()->route('jadwal-pengambilan.auto-tracking'); // Petugas yang sudah terdaftar
+            }
+        }
+
+        // Default route jika level tidak sesuai
+        return redirect()->route('home')->with('error', 'Anda tidak memiliki akses.');
     }
 }

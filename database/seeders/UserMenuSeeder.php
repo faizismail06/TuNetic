@@ -19,7 +19,7 @@ class UserMenuSeeder extends Seeder
         $menuUser = Menu::create([
             'nama_menu' => 'Menu User',
             'url' => '#',
-            'icon' => 'fas fa-users',
+            'icon' => '',
             'parent_id' => '0',
             'urutan' => 4
         ]);
@@ -27,8 +27,8 @@ class UserMenuSeeder extends Seeder
         // Home User
         $homeUser = Menu::create([
             'nama_menu' => 'Home',
-            'url' => 'user/home',
-            'icon' => 'fas fa-home',
+            'url' => 'masyarakat',
+            'icon' => '',
             'parent_id' => $menuUser->id,
             'urutan' => 1
         ]);
@@ -38,8 +38,8 @@ class UserMenuSeeder extends Seeder
         // Laporan Sampah
         $laporanSampahUser = Menu::create([
             'nama_menu' => 'Laporan Sampah',
-            'url' => 'user/laporan-sampah',
-            'icon' => 'fas fa-trash',
+            'url' => 'masyarakat/lapor',
+            'icon' => '',
             'parent_id' => $menuUser->id,
             'urutan' => 2
         ]);
@@ -50,8 +50,8 @@ class UserMenuSeeder extends Seeder
         // Rute Armada
         $ruteArmadaUser = Menu::create([
             'nama_menu' => 'Rute Armada',
-            'url' => 'user/rute-armada',
-            'icon' => 'fas fa-route',
+            'url' => 'masyarakat/lacak',
+            'icon' => '',
             'parent_id' => $menuUser->id,
             'urutan' => 3
         ]);
@@ -61,8 +61,8 @@ class UserMenuSeeder extends Seeder
         // Profile User
         $profileUser = Menu::create([
             'nama_menu' => 'Profile',
-            'url' => 'user/profile',
-            'icon' => 'fas fa-user',
+            'url' => 'masyarakat/profile',
+            'icon' => '',
             'parent_id' => $menuUser->id,
             'urutan' => 4
         ]);

@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ArmadaController;
 use App\Http\Controllers\PetugasController;
 use App\Http\Controllers\JadwalOperasionalController;
+use App\Http\Controllers\JadwalPengambilanController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\LokasiTpsController;
 use App\Http\Controllers\PenugasanPetugasController;
@@ -80,8 +81,6 @@ Route::get('lokasi-tps/get-regencies', [LokasiTpsController::class, 'getRegencie
 Route::get('lokasi-tps/get-districts', [LokasiTpsController::class, 'getDistricts'])->name('lokasi-tps.getDistricts');
 Route::get('lokasi-tps/get-villages', [LokasiTpsController::class, 'getVillages'])->name('lokasi-tps.getVillages');
 
-Route::get('user/rute-armada', [LokasiTpsController::class, 'ruteArmada'])->name('rute-armada.index');
-
 // Penugasan Armada Routes
 Route::resource('penugasan-petugas', PenugasanPetugasController::class);
 
@@ -105,11 +104,12 @@ Route::resource('tracking-armada', TrackingArmadaController::class)->only(['inde
 Route::apiResource('artikel', ArtikelController::class);
 
 Route::get('dbbackup', [DBBackupController::class, 'DBDataBackup']);
+
 Route::get('/masyarakat', [LaporanWargaController::class, 'index'])->middleware('auth');
 
-Route::get('/lapor', function () {
-    return view('masyarakat.lapor');
-})->name('lapor');
+// Route::get('/masyarakat/lapor', function () {
+//     return view('masyarakat.lapor');
+// })->name('lapor');
 
 Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
 
@@ -118,16 +118,19 @@ Route::get('/armada', function () {
     return view('armada');
 })->name('armada');
 
+
+// Route::get('/masyarakat/lacak', [LokasiTpsController::class, 'ruteArmada'])->name('rute-armada.index');
+
 Route::get('/lacak', function () {
     return view('masyarakat.lacak');
 })->name('masyarakat.lacak');
 
-Route::get('/lapor', function () {
+Route::get('/masyarakat/lapor', function () {
     return view('masyarakat.lapor');
 })->name('lapor');
 
-Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
-Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
+Route::post('/masyarakat/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
+Route::get('/masyarakat/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
 Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview'])->middleware('auth');
 
 Route::get('/email/verify', function () {
@@ -143,3 +146,14 @@ Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
     return back()->with('resent', true);
 })->middleware(['auth', 'throttle:6,1'])->name('verification.resend');
+
+Route::middleware(['auth'])->group(function () {
+    // Route untuk halaman auto tracking
+    Route::get('/petugas/jadwal-pengambilan/auto-tracking', [JadwalPengambilanController::class, 'showAutoTrackingPage'])->name('jadwal-pengambilan.auto-tracking');
+    // Route untuk mulai tracking
+    Route::post('/petugas/jadwal-pengambilan/start-tracking/{id}', [JadwalPengambilanController::class, 'startTracking'])->name('jadwal-pengambilan.start-tracking');
+    // Route untuk selesai tracking
+    Route::post('/petugas/jadwal-pengambilan/finish-tracking/{id}', [JadwalPengambilanController::class, 'finishTracking'])->name('jadwal-pengambilan.finish-tracking');
+    // Route untuk menyimpan lokasi tracking
+    Route::post('/petugas/jadwal-pengambilan/save-location', [JadwalPengambilanController::class, 'saveLocation'])->name('jadwal-pengambilan.save-location');
+});

@@ -76,7 +76,7 @@
                 Laporkan melaporkan lokasi sampah yang perlu dibersihkan dengan mengunggah foto, menambahkan deskripsi,
                 dan penandaan di peta untuk tindakan lanjut.
             </p>
-            <a href="/lapor"
+            <a href="/masyarakat/lapor"
                 style="font-family: 'Red Hat Text', sans-serif; font-size: 1.1rem; background-color: #299E63; color: white; padding: 15px 25px; text-decoration: none; border-radius: 8px; display: inline-block;">
                 Laporkan Sampah
             </a>
@@ -177,16 +177,16 @@
 
             <!-- Gambar Armada -->
             <img src="{{ asset('assets/images/Masyarakat/maps-armada-placeholder.png') }}" alt="Peta Placeholder"
-                style="width: 1320px; height: 400px; 
-                                                                                        margin-top: 30px; 
-                                                                                        border-radius: 12px; 
+                style="width: 1320px; height: 400px;
+                                                                                        margin-top: 30px;
+                                                                                        border-radius: 12px;
                                                                                         box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
 
             <!-- Tombol kanan bawah -->
             <div style="display: flex; justify-content: flex-end; margin-top: 20px; padding-right: 100px;">
                 <a href="{{ route('masyarakat.lacak') }}" style="font-size: 1.1rem;
                                                                                                       background-color: #299E63;
-                                                                                                      margin-top: 20px; 
+                                                                                                      margin-top: 20px;
                                                                                                       color: white;
                                                                                                       padding: 15px 25px;
                                                                                                       text-decoration: none;
