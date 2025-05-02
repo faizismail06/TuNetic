@@ -36,12 +36,12 @@ use Illuminate\Http\Request;
 | contains the "web" middleware group. Now create something great!
 |
 */
-// Route untuk halaman utama
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::permanentRedirect('/', '/login');
+// Route::permanentRedirect('/', '/login');
+
+Route::get('/', function () {
+    return view('landing-page');
+});
 
 // Auth::routes();
 Auth::routes(['verify' => true]);
@@ -54,7 +54,13 @@ Route::resource('profil', ProfilController::class)->except('destroy');
 Route::resource('manage-user', UserController::class);
 Route::resource('manage-role', RoleController::class);
 Route::resource('manage-menu', MenuController::class);
+Route::resource('manage-petugas', PetugasController::class);
 Route::resource('manage-permission', PermissionController::class)->only('store', 'destroy');
+Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
+Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
+Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
+Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
+Route::post('petugas', [PetugasController::class, 'store'])->name('petugas.store');
 
 // Armada Routes
 Route::resource('armada', ArmadaController::class);
@@ -63,7 +69,9 @@ Route::resource('armada', ArmadaController::class);
 Route::resource('petugas', PetugasController::class);
 
 // Jadwal Routes
-Route::resource('jadwal', JadwalController::class);
+Route::get('/daftar-jadwal/generate', [JadwalController::class, 'generateForm'])->name('daftar-jadwal.generate.form');
+Route::post('/daftar-jadwal/generate', [JadwalController::class, 'generateStore'])->name('daftar-jadwal.generate.store');
+Route::resource('daftar-jadwal', JadwalController::class);
 
 // Jadwal Operasional Routes
 Route::resource('jadwal-operasional', JadwalOperasionalController::class);
@@ -157,3 +165,43 @@ Route::middleware(['auth'])->group(function () {
     // Route untuk menyimpan lokasi tracking
     Route::post('/petugas/jadwal-pengambilan/save-location', [JadwalPengambilanController::class, 'saveLocation'])->name('jadwal-pengambilan.save-location');
 });
+Route::get('/masyarakat', [LaporanWargaController::class, 'index'])->middleware('auth');
+
+Route::get('/lapor', function () {
+    return view('masyarakat.lapor');
+})->name('lapor');
+
+Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
+
+
+Route::get('/armada', function () {
+    return view('armada');
+})->name('armada');
+
+Route::get('/lacak', function () {
+    return view('masyarakat.lacak');
+})->name('masyarakat.lacak');
+
+Route::get('/lapor', function () {return view('masyarakat.lapor');})->name('lapor');
+
+Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
+Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
+Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview'])->middleware('auth');
+
+
+
+
+
+Route::get('/email/verify', function () {
+    return view('auth.verify'); // atau view lain sesuai struktur kamu
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill(); // Verifikasi email user
+    return redirect('/home'); // Atau arahkan ke halaman sukses lainnya
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('resent', true);
+})->middleware(['auth', 'throttle:6,1'])->name('verification.resend');
