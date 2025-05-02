@@ -68,7 +68,9 @@ Route::resource('armada', ArmadaController::class);
 Route::resource('petugas', PetugasController::class);
 
 // Jadwal Routes
-Route::resource('jadwal', JadwalController::class);
+Route::get('/daftar-jadwal/generate', [JadwalController::class, 'generateForm'])->name('daftar-jadwal.generate.form');
+Route::post('/daftar-jadwal/generate', [JadwalController::class, 'generateStore'])->name('daftar-jadwal.generate.store');
+Route::resource('daftar-jadwal', JadwalController::class);
 
 // Jadwal Operasional Routes
 Route::resource('jadwal-operasional', JadwalOperasionalController::class);
