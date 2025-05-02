@@ -83,7 +83,6 @@ class MasterSeeder extends Seeder
             'name' => 'Admin Pusat',
             'email' => 'admin.pusat@example.com',
             'password' => Hash::make('adminadmin'),
-            'alamat' => 'Jl. Pusat No. 123',
             'level' => 1,
         ]);
         $adminPusat->assignRole('admin_pusat');
@@ -92,7 +91,6 @@ class MasterSeeder extends Seeder
             'name' => 'Admin TPST',
             'email' => 'admin.tpst@example.com',
             'password' => Hash::make('admintpst'),
-            'alamat' => 'Jl. TPST No. 45',
             'level' => 2,
         ]);
         $adminTpst->assignRole('admin_tpst');
@@ -101,7 +99,6 @@ class MasterSeeder extends Seeder
             'name' => 'Petugas Sampah',
             'email' => 'petugas@example.com',
             'password' => Hash::make('petugaspetugas'),
-            'alamat' => 'Jl. Kebersihan No. 67',
             'level' => 3,
         ]);
         $petugas->assignRole('petugas');
@@ -110,7 +107,6 @@ class MasterSeeder extends Seeder
             'name' => 'User Biasa',
             'email' => 'user@example.com',
             'password' => Hash::make('useruser'),
-            'alamat' => 'Jl. Warga No. 89',
             'level' => 4,
         ]);
         $user->assignRole('user');

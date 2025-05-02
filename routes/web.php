@@ -133,22 +133,31 @@ Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapo
 Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview'])->middleware('auth');
 
 
+// Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+//     // Halaman Profil Admin
+//     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
+//     Route::put('/profile', [ProfilController::class, 'update'])->name('profile.update');
+//     Route::post('/profile/upload-photo', [ProfilController::class, 'uploadPhoto'])->name('profile.upload-photo');
+//     Route::get('/index', [UserController::class, 'showRegistrationForm'])->name('index');
+//     Route::get('/get-regencies/{province_id}', [ProfilController::class, 'getRegencies']);
+//     Route::get('/get-districts/{regency_id}', [ProfilController::class, 'getDistricts']);
+//     Route::get('/get-villages/{district_id}', [ProfilController::class, 'getVillages']);
+
+//     // Tambahkan resource lain di sini jika perlu
+// });
+
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Halaman Profil Admin
     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
     Route::put('/profile', [ProfilController::class, 'update'])->name('profile.update');
     Route::post('/profile/upload-photo', [ProfilController::class, 'uploadPhoto'])->name('profile.upload-photo');
-    Route::get('/register', [UserController::class, 'showRegistrationForm'])->name('register');
-    Route::get('/get-regencies/{province_id}', [UserController::class, 'getRegencies']);
-    Route::get('/get-districts/{regency_id}', [UserController::class, 'getDistricts']);
-    Route::get('/get-villages/{district_id}', [UserController::class, 'getVillages']);
-
-    // Tambahkan resource lain di sini jika perlu
+    Route::get('/index', [UserController::class, 'showRegistrationForm'])->name('index');
+    
+    // Route untuk data wilayah
+    Route::get('/get-regencies/{province_id}', [ProfilController::class, 'getRegencies'])->name('get.regencies');
+    Route::get('/get-districts/{regency_id}', [ProfilController::class, 'getDistricts'])->name('get.districts');
+    Route::get('/get-villages/{district_id}', [ProfilController::class, 'getVillages'])->name('get.villages');
 });
-
-
-
-
 
 Route::get('/email/verify', function () {
     return view('auth.verify'); // atau view lain sesuai struktur kamu
