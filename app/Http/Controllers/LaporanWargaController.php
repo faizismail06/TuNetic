@@ -50,15 +50,17 @@ class LaporanWargaController extends Controller
         }
 
         $laporan = LaporanWarga::create($validatedData);
+        return redirect()->back()->with('success', 'Laporan berhasil dikirim!');
 
         // Cari TPS terdekat berdasarkan latitude & longitude laporan
         $nearestTps = $this->findNearestTps($request->latitude, $request->longitude);
 
-        return response()->json([
-            "message" => "Laporan warga berhasil disimpan",
-            "data" => $laporan,
-            "tps_terdekat" => $nearestTps
-        ], 201);
+        // return response()->json([
+        //     "message" => "Laporan warga berhasil disimpan",
+        //     "data" => $laporan,
+        //     "tps_terdekat" => $nearestTps
+        // ], 201);
+
     }
 
     /**
@@ -180,8 +182,8 @@ class LaporanWargaController extends Controller
     {
         $nearestTps = LokasiTps::selectRaw("
             id, nama_lokasi, province_id, regency_id, district_id, village_id, latitude, longitude,
-            (6371 * acos(cos(radians(?)) * cos(radians(latitude)) 
-            * cos(radians(longitude) - radians(?)) 
+            (6371 * acos(cos(radians(?)) * cos(radians(latitude))
+            * cos(radians(longitude) - radians(?))
             + sin(radians(?)) * sin(radians(latitude)))) AS distance
         ", [$latitude, $longitude, $latitude])
             ->orderByRaw("distance ASC")
