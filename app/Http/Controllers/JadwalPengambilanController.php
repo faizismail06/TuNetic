@@ -5,9 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\JadwalOperasional;
 use App\Models\TrackingArmada;
 use App\Models\LokasiTps;
+use App\Models\Jadwal;
+use App\Models\Petugas;
+use App\Models\RuteTps;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class JadwalPengambilanController extends Controller
 {
@@ -22,7 +27,14 @@ class JadwalPengambilanController extends Controller
     /**
      * Halaman untuk petugas melakukan auto tracking
      */
-    public function showAutoTrackingPage()
+    /**
+     * Menampilkan halaman auto tracking untuk hari ini
+     * Method ini akan menavigasikan ke halaman index.blade.php
+     */
+    /**
+     * Menampilkan halaman auto tracking berdasarkan hari yang dipilih atau hari ini
+     */
+    public function showAutoTrackingPage(Request $request, $jadwalId = null)
     {
         try {
             // Check if the logged-in user is a petugas (level 3)
@@ -45,55 +57,141 @@ class JadwalPengambilanController extends Controller
 
             $petugasId = $petugas->id;
 
-            // Rest of the code remains the same
-            $jadwalOperasional = JadwalOperasional::with([
-                'armada',
-                'jadwal',
-                'ruteTps.rute',
-                'ruteTps.lokasi_tps' // Memuat lokasi TPS
-            ])
-                ->whereIn('status', [0, 1]) // Status 0=Belum Berjalan, 1=Sedang Berjalan
-                ->whereHas('penugasanPetugas', function ($query) use ($petugasId) {
-                    $query->where('id_petugas', $petugasId);
-                })
-                ->get();
+            // Jika jadwalId diberikan, langsung ambil jadwal operasional tersebut
+            if ($jadwalId) {
+                $jadwalOperasional = JadwalOperasional::with([
+                    'armada',
+                    'jadwal',
+                    'ruteTps.rute',
+                    'ruteTps.lokasi_tps' // Memuat lokasi TPS
+                ])
+                    ->whereIn('status', [0, 1]) // Status 0=Belum Berjalan, 1=Sedang Berjalan
+                    ->whereHas('penugasanPetugas', function ($query) use ($petugasId) {
+                        $query->where('id_petugas', $petugasId);
+                    })
+                    ->where('id', $jadwalId)
+                    ->first();
 
-            if ($jadwalOperasional->isEmpty()) {
-                Log::warning('Tidak ada jadwal operasional yang ditemukan untuk petugas ID: ' . $petugasId);
-                return redirect()->route('home')
-                    ->with('info', 'Tidak ada jadwal operasional yang tersedia untuk Anda.');
+                if (!$jadwalOperasional) {
+                    Log::warning('Jadwal operasional dengan ID ' . $jadwalId . ' tidak ditemukan atau tidak diotorisasi.');
+                    return redirect()->route('petugas.jadwal-pengambilan.index')
+                        ->with('error', 'Jadwal operasional tidak ditemukan atau Anda tidak memiliki akses.');
+                }
+
+                $selectedDay = $jadwalOperasional->jadwal->hari;
+            } else {
+                // Mendapatkan parameter hari dari URL jika ada
+                $selectedDay = strtolower($request->query('day', ''));
+
+                // Daftar hari yang valid
+                $validDays = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
+
+                // Menggunakan hari ini jika parameter hari tidak valid atau tidak ada
+                if (!in_array($selectedDay, $validDays)) {
+                    // Mendapatkan jadwal untuk hari ini
+                    $today = Carbon::now()->locale('id');
+                    $todayName = strtolower($today->translatedFormat('l')); // Mendapatkan nama hari dalam bahasa Indonesia
+
+                    // Mapping nama hari dalam bahasa Inggris ke Indonesia
+                    $daysMapping = [
+                        'monday' => 'senin',
+                        'tuesday' => 'selasa',
+                        'wednesday' => 'rabu',
+                        'thursday' => 'kamis',
+                        'friday' => 'jumat',
+                        'saturday' => 'sabtu',
+                        'sunday' => 'minggu',
+                    ];
+
+                    // Jika ada pemetaan untuk nama hari dalam bahasa Inggris, gunakan itu
+                    if (array_key_exists(strtolower($today->format('l')), $daysMapping)) {
+                        $todayName = $daysMapping[strtolower($today->format('l'))];
+                    }
+
+                    $selectedDay = $todayName;
+                }
+
+                // Ambil jadwal operasional berdasarkan hari yang dipilih
+                $jadwalOperasional = JadwalOperasional::with([
+                    'armada',
+                    'jadwal',
+                    'ruteTps.rute',
+                    'ruteTps.lokasi_tps' // Memuat lokasi TPS
+                ])
+                    ->whereIn('status', [0, 1]) // Status 0=Belum Berjalan, 1=Sedang Berjalan
+                    ->whereHas('penugasanPetugas', function ($query) use ($petugasId) {
+                        $query->where('id_petugas', $petugasId);
+                    })
+                    ->whereHas('jadwal', function ($query) use ($selectedDay) {
+                        $query->where('hari', $selectedDay);
+                    })
+                    ->get();
+
+                if ($jadwalOperasional->isEmpty()) {
+                    Log::warning('Tidak ada jadwal operasional yang ditemukan untuk petugas ID: ' . $petugasId . ' pada hari ' . $selectedDay);
+                    return redirect()->route('petugas.jadwal-pengambilan.index')
+                        ->with('info', 'Tidak ada jadwal operasional yang tersedia untuk Anda pada hari ' . ucfirst($selectedDay) . '.');
+                }
             }
 
             // Ambil semua TPS yang terkait dengan jadwal operasional
             $allTps = [];
 
-            foreach ($jadwalOperasional as $jadwal) {
-                // Dapatkan semua TPS dalam rute untuk jadwal ini
-                $ruteId = $jadwal->ruteTps->rute->id;
+            // Cek apakah $jadwalOperasional adalah collection atau single instance
+            if (is_a($jadwalOperasional, 'Illuminate\Database\Eloquent\Collection')) {
+                foreach ($jadwalOperasional as $jadwal) {
+                    // Dapatkan semua TPS dalam rute untuk jadwal ini
+                    $ruteId = $jadwal->ruteTps->rute->id;
+
+                    $tpsPoints = \App\Models\RuteTps::with('lokasi_tps')
+                        ->where('id_rute', $ruteId)
+                        ->orderBy('id') // Asumsikan urutan sesuai dengan ID
+                        ->get()
+                        ->map(function ($ruteTps) use ($jadwal) {
+                            $lokasiTps = $ruteTps->lokasi_tps;
+                            return [
+                                'id' => $lokasiTps->id,
+                                'nama' => $lokasiTps->nama_tps,
+                                'latitude' => $lokasiTps->latitude,
+                                'longitude' => $lokasiTps->longitude,
+                                'jadwal_id' => $jadwal->id
+                            ];
+                        })
+                        ->toArray();
+
+                    $allTps[$jadwal->id] = $tpsPoints;
+                }
+            } else {
+                // Single jadwal operasional
+                $ruteId = $jadwalOperasional->ruteTps->rute->id;
 
                 $tpsPoints = \App\Models\RuteTps::with('lokasi_tps')
                     ->where('id_rute', $ruteId)
                     ->orderBy('id') // Asumsikan urutan sesuai dengan ID
                     ->get()
-                    ->map(function ($ruteTps) use ($jadwal) {
+                    ->map(function ($ruteTps) use ($jadwalOperasional) {
                         $lokasiTps = $ruteTps->lokasi_tps;
                         return [
                             'id' => $lokasiTps->id,
                             'nama' => $lokasiTps->nama_tps,
                             'latitude' => $lokasiTps->latitude,
                             'longitude' => $lokasiTps->longitude,
-                            'jadwal_id' => $jadwal->id
+                            'jadwal_id' => $jadwalOperasional->id
                         ];
                     })
                     ->toArray();
 
-                $allTps[$jadwal->id] = $tpsPoints;
+                $allTps[$jadwalOperasional->id] = $tpsPoints;
             }
 
-            return view('petugas.jadwal-pengambilan.index', compact('jadwalOperasional', 'allTps'));
+            // Tambahkan informasi hari yang dipilih
+            $selectedDayInfo = ucfirst($selectedDay);
+
+            return view('petugas.jadwal-pengambilan.index', compact('jadwalOperasional', 'allTps', 'selectedDayInfo'));
         } catch (\Exception $e) {
             Log::error('Error saat menampilkan jadwal operasional: ' . $e->getMessage());
-            return response()->json(['error' => 'Terjadi kesalahan saat memproses request.'], 500);
+            return redirect()->route('petugas.jadwal-pengambilan.index')
+                ->with('error', 'Terjadi kesalahan saat memproses request: ' . $e->getMessage());
         }
     }
 
@@ -236,6 +334,187 @@ class JadwalPengambilanController extends Controller
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat menyimpan lokasi.'
             ], 500);
+        }
+    }
+
+    /**
+     * Menampilkan halaman pemilihan hari jadwal pengambilan
+     * Untuk tampilan pada Gambar 1
+     */
+    public function index()
+    {
+        try {
+            // Mendapatkan hari ini
+            $today = Carbon::now()->locale('id');
+            $todayName = strtolower($today->translatedFormat('l')); // Mendapatkan nama hari dalam bahasa Indonesia
+
+            // Mapping nama hari dalam bahasa Inggris ke Indonesia
+            $daysMapping = [
+                'monday' => 'senin',
+                'tuesday' => 'selasa',
+                'wednesday' => 'rabu',
+                'thursday' => 'kamis',
+                'friday' => 'jumat',
+                'saturday' => 'sabtu',
+                'sunday' => 'minggu',
+            ];
+
+            // Jika ada pemetaan untuk nama hari dalam bahasa Inggris, gunakan itu
+            if (array_key_exists(strtolower($today->format('l')), $daysMapping)) {
+                $todayName = $daysMapping[strtolower($today->format('l'))];
+            }
+
+            // Mendapatkan user saat ini
+            $user = Auth::user();
+
+            if (!$user || $user->level != 3) {
+                Log::error('User tidak terdaftar sebagai petugas operasional (level 3).');
+                return redirect()->route('home')
+                    ->with('error', 'Anda tidak terdaftar sebagai petugas operasional.');
+            }
+
+            $petugas = Petugas::where('user_id', $user->id)->first();
+
+            if (!$petugas) {
+                return redirect()->route('home')
+                    ->with('error', 'Data petugas tidak ditemukan.');
+            }
+
+            // Dapatkan jadwal operasional untuk petugas ini
+            $jadwalOperasional = JadwalOperasional::with(['jadwal'])
+                ->whereHas('penugasanPetugas', function ($query) use ($petugas) {
+                    $query->where('id_petugas', $petugas->id);
+                })
+                ->get();
+
+            // Buat array untuk menyimpan id jadwal operasional berdasarkan hari
+            $jadwalHariIds = [];
+            foreach ($jadwalOperasional as $jadwal) {
+                $hari = strtolower($jadwal->jadwal->hari);
+                if (!isset($jadwalHariIds[$hari])) {
+                    $jadwalHariIds[$hari] = $jadwal->id;
+                }
+            }
+
+            // Mendapatkan semua hari yang ada jadwalnya
+            $jadwalHari = array_keys($jadwalHariIds);
+
+            return view('petugas.jadwal-pengambilan.days', compact('jadwalHari', 'jadwalHariIds', 'todayName'));
+        } catch (\Exception $e) {
+            Log::error('Error saat menampilkan jadwal pengambilan berdasarkan hari: ' . $e->getMessage());
+            return redirect()->route('home')
+                ->with('error', 'Terjadi kesalahan saat memuat jadwal pengambilan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Menampilkan detail jadwal pengambilan sampah per hari
+     * Untuk tampilan pada Gambar 2
+     */
+    public function detail($day)
+    {
+        try {
+            // Validasi nama hari yang diterima
+            $daysIndo = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
+
+            if (!in_array(strtolower($day), $daysIndo)) {
+                return redirect()->route('petugas.jadwal-pengambilan.index')
+                    ->with('error', 'Hari tidak valid.');
+            }
+
+            // Get user petugas
+            $user = Auth::user();
+
+            if (!$user || $user->level != 3) {
+                Log::error('User tidak terdaftar sebagai petugas operasional (level 3).');
+                return redirect()->route('home')
+                    ->with('error', 'Anda tidak terdaftar sebagai petugas operasional.');
+            }
+
+            $petugas = \App\Models\Petugas::where('user_id', $user->id)->first();
+
+            if (!$petugas) {
+                return redirect()->route('home')
+                    ->with('error', 'Data petugas tidak ditemukan.');
+            }
+
+            // Ambil jadwal operasional berdasarkan hari
+            $jadwalOperasional = JadwalOperasional::with([
+                'armada',
+                'jadwal',
+                'ruteTps.lokasi_tps',
+                'ruteTps.rute'
+            ])
+                ->whereHas('jadwal', function ($query) use ($day) {
+                    $query->where('hari', strtolower($day));
+                })
+                ->whereHas('penugasanPetugas', function ($query) use ($petugas) {
+                    $query->where('id_petugas', $petugas->id);
+                })
+                ->first();
+
+            if (!$jadwalOperasional) {
+                return redirect()->route('petugas.jadwal-pengambilan.index')
+                    ->with('info', 'Tidak ada jadwal pengambilan untuk hari ' . ucfirst($day) . '.');
+            }
+
+            // Ambil semua TPS di rute
+            $ruteTps = $jadwalOperasional->ruteTps;
+            $rute = $ruteTps->rute;
+
+            // Ambil semua TPS dalam rute
+            $tpsLocations = RuteTps::with('lokasi_tps')
+                ->where('id_rute', $rute->id)
+                ->get()
+                ->map(function ($ruteTps) use ($jadwalOperasional) {
+                    $lokasiTps = $ruteTps->lokasi_tps;
+                    $trackingData = TrackingArmada::where('id_jadwal_operasional', $jadwalOperasional->id)
+                        ->where('id_tps', $lokasiTps->id)
+                        ->first();
+
+                    $status = 'Belum';
+                    $waktuMulai = null;
+                    $waktuSelesai = null;
+
+                    if ($trackingData) {
+                        if ($trackingData->status == 1) {
+                            $status = 'Progress';
+                            $waktuMulai = Carbon::parse($trackingData->waktu_mulai)->format('H:i');
+                        } elseif ($trackingData->status == 2) {
+                            $status = 'Selesai';
+                            $waktuMulai = Carbon::parse($trackingData->waktu_mulai)->format('H:i');
+                            $waktuSelesai = Carbon::parse($trackingData->waktu_selesai)->format('H:i');
+                        }
+                    }
+
+                    return [
+                        'id' => $lokasiTps->id,
+                        'nama' => $lokasiTps->nama_tps,
+                        'alamat' => $lokasiTps->alamat,
+                        'latitude' => $lokasiTps->latitude,
+                        'longitude' => $lokasiTps->longitude,
+                        'status' => $status,
+                        'waktu_mulai' => $waktuMulai,
+                        'waktu_selesai' => $waktuSelesai
+                    ];
+                })
+                ->toArray();
+
+            // Data untuk tampilan
+            $data = [
+                'hari' => ucfirst($day),
+                'jadwal_operasional' => $jadwalOperasional,
+                'petugas' => $petugas,
+                'tps_locations' => $tpsLocations,
+                'jumlah_lokasi' => count($tpsLocations)
+            ];
+
+            // Arahkan ke halaman index.blade.php untuk hari yang dipilih
+            return view('petugas.jadwal-pengambilan.index', $data);
+        } catch (\Exception $e) {
+            Log::error('Error saat menampilkan detail jadwal pengambilan: ' . $e->getMessage());
+            return redirect()->route('petugas.jadwal-pengambilan.index')
+                ->with('error', 'Terjadi kesalahan saat memuat detail jadwal: ' . $e->getMessage());
         }
     }
 }
