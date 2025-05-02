@@ -114,6 +114,9 @@ Route::get('/lapor', function () {
 
 Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
 
+Route::get('/get-regencies/{province}', [ProfilController::class, 'getRegencies'])->name('get.regencies');
+Route::get('/get-districts/{regency}', [ProfilController::class, 'getDistricts'])->name('get.districts');
+Route::get('/get-villages/{district}', [ProfilController::class, 'getVillages'])->name('get.villages');
 
 Route::get('/armada', function () {
     return view('armada');
@@ -128,6 +131,20 @@ Route::get('/lapor', function () {return view('masyarakat.lapor');})->name('lapo
 Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
 Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
 Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview'])->middleware('auth');
+
+
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+    // Halaman Profil Admin
+    Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [ProfilController::class, 'update'])->name('profile.update');
+    Route::post('/profile/upload-photo', [ProfilController::class, 'uploadPhoto'])->name('profile.upload-photo');
+    Route::get('/register', [UserController::class, 'showRegistrationForm'])->name('register');
+    Route::get('/get-regencies/{province_id}', [UserController::class, 'getRegencies']);
+    Route::get('/get-districts/{regency_id}', [UserController::class, 'getDistricts']);
+    Route::get('/get-villages/{district_id}', [UserController::class, 'getVillages']);
+
+    // Tambahkan resource lain di sini jika perlu
+});
 
 
 
