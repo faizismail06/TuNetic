@@ -159,6 +159,18 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/get-villages/{district_id}', [ProfilController::class, 'getVillages'])->name('get.villages');
 });
 
+// Halaman Profil untuk User Biasa
+Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
+    Route::get('/profile', [ProfilController::class, 'userIndex'])->name('profile.index');
+    Route::put('/profile', [ProfilController::class, 'userUpdate'])->name('profile.update');
+    Route::post('/profile/upload-photo', [ProfilController::class, 'uploadPhoto'])->name('profile.upload-photo');
+
+    // Dropdown wilayah dinamis
+    Route::get('/get-regencies/{province_id}', [ProfilController::class, 'getRegencies'])->name('get.regencies');
+    Route::get('/get-districts/{regency_id}', [ProfilController::class, 'getDistricts'])->name('get.districts');
+    Route::get('/get-villages/{district_id}', [ProfilController::class, 'getVillages'])->name('get.villages');
+});
+
 Route::get('/email/verify', function () {
     return view('auth.verify'); // atau view lain sesuai struktur kamu
 })->middleware('auth')->name('verification.notice');

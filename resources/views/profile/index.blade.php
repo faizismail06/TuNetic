@@ -6,7 +6,7 @@
         <div class="col-md-11">
             <div class="card">
                 <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">Profil User</h5>
+                    <h5 class="mb-0">Profil Admin</h5>
                 </div>
 
                 <div class="card-body">
@@ -26,12 +26,17 @@
                             <div class="col-md-3 text-center">
                                 <label class="form-label mb-2 ms-3" style="text-align: left; display: block;">Foto Diri</label>
                                 <div class="profile-image-container mb-3">
-                                    <div class="profile-image-wrapper rounded-circle mx-auto" style="width: 150px; height: 150px; overflow: hidden; background-color: #f5f5f5;">
+                                <div class="profile-image-wrapper rounded-circle mx-auto d-flex align-items-center justify-content-center" 
+                                    style="width: 150px; height: 150px; overflow: hidden; background-color: #f8f9fa; cursor: pointer;"
+                                    id="profile-image-clickable">
                                         @if($user && $user->foto)
-                                            <img id="profile-preview" src="{{ asset('storage/profil/'.$user->foto) }}" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="Foto Profil">
+                                        <img id="profile-preview" src="{{ asset('storage/profil/'.$user->foto) }}" 
+                                            class="img-fluid w-100 h-100" 
+                                            style="object-fit: cover;" 
+                                            alt="Foto Profil">
                                         @else
-                                            <img id="profile-preview" src="{{ asset('assets/img/default-profile.jpg') }}" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="Foto Profil">
-                                        @endif
+                                            <i class="fas fa-user text-secondary" style="font-size: 4rem;"></i>
+                                            @endif
                                     </div>
                                 </div>
                             </div>
