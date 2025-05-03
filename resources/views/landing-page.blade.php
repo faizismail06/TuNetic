@@ -91,8 +91,8 @@
                     </div>
                 </div>
                 <div class="d-flex">
-                    <a href="#masuk" class="auth-btn sign-in me-2">Sign in</a>
-                    <a href="#daftar" class="auth-btn sign-up">Sign up</a>
+                    <a href="{{ route('login') }}" class="auth-btn sign-in me-2">Sign in</a>
+                    <a href="{{ route('login') }}" class="auth-btn sign-up">Sign up</a>
                 </div>
             </div>
         </nav>
