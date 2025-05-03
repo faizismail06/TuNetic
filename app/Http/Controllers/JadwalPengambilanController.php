@@ -11,6 +11,7 @@ use App\Models\RuteTps;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema; // Tambahkan import untuk Schema
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -111,27 +112,6 @@ class JadwalPengambilanController extends Controller
                     $selectedDay = $todayName;
                 }
 
-                // PERUBAHAN: Periksa terlebih dahulu apakah ada jadwal (dengan status apapun) untuk petugas pada hari yang dipilih
-                $anyJadwalQuery = JadwalOperasional::whereHas('penugasanPetugas', function ($query) use ($petugasId) {
-                    $query->where('id_petugas', $petugasId);
-                })
-                    ->whereHas('jadwal', function ($query) use ($selectedDay) {
-                        $query->where('hari', $selectedDay);
-                    });
-
-                // Tambahkan log untuk debugging
-                Log::info('Query pencarian jadwal: ' . $anyJadwalQuery->toSql());
-                Log::info('Parameter query: ' . json_encode($anyJadwalQuery->getBindings()));
-
-                $anyJadwalExists = $anyJadwalQuery->exists();
-
-                // Jika tidak ada jadwal sama sekali untuk petugas pada hari ini
-                if (!$anyJadwalExists) {
-                    Log::warning('Tidak ada jadwal operasional yang ditemukan untuk petugas ID: ' . $petugasId . ' pada hari ' . $selectedDay);
-                    return redirect()->route('petugas.jadwal-pengambilan.index')
-                        ->with('info', 'Tidak ada jadwal operasional yang tersedia untuk Anda pada hari ' . ucfirst($selectedDay) . '.');
-                }
-
                 // Ambil jadwal operasional yang belum selesai (status 0 atau 1)
                 $jadwalOperasionalQuery = JadwalOperasional::with([
                     'armada',
@@ -152,75 +132,140 @@ class JadwalPengambilanController extends Controller
                 Log::info('Parameter query: ' . json_encode($jadwalOperasionalQuery->getBindings()));
 
                 $jadwalOperasional = $jadwalOperasionalQuery->get();
-
-                // Jika tidak ada jadwal dengan status 0 atau 1, berarti semua jadwal sudah selesai
-                if ($jadwalOperasional->isEmpty()) {
-                    Log::warning('Semua jadwal operasional untuk petugas ID: ' . $petugasId . ' pada hari ' . $selectedDay . ' sudah selesai.');
-                    return redirect()->route('petugas.jadwal-pengambilan.index')
-                        ->with('info', 'Semua jadwal operasional Anda pada hari ' . ucfirst($selectedDay) . ' sudah selesai.');
-                }
             }
 
             // Ambil semua TPS yang terkait dengan jadwal operasional
             $allTps = [];
 
+            // TAMBAHAN: Data untuk info petugas
+            $tpsLocations = [];
+            $jumlahLokasi = 0;
+            $hariInfo = ucfirst($selectedDay);
+
             // Cek apakah $jadwalOperasional adalah collection atau single instance
             if (is_a($jadwalOperasional, 'Illuminate\Database\Eloquent\Collection')) {
-                foreach ($jadwalOperasional as $jadwal) {
-                    // Dapatkan semua TPS dalam rute untuk jadwal ini
-                    $ruteId = $jadwal->ruteTps->rute->id;
+                // Menggunakan jadwal pertama untuk informasi
+                $firstJadwal = $jadwalOperasional->first();
+
+                if ($firstJadwal) {
+                    foreach ($jadwalOperasional as $jadwal) {
+                        // Dapatkan semua TPS dalam rute untuk jadwal ini
+                        $ruteId = $jadwal->ruteTps->rute->id;
+
+                        $tpsPoints = \App\Models\RuteTps::with('lokasi_tps')
+                            ->where('id_rute', $ruteId)
+                            ->orderBy('id') // Asumsikan urutan sesuai dengan ID
+                            ->get()
+                            ->map(function ($ruteTps) use ($jadwal) {
+                                $lokasiTps = $ruteTps->lokasi_tps;
+
+                                // PERBAIKAN: Hanya cek tracking berdasarkan id_jadwal_operasional
+                                // karena tabel tracking_armada tidak memiliki kolom id_tps
+                                $trackingData = TrackingArmada::where('id_jadwal_operasional', $jadwal->id)
+                                    ->first();
+
+                                $status = 'Belum';
+                                if ($trackingData) {
+                                    // Jika ada tracking untuk jadwal ini, anggap semua TPS dalam progress
+                                    $status = 'Progress';
+
+                                    // Tambahkan logika tambahan jika diperlukan untuk menentukan status 'Selesai'
+                                    // Contoh: jika ada field status di tracking_armada
+                                    if (Schema::hasColumn('tracking_armada', 'status')) {
+                                        if ($trackingData->status == 2) {
+                                            $status = 'Selesai';
+                                        }
+                                    }
+                                }
+
+                                return [
+                                    'id' => $lokasiTps->id,
+                                    'nama' => $lokasiTps->nama_lokasi,
+                                    'latitude' => $lokasiTps->latitude,
+                                    'longitude' => $lokasiTps->longitude,
+                                    'jadwal_id' => $jadwal->id,
+                                    'status' => $status
+                                ];
+                            })
+                            ->toArray();
+
+                        $allTps[$jadwal->id] = $tpsPoints;
+
+                        // Tambahkan ke tpsLocations untuk info petugas
+                        $tpsLocations = array_merge($tpsLocations, $tpsPoints);
+                        $jumlahLokasi += count($tpsPoints);
+                    }
+                }
+            } else {
+                // Single jadwal operasional
+                if ($jadwalOperasional) {
+                    $ruteId = $jadwalOperasional->ruteTps->rute->id;
 
                     $tpsPoints = \App\Models\RuteTps::with('lokasi_tps')
                         ->where('id_rute', $ruteId)
                         ->orderBy('id') // Asumsikan urutan sesuai dengan ID
                         ->get()
-                        ->map(function ($ruteTps) use ($jadwal) {
+                        ->map(function ($ruteTps) use ($jadwalOperasional) {
                             $lokasiTps = $ruteTps->lokasi_tps;
+
+                            // PERBAIKAN: Hanya cek tracking berdasarkan id_jadwal_operasional
+                            // karena tabel tracking_armada tidak memiliki kolom id_tps
+                            $trackingData = TrackingArmada::where('id_jadwal_operasional', $jadwalOperasional->id)
+                                ->first();
+
+                            $status = 'Belum';
+                            if ($trackingData) {
+                                // Jika ada tracking untuk jadwal ini, anggap semua TPS dalam progress
+                                $status = 'Progress';
+
+                                // Tambahkan logika tambahan jika diperlukan untuk menentukan status 'Selesai'
+                                // Contoh: jika ada field status di tracking_armada
+                                if (Schema::hasColumn('tracking_armada', 'status')) {
+                                    if ($trackingData->status == 2) {
+                                        $status = 'Selesai';
+                                    }
+                                }
+                            }
+
                             return [
                                 'id' => $lokasiTps->id,
                                 'nama' => $lokasiTps->nama_tps,
                                 'latitude' => $lokasiTps->latitude,
                                 'longitude' => $lokasiTps->longitude,
-                                'jadwal_id' => $jadwal->id
+                                'jadwal_id' => $jadwalOperasional->id,
+                                'status' => $status
                             ];
                         })
                         ->toArray();
 
-                    $allTps[$jadwal->id] = $tpsPoints;
+                    $allTps[$jadwalOperasional->id] = $tpsPoints;
+
+                    // Tambahkan ke tpsLocations untuk info petugas
+                    $tpsLocations = $tpsPoints;
+                    $jumlahLokasi = count($tpsPoints);
                 }
-            } else {
-                // Single jadwal operasional
-                $ruteId = $jadwalOperasional->ruteTps->rute->id;
-
-                $tpsPoints = \App\Models\RuteTps::with('lokasi_tps')
-                    ->where('id_rute', $ruteId)
-                    ->orderBy('id') // Asumsikan urutan sesuai dengan ID
-                    ->get()
-                    ->map(function ($ruteTps) use ($jadwalOperasional) {
-                        $lokasiTps = $ruteTps->lokasi_tps;
-                        return [
-                            'id' => $lokasiTps->id,
-                            'nama' => $lokasiTps->nama_tps,
-                            'latitude' => $lokasiTps->latitude,
-                            'longitude' => $lokasiTps->longitude,
-                            'jadwal_id' => $jadwalOperasional->id
-                        ];
-                    })
-                    ->toArray();
-
-                $allTps[$jadwalOperasional->id] = $tpsPoints;
             }
 
             // Tambahkan informasi hari yang dipilih
             $selectedDayInfo = ucfirst($selectedDay);
 
-            return view('petugas.jadwal-pengambilan.index', compact('jadwalOperasional', 'allTps', 'selectedDayInfo'));
+            return view('petugas.jadwal-pengambilan.index', [
+                'jadwalOperasional' => $jadwalOperasional,
+                'allTps' => $allTps,
+                'selectedDayInfo' => $selectedDayInfo,
+                // Tambahkan data untuk info petugas
+                'hari' => $hariInfo,
+                'petugas' => $petugas,
+                'tps_locations' => $tpsLocations,
+                'jumlah_lokasi' => $jumlahLokasi
+            ]);
         } catch (\Exception $e) {
             Log::error('Error saat menampilkan jadwal operasional: ' . $e->getMessage());
             return redirect()->route('petugas.jadwal-pengambilan.index')
                 ->with('error', 'Terjadi kesalahan saat memproses request: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Mulai tracking untuk jadwal operasional tertentu

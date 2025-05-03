@@ -6,8 +6,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
     <!-- Leaflet Routing Machine CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
-    <!-- CSS untuk info petugas -->
-    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
     <style>
         #map {
             height: 450px;
@@ -155,11 +153,11 @@
         <div class="row justify-content-center">
             <div class="col-lg-10 col-md-11">
                 <div class="card card-transparent border-0">
-                    <div class="card-header bg-transparent border-0">
+                    {{-- <div class="card-header bg-transparent border-0">
                         <h1 class="mb-0 ms-2 w-100 fs-4 fw-bold">Rute Jemputan Sampah Hari
                             {{ ucfirst(request()->day ?? 'Selasa') }}
                         </h1>
-                    </div>
+                    </div> --}}
                     <div class="card-body">
                         @if (session('error'))
                             <div class="alert alert-danger">{{ session('error') }}</div>
@@ -170,6 +168,8 @@
                                 Anda tidak memiliki jadwal operasional yang aktif saat ini.
                             </div>
                         @else
+                            <!-- Tambahkan komponen info petugas di sini -->
+                            @include('petugas.jadwal-pengambilan.info-petugas')
                             <div class="tracking-info mb-3">
                                 <p>
                                     <strong>Petunjuk:</strong> Sistem akan otomatis mengambil lokasi perangkat Anda
@@ -213,8 +213,8 @@
                                             <div class="card jadwal-card h-100 shadow-sm">
                                                 <div class="card-body">
                                                     <h6 class="card-title">
-                                                        {{ $jadwal->armada->nama_armada ?? 'N/A' }} -
-                                                        {{ $jadwal->jadwal->nama_jadwal ?? 'N/A' }}
+                                                        {{ $jadwal->armada->no_polisi ?? 'N/A' }} -
+                                                        {{-- {{ $jadwal->jadwal->nama_jadwal ?? 'N/A' }} --}}
                                                     </h6>
                                                     <p class="card-text">
                                                         <small>
@@ -334,7 +334,7 @@
             legend.onAdd = function(map) {
                 const div = L.DomUtil.create('div', 'map-legend');
                 div.innerHTML = `
-                            <div class="legend-title"><strong>Legenda:</strong></div>
+                            <div class="legend-title"><strong>Legend:</strong></div>
                             <div class="legend-item">
                                 <div class="legend-color" style="background-color: #3388ff; border-radius: 50%;"></div>
                                 <span>TPS</span>
