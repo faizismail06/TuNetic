@@ -14,16 +14,16 @@
         }
 
         .btn-success {
-            background-color: #24A148;
+            background-color: #F7B928;
         }
 
         .btn-warning {
-            background-color: #F7B928;
+            background-color: #A0A0A0;
             color: white;
         }
 
         .btn-secondary {
-            background-color: #A0A0A0;
+            background-color: #24A148;
             color: white;
         }
 
@@ -51,66 +51,48 @@
             }
         }
     </style>
-    <section style="display: flex; align-items: center; justify-content: center; padding: 1px 20px;gap: 40px;">
+    <section style="display: flex; align-items: center; justify-content: center; padding: 1px 20px; gap: 40px;">
         <section class="schedule-section">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-5">
                 <!-- Left: Text + Image -->
-                <div class="flex-grow-1" style="min-width: 300px; max-width: 600px;">
-                    <h1 style="font-weight: 700; font-size: 2.5rem;">Jadwal Pengambilan Sampah</h1>
-                    <p style="font-size: 1.1rem; color: #555;">
-                        Ikuti rute yang sudah ditentukan dan pastikan semua sampah terangkut
-                    </p>
-                    <img src="{{ asset('assets/images/petugas/iconPetugas1.png') }}" alt="Ilustrasi Petugas"
-                        style="width: 100%; height: auto; max-width: 500px;">
-                </div>
+                <div class="d-flex flex-column gap-2">
+                    <!-- Judul + Deskripsi -->
+                    <div>
+                        <h1 class="fw-bold fs-1">Jadwal Pengambilan Sampah</h1>
+                        <p class="fs-5 text-secondary">
+                            Ikuti rute yang sudah ditentukan dan pastikan semua sampah terangkut
+                        </p>
+                    </div>
 
-                <!-- Right: Day Buttons -->
-                <div class="d-flex flex-column gap-3 justify-content-center" style="min-width: 300px; max-width: 350px;">
-                    <div class="d-flex gap-3">
-                        <!-- Fixed routes using proper day parameters -->
-                        <a href="{{ in_array('senin', $jadwalHari) ? route('jadwal-pengambilan.auto-tracking', ['day' => 'senin']) : '#' }}"
-                            class="btn day-btn {{ strtolower($todayName) == 'senin' ? 'btn-success' : 'btn-secondary' }} w-100 py-3 fs-5"
-                            {{ !in_array('senin', $jadwalHari) ? 'disabled' : '' }}>
-                            Senin
-                        </a>
-                        <a href="{{ in_array('selasa', $jadwalHari) ? route('jadwal-pengambilan.auto-tracking', ['day' => 'selasa']) : '#' }}"
-                            class="btn day-btn {{ strtolower($todayName) == 'selasa' ? 'btn-success' : 'btn-secondary' }} w-100 py-3 fs-5"
-                            {{ !in_array('selasa', $jadwalHari) ? 'disabled' : '' }}>
-                            Selasa
-                        </a>
-                    </div>
-                    <div class="d-flex gap-3">
-                        <a href="{{ in_array('rabu', $jadwalHari) ? route('jadwal-pengambilan.auto-tracking', ['day' => 'rabu']) : '#' }}"
-                            class="btn day-btn {{ strtolower($todayName) == 'rabu' ? 'btn-success' : 'btn-secondary' }} w-100 py-3 fs-5"
-                            {{ !in_array('rabu', $jadwalHari) ? 'disabled' : '' }}>
-                            Rabu
-                        </a>
-                        <a href="{{ in_array('kamis', $jadwalHari) ? route('jadwal-pengambilan.auto-tracking', ['day' => 'kamis']) : '#' }}"
-                            class="btn day-btn {{ strtolower($todayName) == 'kamis' ? 'btn-success' : 'btn-secondary' }} w-100 py-3 fs-5"
-                            {{ !in_array('kamis', $jadwalHari) ? 'disabled' : '' }}>
-                            Kamis
-                        </a>
-                    </div>
-                    <div class="d-flex gap-3">
-                        <a href="{{ in_array('jumat', $jadwalHari) ? route('jadwal-pengambilan.auto-tracking', ['day' => 'jumat']) : '#' }}"
-                            class="btn day-btn {{ strtolower($todayName) == 'jumat' ? 'btn-success' : 'btn-secondary' }} w-100 py-3 fs-5"
-                            {{ !in_array('jumat', $jadwalHari) ? 'disabled' : '' }}>
-                            Jumat
-                        </a>
-                        <a href="{{ in_array('sabtu', $jadwalHari) ? route('jadwal-pengambilan.auto-tracking', ['day' => 'sabtu']) : '#' }}"
-                            class="btn day-btn {{ strtolower($todayName) == 'sabtu' ? 'btn-success' : 'btn-secondary' }} w-100 py-3 fs-5"
-                            {{ !in_array('sabtu', $jadwalHari) ? 'disabled' : '' }}>
-                            Sabtu
-                        </a>
-                    </div>
-                    <div class="d-flex">
-                        <a href="{{ in_array('minggu', $jadwalHari) ? route('jadwal-pengambilan.auto-tracking', ['day' => 'minggu']) : '#' }}"
-                            class="btn day-btn {{ strtolower($todayName) == 'minggu' ? 'btn-success' : 'btn-secondary' }} w-50 py-3 fs-5"
-                            {{ !in_array('minggu', $jadwalHari) ? 'disabled' : '' }}>
-                            Minggu
-                        </a>
+                    <!-- Konten Utama: Ilustrasi + Tombol -->
+                    <div class="d-flex align-items-center gap-1">
+                        <!-- Ilustrasi Kiri -->
+                        <div class="d-flex align-items-start gap-1">
+                            <img src="{{ asset('assets/images/petugas/iconPetugas1.png') }}" alt="Ilustrasi Petugas"
+                                class="img-fluid" style="max-width:90%; height:auto;">
+                        </div>
+
+                        @php
+                            $hariList = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
+                        @endphp
+
+                        <div class="container px-0" style="min-width:300px; max-width:350px;">
+                            <div class="row g-3">
+                                @foreach ($hariList as $hari)
+                                    <div class="col-12 col-sm-6">
+                                        <a href="{{ in_array($hari, $jadwalHari) ? route('jadwal-pengambilan.auto-tracking', ['day' => $hari]) : '#' }}"
+                                            class="btn w-100 py-3 px-4 fs-5 {{ strtolower($todayName) == $hari ? 'btn-success' : 'btn-secondary' }}"
+                                            {{ in_array($hari, $jadwalHari) ? '' : 'disabled' }}>
+                                            {{ ucfirst($hari) }}
+                                        </a>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+
             </div>
         </section>
     </section>

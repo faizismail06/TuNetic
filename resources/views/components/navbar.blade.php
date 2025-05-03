@@ -230,6 +230,9 @@
 </head>
 
 <body>
+    @stack('css')
+    @stack('js')
+
     <!-- Navbar -->
     <div class="navbar" style="padding: 12px 50px;">
         <div style="width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 40px;">

@@ -111,12 +111,33 @@ class JadwalPengambilanController extends Controller
                     $selectedDay = $todayName;
                 }
 
-                // Ambil jadwal operasional berdasarkan hari yang dipilih
-                $jadwalOperasional = JadwalOperasional::with([
+                // PERUBAHAN: Periksa terlebih dahulu apakah ada jadwal (dengan status apapun) untuk petugas pada hari yang dipilih
+                $anyJadwalQuery = JadwalOperasional::whereHas('penugasanPetugas', function ($query) use ($petugasId) {
+                    $query->where('id_petugas', $petugasId);
+                })
+                    ->whereHas('jadwal', function ($query) use ($selectedDay) {
+                        $query->where('hari', $selectedDay);
+                    });
+
+                // Tambahkan log untuk debugging
+                Log::info('Query pencarian jadwal: ' . $anyJadwalQuery->toSql());
+                Log::info('Parameter query: ' . json_encode($anyJadwalQuery->getBindings()));
+
+                $anyJadwalExists = $anyJadwalQuery->exists();
+
+                // Jika tidak ada jadwal sama sekali untuk petugas pada hari ini
+                if (!$anyJadwalExists) {
+                    Log::warning('Tidak ada jadwal operasional yang ditemukan untuk petugas ID: ' . $petugasId . ' pada hari ' . $selectedDay);
+                    return redirect()->route('petugas.jadwal-pengambilan.index')
+                        ->with('info', 'Tidak ada jadwal operasional yang tersedia untuk Anda pada hari ' . ucfirst($selectedDay) . '.');
+                }
+
+                // Ambil jadwal operasional yang belum selesai (status 0 atau 1)
+                $jadwalOperasionalQuery = JadwalOperasional::with([
                     'armada',
                     'jadwal',
                     'ruteTps.rute',
-                    'ruteTps.lokasi_tps' // Memuat lokasi TPS
+                    'ruteTps.lokasi_tps'
                 ])
                     ->whereIn('status', [0, 1]) // Status 0=Belum Berjalan, 1=Sedang Berjalan
                     ->whereHas('penugasanPetugas', function ($query) use ($petugasId) {
@@ -124,13 +145,19 @@ class JadwalPengambilanController extends Controller
                     })
                     ->whereHas('jadwal', function ($query) use ($selectedDay) {
                         $query->where('hari', $selectedDay);
-                    })
-                    ->get();
+                    });
 
+                // Tambahkan log untuk debugging
+                Log::info('Query jadwal status 0/1: ' . $jadwalOperasionalQuery->toSql());
+                Log::info('Parameter query: ' . json_encode($jadwalOperasionalQuery->getBindings()));
+
+                $jadwalOperasional = $jadwalOperasionalQuery->get();
+
+                // Jika tidak ada jadwal dengan status 0 atau 1, berarti semua jadwal sudah selesai
                 if ($jadwalOperasional->isEmpty()) {
-                    Log::warning('Tidak ada jadwal operasional yang ditemukan untuk petugas ID: ' . $petugasId . ' pada hari ' . $selectedDay);
+                    Log::warning('Semua jadwal operasional untuk petugas ID: ' . $petugasId . ' pada hari ' . $selectedDay . ' sudah selesai.');
                     return redirect()->route('petugas.jadwal-pengambilan.index')
-                        ->with('info', 'Tidak ada jadwal operasional yang tersedia untuk Anda pada hari ' . ucfirst($selectedDay) . '.');
+                        ->with('info', 'Semua jadwal operasional Anda pada hari ' . ucfirst($selectedDay) . ' sudah selesai.');
                 }
             }
 

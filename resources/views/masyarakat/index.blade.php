@@ -100,21 +100,23 @@
 
             <!-- Kanan: Daftar Laporan -->
             <div class="col-md-6">
-                @if($laporanTerbaru->isEmpty())
+                @if ($laporanTerbaru->isEmpty())
                     <p>Belum ada laporan yang dikirim.</p>
                 @else
                     <div class="d-flex flex-column gap-4" style="padding-top: px;">
-                        @foreach($laporanTerbaru as $laporan)
+                        @foreach ($laporanTerbaru as $laporan)
                             <div class="card border-0 shadow-sm p-3" style="border-radius: 16px;">
                                 <div class="d-flex align-items-center gap-3">
                                     <!-- Gambar -->
                                     <div style="flex: 0 0 150px;">
-                                        @if($laporan->gambar)
+                                        @if ($laporan->gambar)
                                             <img src="{{ asset('storage/' . $laporan->gambar) }}" class="img-fluid rounded"
-                                                style="width: 150px; height: 120px; object-fit: cover;" alt="Gambar Laporan">
+                                                style="width: 150px; height: 120px; object-fit: cover;"
+                                                alt="Gambar Laporan">
                                         @else
                                             <img src="{{ asset('images/default.jpg') }}" class="img-fluid rounded"
-                                                style="width: 150px; height: 120px; object-fit: cover;" alt="Tidak Ada Gambar">
+                                                style="width: 150px; height: 120px; object-fit: cover;"
+                                                alt="Tidak Ada Gambar">
                                         @endif
                                     </div>
 
@@ -126,7 +128,7 @@
 
                                         <div class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9rem;">
                                             <i class="fas fa-calendar-alt me-2 text-success"></i>
-                                            {{  $laporan->created_at->format('d F Y') }}
+                                            {{ $laporan->created_at->format('d F Y') }}
                                         </div>
 
                                         <div class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9rem;">
@@ -136,7 +138,7 @@
 
 
                                         <div class="d-flex align-items-center" style="font-size: 0.9rem;">
-                                            @if($laporan->status == 0)
+                                            @if ($laporan->status == 0)
                                                 <i class="fas fa-exclamation-circle me-2 text-danger"></i>
                                                 <span class="text-danger">Belum diangkut</span>
                                             @elseif($laporan->status == 1)
@@ -184,7 +186,8 @@
 
             <!-- Tombol kanan bawah -->
             <div style="display: flex; justify-content: flex-end; margin-top: 20px; padding-right: 100px;">
-                <a href="{{ route('masyarakat.lacak') }}" style="font-size: 1.1rem;
+                <a href="{{ route('masyarakat.lacak') }}"
+                    style="font-size: 1.1rem;
                                                                                                       background-color: #299E63;
                                                                                                       margin-top: 20px;
                                                                                                       color: white;
