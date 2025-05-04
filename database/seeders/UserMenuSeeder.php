@@ -70,6 +70,28 @@ class UserMenuSeeder extends Seeder
         Permission::create(['name' => 'access_user_profile', 'menu_id' => $profileUser->id]);
         Permission::create(['name' => 'update_user_profile', 'menu_id' => $profileUser->id]);
 
+        $akun = Menu::create([
+            'nama_menu' => 'Akun',
+            'url' => 'user/profile/akun',
+            'icon' => 'fa-solid fa-key',
+            'parent_id' => $profileUser->id,
+            'urutan' => 1
+        ]);
+
+        Permission::create(['name' => 'access_user_profile', 'menu_id' => $akun->id]);
+        Permission::create(['name' => 'update_user_profile', 'menu_id' => $akun->id]);
+
+        $jadiPetugas = Menu::create([
+            'nama_menu' => 'Jadi Petugas',
+            'url' => 'user/profile/akun',
+            'icon' => 'fa-solid fa-repeat',
+            'parent_id' => $profileUser->id,
+            'urutan' => 1
+        ]);
+
+        Permission::create(['name' => 'access_user_profile', 'menu_id' => $jadiPetugas->id]);
+        Permission::create(['name' => 'update_user_profile', 'menu_id' => $jadiPetugas->id]);
+
         // Return the main menu id to be used by MasterSeeder
         return $menuUser->id;
     }
