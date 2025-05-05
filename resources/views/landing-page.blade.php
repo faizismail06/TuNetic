@@ -98,29 +98,35 @@
         </nav>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero bg-success text-white position-relative overflow-hidden">
-        <!-- Siluet Logo di Background -->
-        <div class="position-absolute start-0 top-50 translate-middle-y opacity-7" style="z-index: 1;">
-            <img src="{{ asset('assets/images/logopalsu.png') }}" alt="Siluet Logo" class="img-fluid"
-                style="max-width: 300px;">
-        </div>
+<!-- Hero Section -->
+<section class="hero bg-success text-white position-relative overflow-hidden">
+    <!-- Siluet Logo di Background -->
+    <div class="position-absolute start-0 top-50 translate-middle-y opacity-7" style="z-index: 1;">
+        <img src="{{ asset('assets/images/logopalsu.png') }}" alt="Siluet Logo" class="img-fluid" style="max-width: 300px;">
+    </div>
 
-        <div class="container position-relative pt-5" style="z-index: 2;">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h1 class="display-4 fw-bold" style="font-family: 'Red Hat Text'">Buang Sampah <br /> Tanpa Ribet</h1>
-                    <p class="lead mt-4" style="font-size: 2rem; font-family: 'Red Hat Text', sans-serif;">#Small Steps, Big Impact</p>
-                    <a href="" class="btn btn-warning px-5 py-3 mt-3 start-now-btn">Mulai Sekarang</a>
-                </div>
-                <div class="col-md-6 text-end">
-                    <div class="position-relative">
-                        <img src="{{ asset('assets/images/iconpetugas1.png') }}" alt="Petugas Sampah" class="img-fluid">
-                    </div>
-                </div>
+    <div class="container position-relative pt-5" style="z-index: 2;">
+        <div class="row align-items-center">
+            <!-- Teks Kiri -->
+            <div class="col-md-6" style="padding-left: 40px; padding-top: 100px;">
+            <h1 class="display-4 fw-bold" style="font-family: 'Red Hat Text'; font-size: 4rem;">
+    Buang Sampah <br /> Tanpa Ribet
+</h1>
+
+                <p class="lead mt-4" style="font-size: 2rem; font-family: 'Red Hat Text', sans-serif;">#Small Steps, Big Impact</p>
+                <a href="" class="btn btn-warning px-5 py-3 mt-3 start-now-btn">Mulai Sekarang</a>
+            </div>
+
+            <!-- Gambar Kanan -->
+            <div class="col-md-6 text-end d-flex justify-content-end align-items-end">
+                <img src="{{ asset('assets/images/iconpetugas1.png') }}"
+                     alt="Petugas Sampah"
+                     class="img-fluid"
+                     style="max-width: 100%; transform: translate(115px, 20px);">
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- Pengelolaan Sampah Section -->
     <section class="py-5" id="tentang-kami">
