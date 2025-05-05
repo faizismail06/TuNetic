@@ -3,7 +3,7 @@
         <li class="nav-header">{{ strtoupper($menu->nama_menu) }}</li>
         @foreach ($menu->submenus as $submenu)
             @if (count($submenu->submenus) == '0')
-                <li class="nav-item">
+                <li class="nav-item text-white">
                     <a href="{{ url($submenu->url) }}"
                         class="nav-link {{ Request::segment(1) == $submenu->url ? 'active' : '' }}">
                         <i class="nav-icon {{ $submenu->icon }}"></i>
