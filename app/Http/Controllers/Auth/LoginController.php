@@ -4,23 +4,34 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
     use AuthenticatesUsers;
 
     /**
-     * Where to redirect users after login.
+     * Override method redirectTo untuk menentukan redirect berdasarkan role.
      *
-     * @var string
+     * @return string
      */
-    protected $redirectTo = '/home';
+    protected function redirectTo()
+    {
+        $role = (Auth::user()->roles->first())->name;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
+        if ($role === 'admin_pusat') {
+            return '/admin/home';
+        } elseif ($role === 'admin_tpst') {
+            return '/admin-tpst/home';
+        } elseif ($role === 'petugas') {
+            return '/petugas/home';
+        } elseif ($role === 'warga') {
+            return '/warga/beranda';
+        } else {
+            return '/admin/home'; // default fallback
+        }
+    }
+
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
