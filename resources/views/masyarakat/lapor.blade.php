@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <div class="main-wrapper">
         <div class="form-wrapper">
             <h2 style="font-size: 1.8rem; margin-bottom: 10px; font-weight: 600">Laporan Sampah Baru</h2>
@@ -32,9 +36,9 @@
                 <input type="file" id="gambar" name="gambar" accept="image/*" style="display:none;">
 
 
-                <label style="font-size: 1rem; margin-top: 20px; font-weight: 550; display: block;">Tambah Lokasi</label>
-                <button type="button" class="location-btn" onclick="getLocation()"><span
-                        class="material-icons icon">my_location</span>Lokasi Terkini</button>
+                <label>Pilih Lokasi di Peta</label>
+                <div id="map" style="height: 300px; margin-bottom: 20px; border-radius: 10px;"></div>
+
                 <input type="hidden" name="latitude" id="latitude" required>
                 <input type="hidden" name="longitude" id="longitude" required>
                 <div id="alamat-wrapper" style="display: none;">
@@ -75,69 +79,7 @@
                 reader.readAsDataURL(file);
             }
         });
-    </script>
 
-    <script>
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-
-                    document.getElementById('latitude').value = lat;
-                    document.getElementById('longitude').value = lon;
-
-                    // Pakai OSM Nominatim untuk reverse geocoding
-                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            const displayName = data.display_name;
-                            document.getElementById('alamat').textContent = displayName;
-                            document.getElementById('alamat-wrapper').style.display = 'block';
-                        })
-
-                        .catch(error => {
-                            document.getElementById('alamat').textContent = "Gagal mengambil alamat.";
-                            console.error("Nominatim error:", error);
-                        });
-
-                    alert('Lokasi berhasil ditambahkan!');
-                }, function (error) {
-                    switch (error.code) {
-                        case error.PERMISSION_DENIED:
-                            alert("Pengguna menolak permintaan Geolokasi.");
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            alert("Informasi lokasi tidak tersedia.");
-                            break;
-                        case error.TIMEOUT:
-                            alert("Permintaan untuk mendapatkan lokasi pengguna telah timeout.");
-                            break;
-                        case error.UNKNOWN_ERROR:
-                            alert("Terjadi kesalahan yang tidak diketahui.");
-                            break;
-                    }
-                });
-            } else {
-                alert("Browser tidak mendukung Geolokasi.");
-            }
-        }
-    </script>
-
-
-    @if(session('success'))
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: '{{ e(session("success")) }}',
-                showConfirmButton: false,
-                timer: 2000
-            });
-        </script>
-    @endif
-
-    <script>
         function validateForm() {
             const judul = document.getElementById('judul').value.trim();
             const gambar = document.getElementById('gambar').files.length;
@@ -153,13 +95,112 @@
                 return false;
             }
             if (latitude === '' || longitude === '') {
-                alert('Silakan tambahkan lokasi terlebih dahulu.');
+                alert('Silakan pilih lokasi di peta terlebih dahulu.');
                 return false;
             }
 
-            return true; // semua valid, form dikirim
+            return true;
+        }
+
+    </script>
+
+    <script>
+        let map;
+        let marker = null;  // Marker global yang akan dipindahkan, bukan dibuat ulang
+
+        function setMarker(lat, lng) {
+            // Jika marker sudah ada, hapus dulu sebelum menambahkan yang baru
+            if (marker) {
+                marker.remove(); // Menghapus marker yang lama
+            }
+
+            // Tambahkan marker baru
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+            // Update form koordinat
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+
+            // Ambil dan tampilkan alamat
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('alamat').textContent = data.display_name;
+                    document.getElementById('alamat-wrapper').style.display = 'block';
+                })
+                .catch(error => {
+                    document.getElementById('alamat').textContent = "Gagal mengambil alamat.";
+                    console.error("Geocoding error:", error);
+                });
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                // Inisialisasi peta
+                map = L.map('map').setView([lat, lng], 16);
+
+                // Tambahkan tile OpenStreetMap
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Pasang marker awal dari lokasi pengguna
+                setMarker(lat, lng);
+
+                // Ketika user klik peta
+                map.on('click', function (e) {
+                    setMarker(e.latlng.lat, e.latlng.lng);
+                });
+
+                // Tambahkan search control
+                L.Control.geocoder({
+                    geocoder: L.Control.Geocoder.nominatim({
+                        geocodingQueryParams: {
+                            countrycodes: 'ID'
+                        }
+                    })
+                }).addTo(map);
+
+                // Input pencarian manual
+                document.getElementById('search-input').addEventListener('input', function () {
+                    const query = this.value;
+                    if (query.length > 2) {
+                        fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=ID&q=${query}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.length > 0) {
+                                    const lat = parseFloat(data[0].lat);
+                                    const lon = parseFloat(data[0].lon);
+                                    map.setView([lat, lon], 16);
+                                    setMarker(lat, lon);  // Pastikan hanya satu marker yang dipindahkan
+                                }
+                            })
+                            .catch(error => console.error("Geocoding error:", error));
+                    }
+                });
+
+            }, function () {
+                alert("Gagal mendapatkan lokasi. Aktifkan izin lokasi dan coba lagi.");
+            });
+        } else {
+            alert("Browser tidak mendukung Geolokasi.");
         }
     </script>
+
+    @if(session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '{{ e(session("success")) }}',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        </script>
+    @endif
 
 
     <style>
@@ -187,8 +228,7 @@
             color: #333;
             box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
             min-height: 900px;
-
-            background-image: url('assets/images/Masyarakat/aksenrecyle2.png');
+            background-image: url('{{ asset('assets/images/Masyarakat/aksenrecyle2.png') }}');
             background-repeat: no-repeat;
             background-position: top right;
             background-size: 230px;
@@ -237,7 +277,6 @@
             border-radius: 10px;
         }
 
-
         .location-btn {
             display: flex;
             align-items: center;
@@ -282,7 +321,6 @@
             color: #FFB800;
             font-size: 1.2rem;
         }
-
 
         .buttons {
             display: flex;

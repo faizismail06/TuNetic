@@ -54,11 +54,8 @@ class LaporanWargaController extends Controller
         // Cari TPS terdekat berdasarkan latitude & longitude laporan
         $nearestTps = $this->findNearestTps($request->latitude, $request->longitude);
 
-        return response()->json([
-            "message" => "Laporan warga berhasil disimpan",
-            "data" => $laporan,
-            "tps_terdekat" => $nearestTps
-        ], 201);
+        return redirect()->back()->with('success', 'Laporan warga berhasil disimpan');
+
     }
 
     /**
@@ -66,9 +63,20 @@ class LaporanWargaController extends Controller
      */
     public function show($id)
     {
-        $laporan = LaporanWarga::with('user')->findOrFail($id);
-        return response()->json($laporan, 200);
+        $lapor = LaporanWarga::findOrFail($id);
+
+        // Cek apakah latitude dan longitude ada
+        if ($lapor->latitude && $lapor->longitude) {
+            $latitude = $lapor->latitude;
+            $longitude = $lapor->longitude;
+
+            // Panggil fungsi getLocationName untuk mendapatkan nama lokasi
+            $lapor->lokasi = $this->getLocationName($latitude, $longitude);
+        }
+
+        return view('masyarakat.detailRiwayat', compact('lapor'));
     }
+
 
     /**
      * Memperbarui laporan warga.

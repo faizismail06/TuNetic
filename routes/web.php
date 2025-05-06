@@ -114,13 +114,17 @@ Route::apiResource('artikel', ArtikelController::class);
 
 Route::get('dbbackup', [DBBackupController::class, 'DBDataBackup']);
 
+// Route::get('/masyarakat', [LaporanWargaController::class, 'index'])->middleware('auth');
 Route::get('/masyarakat', [LaporanWargaController::class, 'index'])->middleware('auth');
+
+
 
 Route::get('/lapor', function () {
     return view('masyarakat.lapor');
 })->name('lapor');
 
 Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
+Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
 
 
 Route::get('/armada', function () {
@@ -131,7 +135,9 @@ Route::get('/lacak', function () {
     return view('masyarakat.lacak');
 })->name('masyarakat.lacak');
 
-Route::get('/lapor', function () {return view('masyarakat.lapor');})->name('lapor');
+Route::get('/lapor', function () {
+    return view('masyarakat.lapor');
+})->name('lapor');
 
 Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
 Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');

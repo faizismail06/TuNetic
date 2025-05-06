@@ -119,10 +119,21 @@
                 <a href="/lapor">Lapor Sampah</a>
                 <a href="/armada">Rute Armada</a>
             </div>
-            <a href="profil.html" class="profile">
-                Fulan Andi Prasetyo
-                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
-            </a>
+            @php
+                use Illuminate\Support\Facades\Auth;
+            @endphp
+
+            @if(Auth::check())
+                <a href="{{ route('profil.index') }}" class="profile">
+                    {{ Auth::user()->name }}
+                    <img src="{{ asset(Auth::user()->photo ?? 'assets/images/default-user.png') }}" alt="Profile">
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="profile">
+                    Login
+                    <img src="{{ asset('assets/images/default-user.png') }}" alt="Profile">
+                </a>
+            @endif
         </div>
     </div>
 
