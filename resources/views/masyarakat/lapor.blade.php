@@ -125,7 +125,15 @@
             fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('alamat').textContent = data.display_name;
+                    const addr = data.address;
+                    const readableAlamat = [
+                        addr.road || addr.neighbourhood || '',
+                        addr.village || addr.suburb || addr.town || addr.city || '',
+                        addr.state || '',
+                        addr.country || ''
+                    ].filter(Boolean).join(', ');
+                    document.getElementById('alamat').textContent = readableAlamat;
+
                     document.getElementById('alamat-wrapper').style.display = 'block';
                 })
                 .catch(error => {
