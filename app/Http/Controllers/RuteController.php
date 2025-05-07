@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Http;
+// use App\Http\Controllers\Log;
 use App\Models\Rute;
 use Illuminate\Http\Request;
 use Exception;
@@ -13,11 +15,48 @@ class RuteController extends Controller
      */
     public function index()
     {
-        try {
-            return response()->json(Rute::all(), 200);
-        } catch (Exception $e) {
-            return response()->json(["error" => "Gagal mengambil data rute", "message" => $e->getMessage()], 500);
+        $rute = Rute::all();
+        // return view('adminpusat.manage-rute.index', compact('rute'));
+        foreach ($rute as $item) {
+            if ($item->alamat_laporan) {
+                $item->alamat = $item->alamat_laporan;
+            } else {
+                $koordinat = json_decode($item->map, true);
+                if (is_array($koordinat) && count($koordinat) > 0) {
+                    $lat = $koordinat[0]['lat'];
+                    $lng = $koordinat[0]['lng'];
+    
+                    try {
+                        // Reverse geocoding ke OpenStreetMap
+                        $response = Http::get('https://nominatim.openstreetmap.org/reverse', [
+                            'format' => 'json',
+                            'lat' => $lat,
+                            'lon' => $lng,
+                            'zoom' => 18,
+                            'addressdetails' => 1
+                        ]);
+        
+                        if ($response->ok() && isset($response['display_name'])) {
+                            $alamat = $response['display_name'];
+                            $item->alamat = $alamat;
+
+                            // Simpan agar tidak panggil API lagi
+                            // Log::info('Saving alamat_laporan untuk rute ID: ' . $item->id . ', alamat: ' . $alamat);
+                            $item->alamat_laporan = $alamat;
+                            $item->save();
+                        } else {
+                            $item->alamat = '-';
+                        }
+                    } catch  (\Exception $e) {
+                        $item->alamat = '-';
+                    }
+                } else {
+                    $item->alamat = '-';
+                }
+            }
         }
+
+        return view('adminpusat.manage-rute.index', compact('rute'));
     }
 
     /**

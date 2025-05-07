@@ -129,7 +129,7 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            toastr()->error('Perngguna gagal ditambah </br> Periksa kembali data anda');
+            toastr()->error('Pengguna gagal ditambah </br> Periksa kembali data anda');
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();

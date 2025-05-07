@@ -15,6 +15,7 @@ class Rute extends Model
         'nama_rute',
         'map',
         'wilayah',
+        'alamat_laporan',
     ];
 
     protected $casts = [
