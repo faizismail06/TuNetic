@@ -15,14 +15,20 @@ class LoginController extends Controller
 
     protected function redirectTo()
     {
-        $user = Auth::user();
+        $role = Auth::user()->roles->first()->name; // Ambil nama role user
 
-        if ($user && $user->level == 4) {
-            return '/masyarakat'; // Arahkan ke halaman masyarakat
+        // Redirection berdasarkan role setelah verifikasi email
+        if ($role === 'admin_pusat') {
+            return '/admin/home';
+        } elseif ($role === 'admin_tpst') {
+            return '/admin-tpst/home';
+        } elseif ($role === 'petugas') {
+            return '/petugas/home';
+        } elseif ($role === 'user') {
+            return '/masyarakat';
+        } else {
+            return '/home'; // Default fallback jika role tidak dikenali
         }
-
-        // Jika level tidak sesuai, kembalikan ke halaman home atau halaman default lainnya
-        return '/home';  // default jika bukan masyarakat
     }
 
     public function __construct()
