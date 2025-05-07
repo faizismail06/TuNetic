@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,21 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
+
 <body>
+    @if(auth()->check())
+        @php
+            $level = auth()->user()->level;
+            $redirect = match ($level) {
+                4 => '/masyarakat',
+                1 => '/admin',
+                default => '/home'
+            };
+        @endphp
+        <script>window.location.href = "{{ $redirect }}";</script>
+        @exit
+    @endif
+
     <div class="container">
         <!-- Login Form -->
         <div class="form-box login">
@@ -101,17 +116,18 @@
 
     <script src="{{ asset('assets/js/main.js') }}"></script>
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const params = new URLSearchParams(window.location.search);
-        const mode = params.get("mode");
+        document.addEventListener("DOMContentLoaded", function () {
+            const params = new URLSearchParams(window.location.search);
+            const mode = params.get("mode");
 
-        if (mode === "register") {
-            document.querySelector('.container').classList.add('active');
-        } else {
-            document.querySelector('.container').classList.remove('active');
-        }
-    });
-</script>
+            if (mode === "register") {
+                document.querySelector('.container').classList.add('active');
+            } else {
+                document.querySelector('.container').classList.remove('active');
+            }
+        });
+    </script>
 
 </body>
+
 </html>

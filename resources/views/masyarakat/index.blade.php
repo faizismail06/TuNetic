@@ -37,6 +37,23 @@
         p {
             font-family: 'Red Hat Text', sans-serif;
         }
+
+        .btn-detail {
+            /* margin-top: 12px; */
+            display: inline-block;
+            padding: 8px 18px;
+            /* background-color: #f0f0f0; */
+            color: #299E63;
+            font-weight: 300;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            font-size: 0.9rem;
+        }
+
+        /* .btn-detail:hover {
+                    background-color: #e0e0e0;
+                } */
     </style>
 
 
@@ -105,12 +122,12 @@
                 @else
                     <div class="d-flex flex-column gap-4" style="padding-top: px;">
                         @foreach($laporanTerbaru as $laporan)
-                            <div class="card border-0 shadow-sm p-3" style="border-radius: 16px;">
+                            <div class="card border-0 shadow-sm p-3" style="border-radius: 16px; ">
                                 <div class="d-flex align-items-center gap-3">
                                     <!-- Gambar -->
                                     <div style="flex: 0 0 150px;">
                                         @if($laporan->gambar)
-                                            <img src="{{ asset('storage/' . $laporan->gambar) }}" class="img-fluid rounded"
+                                            <img src="{{ $laporan->gambar }}" class="img-fluid rounded"
                                                 style="width: 150px; height: 120px; object-fit: cover;" alt="Gambar Laporan">
                                         @else
                                             <img src="{{ asset('images/default.jpg') }}" class="img-fluid rounded"
@@ -146,6 +163,13 @@
                                                 <i class="fas fa-check-circle me-2 text-success"></i>
                                                 <span class="text-success">Sudah diangkut</span>
                                             @endif
+
+                                        </div>
+                                        <div class="text-end mt-1">
+                                            <a href="{{ route('laporan.show', $laporan->id) }}" class="btn-detail text-success"
+                                                style="font-family: 'Red Hat Text', sans-serif; font-weight: 500; text-decoration: none;">
+                                                Lihat Detail
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -154,9 +178,9 @@
                     </div>
 
                     <!-- Tombol Lihat Semua -->
-                    <div class="text-end mt-4">
+                    <div class="text-start mt-4">
                         <a href="{{ route('lapor.riwayat') }}" class="text-success"
-                            style="text-decoration: none; font-family: 'Red Hat Text', sans-serif; font-weight: 500;">
+                            style="text-decoration: none; font-family: 'Red Hat Text', sans-serif; font-weight: 600; ">
                             Lihat Semua <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -164,10 +188,6 @@
             </div>
         </div>
     </div>
-
-
-
-
 
     {{-- Lacak Armada --}}
     <section class="py-5" style="font-family: 'Red Hat Text', sans-serif; margin-top: 80px;">
@@ -177,20 +197,12 @@
 
             <!-- Gambar Armada -->
             <img src="{{ asset('assets/images/Masyarakat/maps-armada-placeholder.png') }}" alt="Peta Placeholder"
-                style="width: 1320px; height: 400px; 
-                                                                                        margin-top: 30px; 
-                                                                                        border-radius: 12px; 
-                                                                                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                style="width: 1320px; height: 400px; margin-top: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
 
             <!-- Tombol kanan bawah -->
             <div style="display: flex; justify-content: flex-end; margin-top: 20px; padding-right: 100px;">
-                <a href="{{ route('masyarakat.lacak') }}" style="font-size: 1.1rem;
-                                                                                                      background-color: #299E63;
-                                                                                                      margin-top: 20px; 
-                                                                                                      color: white;
-                                                                                                      padding: 15px 25px;
-                                                                                                      text-decoration: none;
-                                                                                                      border-radius: 8px;">
+                <a href="{{ route('masyarakat.lacak') }}"
+                    style="font-size: 1.1rem; background-color: #299E63; margin-top: 20px; color: white; padding: 15px 25px; text-decoration: none; border-radius: 8px;">
                     Cek Rute Armada
                 </a>
             </div>
