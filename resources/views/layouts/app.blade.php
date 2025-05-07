@@ -228,6 +228,8 @@
                 });
         });
     </script>
+
+@stack('scripts') <!-- Wajib ada jika belum -->
 </body>
 
 </html>
