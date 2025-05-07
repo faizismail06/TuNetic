@@ -6,7 +6,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6 text-uppercase">
-                    <h4 class="m-0">Tambah Pengguna</h4>
+                    <h4 class="m-0">Edit Pengguna</h4>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -19,7 +19,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card card-success card-outline">
+            <div class="card card-success card-outline">
                         <div class="card-header">
                             <h5 class="card-title m-0"></h5>
                             <div class="card-tools">
@@ -28,9 +28,9 @@
                             </div>
                         </div>
                         <form action="{{ route('manage-user.update', $user->id) }}" method="post">
-                            @csrf
-                            @method('PUT')
-                            <div class="card-body">
+                    @csrf
+                    @method('PUT')
+                    <div class="card-body">
                                 <div class="form-group">
                                     <label>Nama Lengkap</label>
                                     <input type="text" name="name"
@@ -39,7 +39,7 @@
                                     @error('name')
                                         <div class="invalid-feedback" role="alert">
                                             <span>{{ $message }}</span>
-                                        </div>
+                    </div>
                                     @enderror
                                 </div>
                                 <div class="form-group">
@@ -91,7 +91,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-footer">
+                    <div class="card-footer">
                                 <button type="submit" class="btn btn-info btn-block btn-flat"><i class="fa fa-save"></i>
                                     Simpan</button>
                             </div>

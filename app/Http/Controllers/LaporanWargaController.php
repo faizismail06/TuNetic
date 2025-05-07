@@ -50,16 +50,27 @@ class LaporanWargaController extends Controller
         }
 
         $laporan = LaporanWarga::create($validatedData);
+
         return redirect()->back()->with('success', 'Laporan berhasil dikirim!');
+
+>>>>>>> 82c7fce36379b374c0da5cc20a1dabdf956beb8b
 
         // Cari TPS terdekat berdasarkan latitude & longitude laporan
         $nearestTps = $this->findNearestTps($request->latitude, $request->longitude);
+
 
         // return response()->json([
         //     "message" => "Laporan warga berhasil disimpan",
         //     "data" => $laporan,
         //     "tps_terdekat" => $nearestTps
         // ], 201);
+
+
+        return response()->json([
+            "message" => "Laporan warga berhasil disimpan",
+            "data" => $laporan,
+            "tps_terdekat" => $nearestTps
+        ], 201);
 
     }
 

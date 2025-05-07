@@ -35,12 +35,12 @@ use Illuminate\Http\Request;
 | contains the "web" middleware group. Now create something great!
 |
 */
-// Route untuk halaman utama
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::permanentRedirect('/', '/login');
+// Route::permanentRedirect('/', '/login');
+
+Route::get('/', function () {
+    return view('landing-page');
+});
 
 // Auth::routes();
 Auth::routes(['verify' => true]);
@@ -53,7 +53,13 @@ Route::resource('profil', ProfilController::class)->except('destroy');
 Route::resource('manage-user', UserController::class);
 Route::resource('manage-role', RoleController::class);
 Route::resource('manage-menu', MenuController::class);
+Route::resource('manage-petugas', PetugasController::class);
 Route::resource('manage-permission', PermissionController::class)->only('store', 'destroy');
+Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
+Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
+Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
+Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
+Route::post('petugas', [PetugasController::class, 'store'])->name('petugas.store');
 
 // Armada Routes
 Route::resource('armada', ArmadaController::class);
@@ -62,7 +68,9 @@ Route::resource('armada', ArmadaController::class);
 Route::resource('petugas', PetugasController::class);
 
 // Jadwal Routes
-Route::resource('jadwal', JadwalController::class);
+Route::get('/daftar-jadwal/generate', [JadwalController::class, 'generateForm'])->name('daftar-jadwal.generate.form');
+Route::post('/daftar-jadwal/generate', [JadwalController::class, 'generateStore'])->name('daftar-jadwal.generate.store');
+Route::resource('daftar-jadwal', JadwalController::class);
 
 // Jadwal Operasional Routes
 Route::resource('jadwal-operasional', JadwalOperasionalController::class);

@@ -112,8 +112,14 @@
                                     <select name="id_jadwal" class="form-control" required>
                                         @foreach ($jadwals as $jadwal)
                                             <option value="{{ $jadwal->id }}">{{ $jadwal->hari }} - {{ $jadwal->tanggal }}</option>
+                                            {{-- <option value="{{ $jadwal->id }}">{{ $jadwal->hari }}</option> --}}
                                         @endforeach
                                     </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="tanggal">Tanggal</label>
+                                    <input type="date" name="tanggal" class="form-control" required value="{{ old('tanggal', $jadwalOperasional->tanggal ?? '') }}">
                                 </div>
 
                                 <div class="form-group">
