@@ -44,44 +44,44 @@ class LaporanWargaController extends Controller
             'status' => 'integer|in:0,1,2', // 0: Pending, 1: Diproses, 2: Selesai
         ]);
 
+        // Pembersihan teks untuk menghapus aksara Jawa (dan karakter lainnya jika perlu)
+        $validatedData['judul'] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $validatedData['judul']);
+        $validatedData['deskripsi'] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $validatedData['deskripsi']);
+
         if ($request->hasFile('gambar')) {
             $path = $request->file('gambar')->store('laporan_warga', 'public');
             $validatedData['gambar'] = asset('storage/' . $path);
         }
 
         $laporan = LaporanWarga::create($validatedData);
-
         return redirect()->back()->with('success', 'Laporan berhasil dikirim!');
-
->>>>>>> 82c7fce36379b374c0da5cc20a1dabdf956beb8b
 
         // Cari TPS terdekat berdasarkan latitude & longitude laporan
         $nearestTps = $this->findNearestTps($request->latitude, $request->longitude);
 
-
-        // return response()->json([
-        //     "message" => "Laporan warga berhasil disimpan",
-        //     "data" => $laporan,
-        //     "tps_terdekat" => $nearestTps
-        // ], 201);
-
-
-        return response()->json([
-            "message" => "Laporan warga berhasil disimpan",
-            "data" => $laporan,
-            "tps_terdekat" => $nearestTps
-        ], 201);
-
+        return redirect()->back()->with('success', 'Laporan warga berhasil disimpan');
     }
+
 
     /**
      * Menampilkan laporan berdasarkan ID.
      */
     public function show($id)
     {
-        $laporan = LaporanWarga::with('user')->findOrFail($id);
-        return response()->json($laporan, 200);
+        $lapor = LaporanWarga::findOrFail($id);
+
+        // Cek apakah latitude dan longitude ada
+        if ($lapor->latitude && $lapor->longitude) {
+            $latitude = $lapor->latitude;
+            $longitude = $lapor->longitude;
+
+            // Panggil fungsi getLocationName untuk mendapatkan nama lokasi
+            $lapor->lokasi = $this->getLocationName($latitude, $longitude);
+        }
+
+        return view('masyarakat.detailRiwayat', compact('lapor'));
     }
+
 
     /**
      * Memperbarui laporan warga.
@@ -99,6 +99,15 @@ class LaporanWargaController extends Controller
             'deskripsi' => 'sometimes|string',
             'status' => 'integer|in:0,1,2',
         ]);
+
+        // Pembersihan teks untuk menghapus aksara Jawa (dan karakter lainnya jika perlu)
+        if (isset($validatedData['judul'])) {
+            $validatedData['judul'] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $validatedData['judul']);
+        }
+
+        if (isset($validatedData['deskripsi'])) {
+            $validatedData['deskripsi'] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $validatedData['deskripsi']);
+        }
 
         if ($request->hasFile('gambar')) {
             if ($laporan->gambar) {
@@ -152,13 +161,13 @@ class LaporanWargaController extends Controller
                     $lokasi = [];
 
                     if ($jalan)
-                        $lokasi[] = $jalan;
+                        $lokasi[] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $jalan);  // Hapus aksara Jawa
                     if ($desa)
-                        $lokasi[] = 'Desa/Kel. ' . $desa;
+                        $lokasi[] = 'Desa/Kel. ' . preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $desa);  // Hapus aksara Jawa
                     if ($kabupaten)
-                        $lokasi[] = $kabupaten;
+                        $lokasi[] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $kabupaten);  // Hapus aksara Jawa
                     if ($provinsi)
-                        $lokasi[] = $provinsi;
+                        $lokasi[] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $provinsi);  // Hapus aksara Jawa
 
                     return implode(', ', $lokasi);
                 }
@@ -170,6 +179,7 @@ class LaporanWargaController extends Controller
 
         return "Lokasi tidak tersedia";
     }
+
 
     /**
      * Menghapus laporan warga (Soft Delete).
@@ -193,8 +203,8 @@ class LaporanWargaController extends Controller
     {
         $nearestTps = LokasiTps::selectRaw("
             id, nama_lokasi, province_id, regency_id, district_id, village_id, latitude, longitude,
-            (6371 * acos(cos(radians(?)) * cos(radians(latitude)) 
-            * cos(radians(longitude) - radians(?)) 
+            (6371 * acos(cos(radians(?)) * cos(radians(latitude))
+            * cos(radians(longitude) - radians(?))
             + sin(radians(?)) * sin(radians(latitude)))) AS distance
         ", [$latitude, $longitude, $latitude])
             ->orderByRaw("distance ASC")

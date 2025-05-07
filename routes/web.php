@@ -10,6 +10,7 @@ use App\Http\Controllers\ArmadaController;
 use App\Http\Controllers\PetugasController;
 use App\Http\Controllers\JadwalOperasionalController;
 use App\Http\Controllers\JadwalController;
+use App\Http\Controllers\JadwalTemplateController;
 use App\Http\Controllers\LokasiTpsController;
 use App\Http\Controllers\PenugasanPetugasController;
 use App\Http\Controllers\RuteController;
@@ -67,6 +68,17 @@ Route::resource('armada', ArmadaController::class);
 // Driver Routes
 Route::resource('petugas', PetugasController::class);
 
+Route::prefix('jadwal-template')->group(function () {
+    Route::get('/', [JadwalTemplateController::class, 'index'])->name('jadwal-template.index');
+    Route::get('/{hari}', [JadwalTemplateController::class, 'filterByDay'])->name('jadwal-template.filter');
+    Route::post('/store', [JadwalTemplateController::class, 'store'])->name('jadwal-template.store');
+    Route::put('/{id}', [JadwalTemplateController::class, 'update'])->name('jadwal-template.update');
+    Route::delete('/{id}', [JadwalTemplateController::class, 'destroy'])->name('jadwal-template.destroy');
+    Route::get('/filter/{hari}', [JadwalTemplateController::class, 'filterByDay']);
+});
+Route::resource('jadwal-template', JadwalTemplateController::class)->except(['show']);
+
+
 // Jadwal Routes
 Route::get('/daftar-jadwal/generate', [JadwalController::class, 'generateForm'])->name('daftar-jadwal.generate.form');
 Route::post('/daftar-jadwal/generate', [JadwalController::class, 'generateStore'])->name('daftar-jadwal.generate.store');
@@ -114,13 +126,17 @@ Route::apiResource('artikel', ArtikelController::class);
 
 Route::get('dbbackup', [DBBackupController::class, 'DBDataBackup']);
 
+// Route::get('/masyarakat', [LaporanWargaController::class, 'index'])->middleware('auth');
 Route::get('/masyarakat', [LaporanWargaController::class, 'index'])->middleware('auth');
+
+
 
 Route::get('/lapor', function () {
     return view('masyarakat.lapor');
 })->name('lapor');
 
 Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
+Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
 
 Route::get('/get-regencies/{province}', [ProfilController::class, 'getRegencies'])->name('get.regencies');
 Route::get('/get-districts/{regency}', [ProfilController::class, 'getDistricts'])->name('get.districts');
@@ -134,7 +150,9 @@ Route::get('/lacak', function () {
     return view('masyarakat.lacak');
 })->name('masyarakat.lacak');
 
-Route::get('/lapor', function () {return view('masyarakat.lapor');})->name('lapor');
+Route::get('/lapor', function () {
+    return view('masyarakat.lapor');
+})->name('lapor');
 
 Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
 Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');

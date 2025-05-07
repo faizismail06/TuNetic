@@ -11,7 +11,7 @@
 
             @foreach($laporan as $lapor)
                 <div class="laporan-card">
-                    <img src="{{ asset('storage/' . $lapor->gambar) }}" alt="Gambar Sampah">
+                    <img src="{{ $lapor->gambar }}" alt="Gambar Sampah">
                     <div class="laporan-detail">
                         <div class="laporan-title">{{ $lapor->judul }}</div>
                         <div class="laporan-meta">
@@ -30,7 +30,16 @@
                             <span class="status sedang"><i class="fas fa-spinner icon-status"></i> Sedang proses</span>
                         @elseif($lapor->status == 2)
                             <span class="status selesai"><i class="fas fa-circle-check icon-status"></i> Sudah diangkut</span>
+                        @elseif($lapor->status == -1)
+                            <span class="status belum"><i class="fas fa-circle-xmark icon-status"></i> Ditolak</span>
+                        @elseif($lapor->status == -2)
+                            <span class="status belum"><i class="fas fa-ban icon-status"></i> Unverifikasi</span>
                         @endif
+
+                        <div class="laporan-action d-flex justify-content-end">
+                            <a href="{{ route('laporan.show', $lapor->id) }}" class="btn-detail">Lihat Detail</a>
+                        </div>
+
                     </div>
                 </div>
 
@@ -79,6 +88,7 @@
             min-height: 160px;
             background-color: #fff;
             align-items: center;
+
         }
 
         .laporan-card img {
@@ -94,6 +104,7 @@
             justify-content: center;
             font-size: 1.05rem;
             color: #555;
+            flex: 1;
         }
 
         .laporan-title {
@@ -145,6 +156,36 @@
             margin-top: 30px;
             font-size: 1.1rem;
         }
+
+        .btn-detail {
+            margin-left: auto;
+            margin-top: 12px;
+            display: inline-block;
+            padding: 10px 18px;
+            /* background-color: #f0f0f0; */
+            color: #299E63;
+            font-weight: 600;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: flex-end;
+            /* Menggeser tombol ke kanan */
+
+        }
+
+        .laporan-action {
+            display: flex;
+            justify-content: flex-end;
+            /* Memastikan tombol berada di sebelah kanan */
+            width: 100%;
+            /* Memanfaatkan lebar penuh */
+            margin-top: 12px;/
+        }
+
+        /* .btn-detail:hover {
+                    background-color: #e0e0e0;
+                } */
     </style>
 
 @endsection

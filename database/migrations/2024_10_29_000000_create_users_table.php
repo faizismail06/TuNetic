@@ -26,7 +26,7 @@ return new class extends Migration {
             $table->char('village_id', 10)->nullable(); // Sesuai dengan tipe data di reg_villages
 
             $table->string('alamat')->nullable();
-
+            // $table->integer('role')->default(0);
             $table->integer('level')->default(0);
             $table->rememberToken();
             $table->timestamps();

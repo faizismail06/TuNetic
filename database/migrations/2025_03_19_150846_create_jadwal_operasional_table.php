@@ -14,9 +14,10 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('id_armada')->constrained('armada');
             $table->foreignId('id_jadwal')->constrained('jadwal');
-            $table->foreignId('id_rute_tps')->constrained('rute_tps');
+            $table->foreignId('id_rute')->constrained('rute');
             $table->date('tanggal');
             $table->time('jam_aktif');
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }
