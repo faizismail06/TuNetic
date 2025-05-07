@@ -26,6 +26,7 @@ class ProfilController extends Controller
         return view('profile.index', compact('user', 'provinces'));
     }
 
+
     /**
      * Tampilkan profil user biasa.
      */
@@ -36,6 +37,48 @@ class ProfilController extends Controller
 
         return view('masyarakat.profils.index', compact('user', 'provinces'));
     }
+
+    /**
+     * Tampilkan profil petugas.
+     */
+    // Tambahkan method ini:
+    public function petugasIndex()
+    {
+        if (auth()->user()->role !== 'petugas') {
+            return redirect()->back()->with('error', 'Akses ditolak');
+        }    
+        
+        $user = Auth::user();
+        $provinces = Province::all();
+    
+        return view('petugas.profile.index', [
+            'user' => $user,
+            'provinces' => $provinces,
+            'petugas' => $user->petugas // Pastikan relasi ini ada di model User
+        ]);
+    }
+
+public function petugasUpdate(Request $request)
+{
+    $user = Auth::user();
+    $validator = Validator::make($request->all(), [
+        'name' => 'required',
+        'email' => 'required|email',
+        'no_telepon' => 'required',
+        // tambahkan validasi lainnya
+    ]);
+
+    // Update data user
+    $user = Auth::user();
+    $user->update($request->only(['name', 'email']));
+
+    // Update data petugas
+    $user = Auth::user();
+    $petugas = $user->petugas;
+    $petugas->update($request->except(['name', 'email', '_token']));
+
+    return redirect()->route('petugas.profile.index')->with('success', 'Profil berhasil diperbarui');
+}
 
     /**
      * Ambil kabupaten berdasarkan ID provinsi.
@@ -81,6 +124,11 @@ class ProfilController extends Controller
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
+        // Add 'status_petugas' validation rule only if the user is a petugas
+        if ($user->role === 'petugas') {
+            $rules['status_petugas'] = 'required|in:aktif,tidak aktif';
+        }
+
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -94,6 +142,11 @@ class ProfilController extends Controller
         $user->district_id = $request->district_id;
         $user->village_id = $request->village_id;
 
+        // Handle status_petugas update if it exists in the request.
+        if ($request->has('status_petugas')) {
+            $user->status_petugas = $request->status_petugas;
+        }
+        
         // Upload foto jika ada
         if ($request->hasFile('foto')) {
             $uploadPath = 'public/profil';
@@ -116,8 +169,10 @@ class ProfilController extends Controller
         // Cek peran untuk redirect
         if ($user->role === 'admin') {
             return redirect()->route('admin.profile.index')->with('success', 'Profil berhasil diperbarui.');
-        } else {
+        } elseif ($user->role === 'user') {
             return redirect()->route('user.profile.index')->with('success', 'Profil berhasil diperbarui.');
+        } else {
+            return redirect()->route('petugas.profils.index')->with('success', 'Profil berhasil diperbarui.');
         }
     }
 
@@ -193,6 +248,12 @@ class ProfilController extends Controller
         $user->password = Hash::make($request->password);
         $user->save();
 
-        return redirect()->route('profile.index')->with('success', 'Password berhasil diubah');
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.profile.index')->with('success', 'Profil berhasil diperbarui.');
+        } elseif ($user->role === 'user') {
+            return redirect()->route('user.profile.index')->with('success', 'Profil berhasil diperbarui.');
+        } else {
+            return redirect()->route('petugas.profils.index')->with('success', 'Profil berhasil diperbarui.');
+        }
     }
 }

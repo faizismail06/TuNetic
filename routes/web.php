@@ -142,6 +142,13 @@ Route::get('/get-regencies/{province}', [ProfilController::class, 'getRegencies'
 Route::get('/get-districts/{regency}', [ProfilController::class, 'getDistricts'])->name('get.districts');
 Route::get('/get-villages/{district}', [ProfilController::class, 'getVillages'])->name('get.villages');
 
+
+Route::prefix('petugas')->name('petugas.')->middleware('auth')->group(function() {
+    Route::get('/profile', [ProfilController::class, 'petugasIndex'])->name('profile.index');
+    Route::put('/profile/update', [ProfilController::class, 'petugasUpdate'])->name('profile.update');
+    Route::post('/profile/upload-photo', [ProfilController::class, 'uploadPhoto'])->name('profile.upload-photo');
+});
+
 Route::get('/armada', function () {
     return view('armada');
 })->name('armada');
