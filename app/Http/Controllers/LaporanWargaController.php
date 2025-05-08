@@ -58,7 +58,9 @@ class LaporanWargaController extends Controller
         // Cari TPS terdekat berdasarkan latitude & longitude laporan
         $nearestTps = $this->findNearestTps($request->latitude, $request->longitude);
 
-        return redirect()->back()->with('success', 'Laporan warga berhasil disimpan');
+        return redirect()->route('lapor.detailRiwayat', ['id' => $laporan->id])->with('success', 'Laporan warga berhasil disimpan');
+
+
     }
 
 

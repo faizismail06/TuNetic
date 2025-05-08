@@ -52,8 +52,8 @@
         }
 
         /* .btn-detail:hover {
-                    background-color: #e0e0e0;
-                } */
+                        background-color: #e0e0e0;
+                    } */
     </style>
 
 
@@ -90,7 +90,7 @@
             <h1 style="font-family: 'Red Hat Text', sans-serif; font-size: 2.5rem; margin-bottom: 40px; font-weight: 600">
                 Lapor Sampah</h1>
             <p style="font-family: 'Red Hat Text', sans-serif; font-size: 1.5rem; margin-bottom: 40px; color: #555;">
-                Laporkan melaporkan lokasi sampah yang perlu dibersihkan dengan mengunggah foto, menambahkan deskripsi,
+                Laporkan lokasi sampah yang perlu dibersihkan dengan mengunggah foto, menambahkan deskripsi,
                 dan penandaan di peta untuk tindakan lanjut.
             </p>
             <a href="/lapor"

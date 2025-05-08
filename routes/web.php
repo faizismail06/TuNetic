@@ -120,11 +120,11 @@ Route::get('/masyarakat', [LaporanWargaController::class, 'index'])->middleware(
 
 
 Route::get('/lapor', function () {
-    return view('masyarakat.lapor');
-})->name('lapor');
+    return view('masyarakat.lapor'); })->name('lapor');
 
 Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
 Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
+Route::get('/lapor/{id}', [LaporanWargaController::class, 'show'])->name('lapor.detailRiwayat');
 
 
 Route::get('/armada', function () {
@@ -136,8 +136,7 @@ Route::get('/lacak', function () {
 })->name('masyarakat.lacak');
 
 Route::get('/lapor', function () {
-    return view('masyarakat.lapor');
-})->name('lapor');
+    return view('masyarakat.lapor'); })->name('lapor');
 
 Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
 Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
