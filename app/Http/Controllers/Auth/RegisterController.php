@@ -82,16 +82,11 @@ class RegisterController extends Controller
         ]);
 
         $user->assignRole('user'); // assign role
-
         return $user; // ✅ return User object, bukan redirect!
     }
     protected function registered($request, $user)
     {
-        // dd(config('mail')); // ← Tambahkan ini untuk melihat konfigurasi email
-        event(new Registered($user));
-
         Auth::logout();
-
         return redirect('/login')->with('success', 'Registrasi berhasil! Silakan cek email untuk verifikasi.');
     }
 }
