@@ -6,7 +6,7 @@
         <div class="col-md-11">
             <div class="card">
                 <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">Profil User</h5>
+                    <h5 class="mb-0">Profil Pengguna</h5>
                 </div>
 
                 <div class="card-body">

@@ -61,6 +61,7 @@ class ProfilController extends Controller
 public function petugasUpdate(Request $request)
 {
     $user = Auth::user();
+    Log::info($user);
     $validator = Validator::make($request->all(), [
         'name' => 'required',
         'email' => 'required|email',
@@ -112,6 +113,7 @@ public function petugasUpdate(Request $request)
      */
     public function update(Request $request)
     {
+        $user = Auth::user();
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -141,6 +143,7 @@ public function petugasUpdate(Request $request)
         $user->regency_id = $request->regency_id;
         $user->district_id = $request->district_id;
         $user->village_id = $request->village_id;
+        $user->save();
 
         // Handle status_petugas update if it exists in the request.
         if ($request->has('status_petugas')) {
@@ -247,13 +250,16 @@ public function petugasUpdate(Request $request)
 
         $user->password = Hash::make($request->password);
         $user->save();
-
+        
         if ($user->role === 'admin') {
-            return redirect()->route('admin.profile.index')->with('success', 'Profil berhasil diperbarui.');
+            return view('profile.index', compact('user', 'provinces')); // View untuk admin
         } elseif ($user->role === 'user') {
-            return redirect()->route('user.profile.index')->with('success', 'Profil berhasil diperbarui.');
+            return view('masyarakat.profils.index', compact('user', 'provinces')); // View untuk pengguna biasa
+        } elseif ($user->role === 'petugas') {
+            return view('petugas.profile.index', ['user' => $user, 'provinces' => $provinces, 'petugas' => $user->petugas]); // View untuk petugas
         } else {
-            return redirect()->route('petugas.profils.index')->with('success', 'Profil berhasil diperbarui.');
+            // Handle jika ada peran lain atau tidak ada peran
+            return abort(403, 'Akses Ditolak.');
         }
     }
 }
