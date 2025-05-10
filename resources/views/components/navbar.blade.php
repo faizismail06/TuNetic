@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TuNetic</title>
-    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@400;500;550;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@400;500;550;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <style>
@@ -123,8 +122,8 @@
                 use Illuminate\Support\Facades\Auth;
             @endphp
 
-            @if(Auth::check())
-                <a href="{{ route('profil.index') }}" class="profile">
+            @if (Auth::check())
+                <a href="{{ route('user.profile.index') }}" class="profile">
                     {{ Auth::user()->name }}
                     <img src="{{ asset(Auth::user()->photo ?? 'assets/images/default-user.png') }}" alt="Profile">
                 </a>
@@ -187,9 +186,11 @@
                 <div>
                     <h4 style="margin-bottom: 15px;">Layanan</h4>
                     <ul style="list-style: none; padding: 0; margin: 0;">
-                        <li style="margin-bottom: 10px;"><a href="#" style="color: white; text-decoration: none;">Jemput
+                        <li style="margin-bottom: 10px;"><a href="#"
+                                style="color: white; text-decoration: none;">Jemput
                                 Sampah</a></li>
-                        <li style="margin-bottom: 10px;"><a href="#" style="color: white; text-decoration: none;">Lapor
+                        <li style="margin-bottom: 10px;"><a href="#"
+                                style="color: white; text-decoration: none;">Lapor
                                 Sampah</a></li>
                     </ul>
 

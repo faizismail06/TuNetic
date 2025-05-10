@@ -3,7 +3,7 @@
 use App\Http\Controllers\DBBackupController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ArmadaController;
@@ -50,7 +50,20 @@ Auth::routes(['verify' => true]);
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::resource('admin/home', DashboardController::class);
 
-Route::resource('profil', ProfilController::class)->except('destroy');
+// Halaman Profil untuk User Biasa
+Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'userIndex'])->name('profile.index');
+    Route::put('/profile', [ProfileController::class, 'userUpdate'])->name('profile.update');
+    Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
+
+    // Dropdown wilayah dinamis
+    Route::get('/get-regencies/{province_id}', [ProfileController::class, 'getRegencies'])->name('get.regencies');
+    Route::get('/get-districts/{regency_id}', [ProfileController::class, 'getDistricts'])->name('get.districts');
+    Route::get('/get-villages/{district_id}', [ProfileController::class, 'getVillages'])->name('get.villages');
+});
+
+
+// Route::resource('profile', ProfileController::class)->except('destroy');
 Route::resource('manage-user', UserController::class);
 Route::resource('manage-role', RoleController::class);
 Route::resource('manage-menu', MenuController::class);
@@ -138,15 +151,15 @@ Route::get('/lapor', function () {
 Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
 Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
 
-Route::get('/get-regencies/{province}', [ProfilController::class, 'getRegencies'])->name('get.regencies');
-Route::get('/get-districts/{regency}', [ProfilController::class, 'getDistricts'])->name('get.districts');
-Route::get('/get-villages/{district}', [ProfilController::class, 'getVillages'])->name('get.villages');
+Route::get('/get-regencies/{province}', [ProfileController::class, 'getRegencies'])->name('get.regencies');
+Route::get('/get-districts/{regency}', [ProfileController::class, 'getDistricts'])->name('get.districts');
+Route::get('/get-villages/{district}', [ProfileController::class, 'getVillages'])->name('get.villages');
 
 
-Route::prefix('petugas')->name('petugas.')->middleware('auth')->group(function() {
-    Route::get('/profile', [ProfilController::class, 'petugasIndex'])->name('profile.index');
-    Route::put('/profile/update', [ProfilController::class, 'petugasUpdate'])->name('profile.update');
-    Route::post('/profile/upload-photo', [ProfilController::class, 'uploadPhoto'])->name('profile.upload-photo');
+Route::prefix('petugas')->name('petugas.')->middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'petugasIndex'])->name('profile.index');
+    Route::put('/profile/update', [ProfileController::class, 'petugasUpdate'])->name('profile.update');
+    Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
 });
 
 Route::get('/armada', function () {
@@ -166,43 +179,19 @@ Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapo
 Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview'])->middleware('auth');
 
 
-// Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
-//     // Halaman Profil Admin
-//     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
-//     Route::put('/profile', [ProfilController::class, 'update'])->name('profile.update');
-//     Route::post('/profile/upload-photo', [ProfilController::class, 'uploadPhoto'])->name('profile.upload-photo');
-//     Route::get('/index', [UserController::class, 'showRegistrationForm'])->name('index');
-//     Route::get('/get-regencies/{province_id}', [ProfilController::class, 'getRegencies']);
-//     Route::get('/get-districts/{regency_id}', [ProfilController::class, 'getDistricts']);
-//     Route::get('/get-villages/{district_id}', [ProfilController::class, 'getVillages']);
-
-//     // Tambahkan resource lain di sini jika perlu
-// });
-
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Halaman Profil Admin
-    Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
-    Route::put('/profile', [ProfilController::class, 'update'])->name('profile.update');
-    Route::post('/profile/upload-photo', [ProfilController::class, 'uploadPhoto'])->name('profile.upload-photo');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
     Route::get('/index', [UserController::class, 'showRegistrationForm'])->name('index');
-    
+
     // Route untuk data wilayah
-    Route::get('/get-regencies/{province_id}', [ProfilController::class, 'getRegencies'])->name('get.regencies');
-    Route::get('/get-districts/{regency_id}', [ProfilController::class, 'getDistricts'])->name('get.districts');
-    Route::get('/get-villages/{district_id}', [ProfilController::class, 'getVillages'])->name('get.villages');
+    Route::get('/get-regencies/{province_id}', [ProfileController::class, 'getRegencies'])->name('get.regencies');
+    Route::get('/get-districts/{regency_id}', [ProfileController::class, 'getDistricts'])->name('get.districts');
+    Route::get('/get-villages/{district_id}', [ProfileController::class, 'getVillages'])->name('get.villages');
 });
 
-// Halaman Profil untuk User Biasa
-Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
-    Route::get('/profile', [ProfilController::class, 'userIndex'])->name('profile.index');
-    Route::put('/profile', [ProfilController::class, 'userUpdate'])->name('profile.update');
-    Route::post('/profile/upload-photo', [ProfilController::class, 'uploadPhoto'])->name('profile.upload-photo');
-
-    // Dropdown wilayah dinamis
-    Route::get('/get-regencies/{province_id}', [ProfilController::class, 'getRegencies'])->name('get.regencies');
-    Route::get('/get-districts/{regency_id}', [ProfilController::class, 'getDistricts'])->name('get.districts');
-    Route::get('/get-villages/{district_id}', [ProfilController::class, 'getVillages'])->name('get.villages');
-});
 
 Route::get('/email/verify', function () {
     return view('auth.verify'); // atau view lain sesuai struktur kamu

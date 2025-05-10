@@ -79,8 +79,8 @@ class PetugasMenuSeeder extends Seeder
             'urutan' => 1
         ]);
 
-        Permission::create(['name' => 'access_user_profile', 'menu_id' => $akun->id]);
-        Permission::create(['name' => 'update_user_profile', 'menu_id' => $akun->id]);
+        Permission::create(['name' => 'access_petugas_profile_akun', 'menu_id' => $akun->id]);
+        Permission::create(['name' => 'update_petugas_profile_akun', 'menu_id' => $akun->id]);
         // Return the main menu id to be used by MasterSeeder
         return $menuPetugas->id;
     }

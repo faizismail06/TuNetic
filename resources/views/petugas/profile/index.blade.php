@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('content')
+@section('title', 'Profil Petugas')
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-11">
             <div class="card">
                 <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">Profil Pengguna</h5>
+                    <h5 class="mb-0">Profil Petugas</h5>
                 </div>
 
                 <div class="card-body">
@@ -17,7 +17,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('user.profile.update') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('petugas.profile.update') }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -26,13 +26,13 @@
                             <div class="col-md-3 text-center">
                                 <label class="form-label mb-2 ms-3" style="text-align: left; display: block;">Foto Diri</label>
                                 <div class="profile-image-container mb-3">
-                                <div class="profile-image-wrapper rounded-circle mx-auto d-flex align-items-center justify-content-center" 
+                                <div class="profile-image-wrapper rounded-circle mx-auto d-flex align-items-center justify-content-center"
                                     style="width: 150px; height: 150px; overflow: hidden; background-color: #f8f9fa; cursor: pointer;"
                                     id="profile-image-clickable">
                                     @if($user && $user->foto)
-                                        <img id="profile-preview" src="{{ asset('storage/profil/'.$user->foto) }}" 
-                                            class="img-fluid w-100 h-100" 
-                                            style="object-fit: cover;" 
+                                        <img id="profile-preview" src="{{ asset('storage/profile/'.$user->foto) }}"
+                                            class="img-fluid w-100 h-100"
+                                            style="object-fit: cover;"
                                             alt="Foto Profil">
                                     @else
                                         <div id="profile-preview" class="w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-light">
@@ -44,7 +44,7 @@
                                 </div>
                             </div>
     </div>
-                            
+
                             <div class="col-md-9">
                                 <div class="d-flex flex-column h-100 justify-content-center">
                                     <div class="d-flex align-items-center mb-2">
@@ -66,10 +66,10 @@
                                 <label for="name" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
                             </div>
                             <div class="col-md-9">
-                                <input type="text" 
-                                    class="form-control @error('name') is-invalid @enderror" 
-                                    id="name" 
-                                    name="name" 
+                                <input type="text"
+                                    class="form-control @error('name') is-invalid @enderror"
+                                    id="name"
+                                    name="name"
                                     value="{{ old('name', $user->name ?? '') }}">
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -96,6 +96,22 @@
                             <div class="col-md-9">
                                 <input type="text" class="form-control @error('no_telepon') is-invalid @enderror" id="no_telepon" name="no_telepon" value="{{ old('no_telepon', $user->no_telepon ?? '') }}">
                                 @error('no_telepon')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="status_petugas" class="form-label">Status Petugas <span class="text-danger">*</span></label>
+                            </div>
+                            <div class="col-md-9">
+                                <select name="status_petugas" id="status_petugas" class="form-control @error('status_petugas') is-invalid @enderror">
+                                    <option value="">Pilih Status</option>
+                                    <option value="aktif" {{ old('status_petugas', $user->status_petugas ?? '') == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                                    <option value="tidak aktif" {{ old('status_petugas', $user->status_petugas ?? '') == 'tidak aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                                </select>
+                                @error('status_petugas')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -177,9 +193,9 @@
                             <label for="detail_alamat" class="form-label">Detail Alamat <span class="text-danger">*</span></label>
                         </div>
                         <div class="col-md-9">
-                            <textarea class="form-control @error('detail_alamat') is-invalid @enderror" 
-                                    id="detail_alamat" 
-                                    name="detail_alamat" 
+                            <textarea class="form-control @error('detail_alamat') is-invalid @enderror"
+                                    id="detail_alamat"
+                                    name="detail_alamat"
                                     rows="2">{{ old('detail_alamat', $user->detail_alamat ?? '') }}</textarea>
                             @error('detail_alamat')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -262,7 +278,7 @@ $(document).ready(function() {
     $('#btn-choose-photo').click(function() {
         $('#input-foto').trigger('click');
     });
-    
+
     // Preview and auto-upload when file selected
     $('#input-foto').change(function() {
         if (this.files && this.files[0]) {
@@ -271,27 +287,27 @@ $(document).ready(function() {
                 toastr.error('Ukuran file maksimal 2MB');
                 return;
             }
-            
+
             // Preview image
             var reader = new FileReader();
             reader.onload = function(e) {
                 $('#profile-preview').attr('src', e.target.result);
             }
             reader.readAsDataURL(this.files[0]);
-            
+
             // Auto upload
             uploadPhoto(this.files[0]);
         }
     });
-    
+
     // Upload function
     function uploadPhoto(file) {
         let formData = new FormData();
         formData.append('foto', file);
         formData.append('_token', '{{ csrf_token() }}');
-        
+
         $.ajax({
-            url: '{{ route("user.profile.upload-photo") }}',
+            url: '{{ route("petugas.profile.upload-photo") }}',
             type: 'POST',
             data: formData,
             processData: false,
@@ -317,7 +333,7 @@ $(document).ready(function() {
             }
         });
     }
-    
+
     // Wilayah Dropdown Logic
     function loadRegencies(provinceId, selectedId = null) {
         if (!provinceId) {
@@ -334,7 +350,7 @@ $(document).ready(function() {
                 options += '<option value="' + value.id + '" ' + selected + '>' + value.name + '</option>';
             });
             $('#regency').html(options);
-            
+
             if (selectedId) {
                 $('#regency').trigger('change');
             }
@@ -358,7 +374,7 @@ $(document).ready(function() {
                 options += '<option value="' + value.id + '" ' + selected + '>' + value.name + '</option>';
             });
             $('#district').html(options);
-            
+
             if (selectedId) {
                 $('#district').trigger('change');
             }
@@ -409,16 +425,16 @@ $(document).ready(function() {
         var regencyId = '{{ $user->regency_id }}';
         var districtId = '{{ $user->district_id }}';
         var villageId = '{{ $user->village_id }}';
-        
+
         // Load regencies first
         loadRegencies(provinceId, regencyId);
-        
+
         // Then load districts after a short delay
         setTimeout(function() {
             if (regencyId) {
                 loadDistricts(regencyId, districtId);
             }
-            
+
             // Finally load villages after another delay
             setTimeout(function() {
                 if (districtId) {

@@ -16,15 +16,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'foto',
         'no_telepon',
+        'gambar',
         'province_id',
         'regency_id',
         'district_id',
         'village_id',
-        'detail_alamat',
-        'status_petugas',
-        'email_verified_at',
+        'alamat',
         'level'
     ];
 
@@ -65,11 +63,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Petugas::class);
     }
 
-    // Accessor untuk foto profil
-    public function getFotoProfilAttribute()
+    // Accessor untuk gambar profil
+    public function getGambarProfilAttribute()
     {
-        if ($this->foto) {
-            return asset('storage/profil/' . $this->foto);
+        if ($this->gambar) {
+            return asset('storage/profile/' . $this->gambar);
         }
         return asset('assets/img/default-profile.jpg');
     }
