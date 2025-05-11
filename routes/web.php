@@ -21,6 +21,7 @@ use App\Http\Controllers\LaporanTpsController;
 use App\Http\Controllers\TrackingArmadaController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\RuteArmadaController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -127,15 +128,22 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview']);
 });
 
-Route::get('/masyarakat/lapor', function () {
-    return view('masyarakat.lapor');
-})->name('lapor');
-Route::post('/masyarakat/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
-Route::get('/masyarakat/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
+// Route publik untuk masyarakat (tidak perlu login)
+Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
+    // Route untuk lapor sampah (publik)
+    Route::get('/lapor', function () {
+        return view('masyarakat.lapor');
+    })->name('lapor');
 
-Route::get('/lacak', function () {
-    return view('masyarakat.lacak');
-})->name('masyarakat.lacak');
+    Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
+    Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
+
+    // Route untuk rute armada (publik)
+    Route::get('/rute-armada', [RuteArmadaController::class, 'index'])->name('rute-armada.index');
+    Route::get('/rute-armada/all-tps', [RuteArmadaController::class, 'showAllTps'])->name('rute-armada.all-tps');
+    Route::get('/rute-armada/jadwal/{id}', [RuteArmadaController::class, 'getJadwalDetail'])->name('rute-armada.jadwal-detail');
+    Route::get('/rute-armada/tracking/{id}', [RuteArmadaController::class, 'getRealtimeTracking'])->name('rute-armada.realtime-tracking');
+});
 
 // ===================
 // LAPORAN
@@ -170,11 +178,6 @@ Route::middleware(['auth'])->group(function () {
     // Put the specific route FIRST
     Route::get('/jadwal-pengambilan/auto-tracking', [JadwalPengambilanController::class, 'showAutoTrackingPage'])
         ->name('jadwal-pengambilan.auto-tracking');
-
-    // Then the more general route with the parameter
-    // Route::get('/jadwal-pengambilan/{day}', [JadwalPengambilanController::class, 'detail'])
-    //     ->name('jadwal-pengambilan.detail');
-
     Route::post('/petugas/jadwal-pengambilan/start-tracking/{id}', [JadwalPengambilanController::class, 'startTracking'])
         ->name('jadwal-pengambilan.start-tracking');
     Route::post('/petugas/jadwal-pengambilan/finish-tracking/{id}', [JadwalPengambilanController::class, 'finishTracking'])
@@ -186,13 +189,3 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/jadwal-pengambilan/detail', function () {
     return view('petugas.jadwal-pengambilan.details');
 })->name('jadwal.penjemputan');
-
-
-// Route::get('/petugas/days', function () {
-//     return view('petugas.jadwal-pengambilan.days');
-// })->name('jadwal.pengambilan.days');
-
-
-// Route::get('/petugas/jadwal-pengambilan/details', function () {
-//     return view('petugas.jadwal-pengambilan.details');
-// })->name('jadwal.pengambilan.selasa');

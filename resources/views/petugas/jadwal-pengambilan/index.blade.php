@@ -443,7 +443,7 @@
             // Tampilkan rute dari posisi saat ini ke semua TPS
             drawRouteBetweenTps(tpsPoints);
         }
-        // Fungsi untuk menggambar rute antara TPS mengikuti jalan
+
         // Fungsi untuk menggambar rute dari lokasi saat ini ke semua TPS
         function drawRouteBetweenTps(tpsPoints) {
             // Hapus routing control sebelumnya jika ada
@@ -517,16 +517,78 @@
                 console.log('Rute ditemukan:', routes);
                 console.log('Jarak total:', summary.totalDistance, 'meter');
                 console.log('Waktu perkiraan:', summary.totalTime, 'detik');
-            });
 
-            // Set flag rute terlihat
-            isRouteVisible = true;
+                // Set flag rute terlihat setelah rute berhasil dibuat
+                isRouteVisible = true;
+                document.getElementById('toggle-route').textContent = 'Sembunyikan Rute';
+            });
         }
 
-        // Toggle visibilitas rute
-        function toggleRouteVisibility() {
-            if (!routeControl) return;
+        function checkRouteStatus() {
+            // Cek apakah ada TPS yang sudah ditampilkan dan routeControl sudah ada
+            if (routeControl && isRouteVisible) {
+                document.getElementById('toggle-route').textContent = 'Sembunyikan Rute';
+            } else {
+                document.getElementById('toggle-route').textContent = 'Tampilkan Rute';
+            }
+        }
 
+        // Modifikasi DOMContentLoaded untuk memanggil checkRouteStatus
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMap();
+            loadOfflineData();
+            setupEventListeners();
+            checkActiveTracking();
+            checkRouteStatus(); // Tambahkan ini
+        });
+        // Toggle visibilitas rute (PERBAIKAN)
+        function toggleRouteVisibility() {
+            // Jika routeControl belum ada, coba buat rute untuk jadwal aktif atau yang pertama
+            if (!routeControl) {
+                // Cek apakah ada jadwal aktif
+                let selectedJadwalId = activeJadwalId;
+
+                // Jika tidak ada jadwal aktif, cari jadwal yang sedang berjalan atau yang pertama
+                if (!selectedJadwalId) {
+                    // Cari jadwal yang statusnya 1 (sedang berjalan)
+                    const activeJadwal = document.querySelector('.jadwal-buttons[data-status="1"]');
+                    if (activeJadwal) {
+                        selectedJadwalId = activeJadwal.dataset.id;
+                    } else {
+                        // Jika tidak ada yang aktif, ambil jadwal pertama yang tersedia
+                        const firstJadwal = document.querySelector('.jadwal-buttons');
+                        if (firstJadwal) {
+                            selectedJadwalId = firstJadwal.dataset.id;
+                        }
+                    }
+                }
+
+                // Jika masih tidak ada jadwal yang ditemukan
+                if (!selectedJadwalId) {
+                    alert('Tidak ada jadwal yang dapat ditampilkan rutenya. Silakan pilih jadwal terlebih dahulu.');
+                    return;
+                }
+
+                // Cek apakah ada data TPS untuk jadwal ini
+                if (!tpsData[selectedJadwalId] || tpsData[selectedJadwalId].length === 0) {
+                    alert('Tidak ada data TPS untuk jadwal ini. Silakan tampilkan TPS terlebih dahulu.');
+                    return;
+                }
+
+                // Tampilkan TPS dan rute untuk jadwal yang dipilih
+                showTpsOnMap(selectedJadwalId);
+
+                // Set tombol menjadi "Sembunyikan Rute" setelah rute dibuat
+                setTimeout(() => {
+                    if (routeControl && isRouteVisible) {
+                        document.getElementById('toggle-route').textContent = 'Sembunyikan Rute';
+                    }
+                }, 500);
+
+                return;
+            }
+
+            // Jika routeControl sudah ada, toggle visibility
             if (isRouteVisible) {
                 // Sembunyikan rute
                 const routingContainer = document.querySelector('.leaflet-routing-container');

@@ -354,6 +354,9 @@ class JadwalPengambilanController extends Controller
     /**
      * Simpan lokasi dari perangkat petugas
      */
+    /**
+     * Simpan lokasi dari perangkat petugas
+     */
     public function saveLocation(Request $request)
     {
         try {
@@ -388,13 +391,26 @@ class JadwalPengambilanController extends Controller
                 ], 400);
             }
 
-            // Simpan data tracking
-            $tracking = TrackingArmada::create([
-                'id_jadwal_operasional' => $request->id_jadwal_operasional,
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
-                'timestamp' => now(),
-            ]);
+            // PERUBAHAN: Cari tracking yang sudah ada untuk jadwal ini
+            $tracking = TrackingArmada::where('id_jadwal_operasional', $request->id_jadwal_operasional)
+                ->first();
+
+            if ($tracking) {
+                // Update tracking yang sudah ada
+                $tracking->update([
+                    'latitude' => $request->latitude,
+                    'longitude' => $request->longitude,
+                    'timestamp' => now(),
+                ]);
+            } else {
+                // Buat tracking baru jika belum ada
+                $tracking = TrackingArmada::create([
+                    'id_jadwal_operasional' => $request->id_jadwal_operasional,
+                    'latitude' => $request->latitude,
+                    'longitude' => $request->longitude,
+                    'timestamp' => now(),
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
