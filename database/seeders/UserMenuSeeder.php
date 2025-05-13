@@ -70,10 +70,10 @@ class UserMenuSeeder extends Seeder
         Permission::create(['name' => 'access_user_profile', 'menu_id' => $profileUser->id]);
         Permission::create(['name' => 'update_user_profile', 'menu_id' => $profileUser->id]);
 
-        // Akun Submenu
+        // // Akun Menu (sekarang menu utama)
         $akun = Menu::create([
             'nama_menu' => 'Akun',
-            'url' => 'user/profile/akun',
+            'url' => 'user/akun',
             'icon' => '',
             'parent_id' => $menuUser->id,
             'urutan' => 1
@@ -82,10 +82,10 @@ class UserMenuSeeder extends Seeder
         Permission::create(['name' => 'access_user_profile_akun', 'menu_id' => $akun->id]);
         Permission::create(['name' => 'update_user_profile_akun', 'menu_id' => $akun->id]);
 
-        // Jadi Petugas Submenu
+        // adi Petugas Menu (sekarang menu utama)
         $jadiPetugas = Menu::create([
             'nama_menu' => 'Jadi Petugas',
-            'url' => 'user/profile/jadi-petugas',
+            'url' => 'user/jadi-petugas',
             'icon' => '',
             'parent_id' => $menuUser->id,
             'urutan' => 2

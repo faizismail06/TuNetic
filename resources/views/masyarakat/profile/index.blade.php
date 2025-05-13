@@ -60,10 +60,10 @@
                                         <div class="profile-image-wrapper rounded-circle mx-auto d-flex align-items-center justify-content-center"
                                             style="width: 150px; height: 150px; overflow: hidden; background-color: #f8f9fa; cursor: pointer;"
                                             id="profile-image-clickable">
-                                            @if ($user && $user->gambar)
-                                                <img id="profile-preview"
-                                                    src="{{ asset('storage/profile/' . $user->gambar) }}"
-                                                    class="img-fluid w-100 h-100" style="object-fit: cover;"
+                                            @if($user && $user->foto)
+                                                <img id="profile-preview" src="{{ asset('storage/profil/'.$user->foto) }}" 
+                                                    class="img-fluid w-100 h-100" 
+                                                    style="object-fit: cover;" 
                                                     alt="Foto Profil">
                                             @else
                                                 <div id="profile-preview"
@@ -81,7 +81,7 @@
                                 <div class="col-md-9">
                                     <div class="d-flex flex-column h-100 justify-content-center">
                                         <div class="d-flex align-items-center mb-2">
-                                            <button type="button" id="btn-choose-photo" class="btn btn-success px-4">
+                                            <button type="button" id="btn-choose-photo" class="btn btn-success px-4" style="background-color: #299E63; border-color: #299E63;">
                                                 <i class="fas fa-camera me-2"></i> Pilih Photo
                                             </button>
                                             <input type="file" name="gambar" id="input-gambar" class="d-none"
@@ -238,7 +238,7 @@
 
                             <div class="row mt-4">
                                 <div class="col-12 text-end">
-                                    <button type="submit" class="btn btn-success px-4">
+                                    <button type="submit" class="btn btn-success px-4" style="background-color: #299E63; border-color: #299E63;">
                                         <i class="fas fa-save me-2"></i> Simpan Perubahan
                                     </button>
                                 </div>

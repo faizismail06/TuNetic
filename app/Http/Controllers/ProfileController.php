@@ -48,6 +48,26 @@ class ProfileController extends Controller
         ]);
     }
 
+    public function akun()
+{
+    return view('masyarakat.akun.index', [
+        'user' => auth()->user()
+    ]);
+}
+
+public function updatePassword(Request $request)
+{
+    $request->validate([
+        'new_password' => 'required|string|min:8|confirmed',
+    ]);
+    
+    $user = Auth::user();
+    $user->password = Hash::make($request->new_password);
+    $user->save();
+    
+    return redirect()->route('user.akun.index')->with('success', 'Password berhasil diubah!');
+}
+
     // Menambahkan method userUpdate yang hilang
     public function userUpdate(Request $request)
     {
@@ -260,7 +280,7 @@ class ProfileController extends Controller
         return view('profile.change-password');
     }
 
-    public function updatePassword(Request $request)
+    public function updateAkun(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'current_password' => 'required',
