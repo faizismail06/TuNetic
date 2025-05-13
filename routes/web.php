@@ -72,6 +72,7 @@ Route::prefix('jadwal-template')->group(function () {
     Route::get('/', [JadwalTemplateController::class, 'index'])->name('jadwal-template.index');
     Route::get('/{hari}', [JadwalTemplateController::class, 'filterByDay'])->name('jadwal-template.filter');
     Route::post('/store', [JadwalTemplateController::class, 'store'])->name('jadwal-template.store');
+    Route::get('/{id}/edit', [JadwalTemplateController::class, 'edit'])->name('jadwal-template.edit');
     Route::put('/{id}', [JadwalTemplateController::class, 'update'])->name('jadwal-template.update');
     Route::delete('/{id}', [JadwalTemplateController::class, 'destroy'])->name('jadwal-template.destroy');
     Route::get('/filter/{hari}', [JadwalTemplateController::class, 'filterByDay']);
