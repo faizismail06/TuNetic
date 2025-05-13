@@ -25,6 +25,11 @@ class Jadwal extends Model
         'status',
     ];
 
+    public function jadwalOperasional()
+    {
+        return $this->hasMany(JadwalOperasional::class, 'id_jadwal', 'id');
+    }
+
     // protected $casts = [
     //     'tanggal' => 'date',
     // ];

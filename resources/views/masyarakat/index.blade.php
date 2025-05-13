@@ -93,7 +93,7 @@
                 Laporkan lokasi sampah yang perlu dibersihkan dengan mengunggah foto, menambahkan deskripsi,
                 dan penandaan di peta untuk tindakan lanjut.
             </p>
-            <a href="/lapor"
+            <a href="/masyarakat/lapor"
                 style="font-family: 'Red Hat Text', sans-serif; font-size: 1.1rem; background-color: #299E63; color: white; padding: 15px 25px; text-decoration: none; border-radius: 8px; display: inline-block;">
                 Laporkan Sampah
             </a>
@@ -117,11 +117,11 @@
 
             <!-- Kanan: Daftar Laporan -->
             <div class="col-md-6">
-                @if($laporanTerbaru->isEmpty())
+                @if ($laporanTerbaru->isEmpty())
                     <p>Belum ada laporan yang dikirim.</p>
                 @else
                     <div class="d-flex flex-column gap-4" style="padding-top: px;">
-                        @foreach($laporanTerbaru as $laporan)
+                        @foreach ($laporanTerbaru as $laporan)
                             <div class="card border-0 shadow-sm p-3" style="border-radius: 16px; ">
                                 <div class="d-flex align-items-center gap-3">
                                     <!-- Gambar -->
@@ -131,7 +131,8 @@
                                                 style="width: 150px; height: 120px; object-fit: cover;" alt="Gambar Laporan">
                                         @else
                                             <img src="{{ asset('images/default.jpg') }}" class="img-fluid rounded"
-                                                style="width: 150px; height: 120px; object-fit: cover;" alt="Tidak Ada Gambar">
+                                                style="width: 150px; height: 120px; object-fit: cover;"
+                                                alt="Tidak Ada Gambar">
                                         @endif
                                     </div>
 
@@ -143,7 +144,7 @@
 
                                         <div class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9rem;">
                                             <i class="fas fa-calendar-alt me-2 text-success"></i>
-                                            {{  $laporan->created_at->format('d F Y') }}
+                                            {{ $laporan->created_at->format('d F Y') }}
                                         </div>
 
                                         <div class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9rem;">
@@ -153,7 +154,7 @@
 
 
                                         <div class="d-flex align-items-center" style="font-size: 0.9rem;">
-                                            @if($laporan->status == 0)
+                                            @if ($laporan->status == 0)
                                                 <i class="fas fa-exclamation-circle me-2 text-danger"></i>
                                                 <span class="text-danger">Belum diangkut</span>
                                             @elseif($laporan->status == 1)
@@ -197,12 +198,20 @@
 
             <!-- Gambar Armada -->
             <img src="{{ asset('assets/images/Masyarakat/maps-armada-placeholder.png') }}" alt="Peta Placeholder"
-                style="width: 1320px; height: 400px; margin-top: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                style="width: 1320px; height: 400px;
+                                                                                        margin-top: 30px;
+                                                                                        border-radius: 12px;
+                                                                                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
 
             <!-- Tombol kanan bawah -->
             <div style="display: flex; justify-content: flex-end; margin-top: 20px; padding-right: 100px;">
-                <a href="{{ route('masyarakat.lacak') }}"
-                    style="font-size: 1.1rem; background-color: #299E63; margin-top: 20px; color: white; padding: 15px 25px; text-decoration: none; border-radius: 8px;">
+                <a href="{{ route('masyarakat.lacak') }}" style="font-size: 1.1rem;
+                                                                                                      background-color: #299E63;
+                                                                                                      margin-top: 20px;
+                                                                                                      color: white;
+                                                                                                      padding: 15px 25px;
+                                                                                                      text-decoration: none;
+                                                                                                      border-radius: 8px;">
                     Cek Rute Armada
                 </a>
             </div>
