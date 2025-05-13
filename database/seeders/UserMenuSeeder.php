@@ -85,7 +85,7 @@ class UserMenuSeeder extends Seeder
         // adi Petugas Menu (sekarang menu utama)
         $jadiPetugas = Menu::create([
             'nama_menu' => 'Jadi Petugas',
-            'url' => 'user/jadi-petugas',
+            'url' => 'user/jadi-petugas/form',
             'icon' => '',
             'parent_id' => $menuUser->id,
             'urutan' => 2
