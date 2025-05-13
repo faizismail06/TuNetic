@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>TuNetic</title>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -53,7 +55,8 @@
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link text-white" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i
+                            class="fas fa-bars"></i></a>
                 </li>
             </ul>
 
@@ -109,11 +112,10 @@
                         <div class="modal-footer justify-content-between">
                             <button type="button" class="btn btn-sm btn-default btn-flat"
                                 data-dismiss="modal">Tidak</button>
-                                <a class="btn btn-sm btn-flat float-right" style="background-color: #299e63; color: #fff;" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                    this.closest('form').submit();">
-                                    <span>Ya, Keluar</span>
-                                </a>
-
+                            <a class="btn btn-sm btn-info btn-flat float-right" href="{{ route('logout') }}"
+                                onclick="event.preventDefault();
+                            this.closest('form').submit();"><span>Ya,
+                                    Keluar</span></a>
                         </div>
                     </form>
                 </div>
@@ -185,7 +187,7 @@
     @stack('js')
     <script src="{{ asset('') }}dist/js/adminlte.min.js"></script>
     <script>
-        $(function () {
+        $(function() {
             $("#datatable-main").DataTable({
                 "responsive": true,
                 lengthMenu: [
@@ -207,20 +209,20 @@
             });
         });
 
-        $('.confirm-button').click(function (event) {
+        $('.confirm-button').click(function(event) {
             var form = $(this).closest("form");
             event.preventDefault();
             swal({
-                title: `Hapus data`,
-                icon: "warning",
-                buttons: {
-                    confirm: {
-                        text: 'Ya'
+                    title: `Hapus data`,
+                    icon: "warning",
+                    buttons: {
+                        confirm: {
+                            text: 'Ya'
+                        },
+                        cancel: 'Tidak'
                     },
-                    cancel: 'Tidak'
-                },
-                dangerMode: true,
-            })
+                    dangerMode: true,
+                })
                 .then((willDelete) => {
                     if (willDelete) {
                         form.submit();
