@@ -186,7 +186,7 @@
 
             <!-- Tombol kanan bawah -->
             <div style="display: flex; justify-content: flex-end; margin-top: 20px; padding-right: 100px;">
-                <a href="{{ route('masyarakat.lacak') }}"
+                <a href="{{ route('masyarakat.rute-armada.index') }}"
                     style="font-size: 1.1rem;
                                                                                                       background-color: #299E63;
                                                                                                       margin-top: 20px;

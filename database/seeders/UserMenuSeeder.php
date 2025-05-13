@@ -50,7 +50,7 @@ class UserMenuSeeder extends Seeder
         // Rute Armada
         $ruteArmadaUser = Menu::create([
             'nama_menu' => 'Rute Armada',
-            'url' => 'masyarakat/lacak',
+            'url' => 'masyarakat/rute-armada',
             'icon' => '',
             'parent_id' => $menuUser->id,
             'urutan' => 3
