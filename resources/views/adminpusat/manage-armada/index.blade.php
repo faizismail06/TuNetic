@@ -11,7 +11,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6 text-uppercase">
-                    <h4 class="m-0">Kelola Rute</h4>
+                    <h4 class="m-0">Kelola Armada</h4>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right"></ol>
@@ -26,10 +26,10 @@
                 <div class="col-md-12">
                     <div class="card card-success card-outline">
                         <div class="card-header">
-                            <h3 class="card-title">Data Rute</h3>
+                            <h3 class="card-title">Data Armada</h3>
                             <div class="card-tools">
                                 <a href="{{ route('manage-rute.create') }}" class="btn btn-sm btn-success">
-                                    <i class="fas fa-plus-circle mr-1"></i> Tambah Rute
+                                    <i class="fas fa-plus-circle mr-1"></i> Tambah Armada
                                 </a>
                             </div>
                         </div>
@@ -38,31 +38,29 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 1%;" class="text-center">ID</th>
-                                        <th class="text-center">Nama Rute</th>
+                                        <th class="text-center">Jenis</th>
+                                        <th class="text-center">NoPol</th>
+                                        <th class="text-center">Merek</th>
+                                        <th class="text-center">Kapasitas</th>
                                         {{-- <th>Tanggal</th> --}}
-                                        <th style="width: 30%;" class="text-center">Rute</th>
+                                        {{-- <th style="width: 30%;" class="text-center">Rute</th> --}}
                                         {{-- <th>Lokasi Laporan</th> --}}
                                         <th style="width: 25%;" class="text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($rute as $item)
+                                    @foreach ($armada as $item)
                                         <tr>
                                             <td class="text-center">{{ $loop->iteration }}</td>
-                                            <td class="text-center">{{ $item->nama_rute }}</td>
+                                            <td class="text-center">{{ $item->jenis_kendaraan }}</td>
+                                            <td class="text-center">{{ $item->no_polisi }}</td>
+                                            <td class="text-center">{{ $item->merk_kendaraan }}</td>
+                                            <td class="text-center">{{ $item->kapasitas }}</td>
                                             {{-- <td>{{ $item->tanggal_jadwal }}</td> --}}
-                                            <td class="text-center">
-                                                {{-- <a href="{{ route('manage-rute.detail', $item->id) }}" class="btn btn-sm btn-warning text-white" style="width: 180px; height: 36px">
-                                                    <i class="fas fa-info-circle mr-1 text-white"></i> Detail Rute
-                                                </a> --}}
-                                                <button class="btn btn-sm btn-warning text-white btn-detail-rute" data-id="{{ $item->id }}" style="width: 180px; height: 36px">
-                                                    <i class="fas fa-info-circle mr-1 text-white"></i> Detail Rute
-                                                </button>
-                                            </td>
                                             {{-- <td>{{ $item->alamat ?? '-' }}</td> --}}
                                             <td class="text-center">
                                                 <div class="dropdown">
-                                                    <button type="button" class="btn btn-outline-info" data-toggle="dropdown" aria-expanded="false" style="width: 120px; height: 36px">
+                                                    <button type="button" class="btn btn-outline-info" data-toggle="dropdown" aria-expanded="false" style="width: 150px; height: 36px">
                                                         <i class="fas fa-cog"></i>
                                                     </button>
                                                     <div class="dropdown-menu dropdown-menu-right" role="menu">
@@ -88,7 +86,7 @@
     </div>
 @endsection
 
-<div id="modalOverlay" style="display: none; position: fixed; inset: 0; backdrop-filter: blur(6px); background-color: rgba(0, 0, 0, 0.35); z-index: 9999; justify-content: center; align-items: center;">
+{{-- <div id="modalOverlay" style="display: none; position: fixed; inset: 0; backdrop-filter: blur(6px); background-color: rgba(0, 0, 0, 0.35); z-index: 9999; justify-content: center; align-items: center;">
     <div id="modalContent" style="background: white; padding: 30px 40px; border-radius: 16px; width: 500px; max-width: 95%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative;">
         <h1 style="text-align: center; font-weight: bold; margin-bottom: 25px; color: #343a40;"> <i class="fas fa-info-circle mr-1"></i> DETAIL RUTE</h1>
         <div id="ruteContent" style="font-size: 20px; line-height: 1.6; color: #444;"></div>
@@ -96,7 +94,7 @@
             Tutup
         </button>
     </div>
-</div>
+</div> --}}
 
 @push('js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -113,7 +111,7 @@
     <script src="{{ asset('plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
     <script src="{{ asset('plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
 
-    <script>
+    {{-- <script>
         @if (session('success'))
             Swal.fire({
                 icon: 'success',
@@ -211,5 +209,5 @@
                 this.style.display = 'none';
             }
         });
-    </script>
+    </script> --}}
 @endpush
