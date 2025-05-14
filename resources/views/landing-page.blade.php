@@ -64,7 +64,7 @@
         <nav class="navbar navbar-expand-lg bg-white navbar-light py-1">
             <div class="container">
                 <a class="navbar-brand" href="/">
-                    <img src="{{ asset('assets/images/logowarna2.png') }}" alt="TuRetic Logo" style="height: 60px;">
+                    <img src="{{ asset('assets/images/landpage/logowarna2.png') }}" alt="TuRetic Logo" style="height: 60px;">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
@@ -102,7 +102,7 @@
     <section class="hero bg-success text-white position-relative overflow-hidden">
         <!-- Siluet Logo di Background -->
         <div class="position-absolute start-0 top-50 translate-middle-y opacity-7" style="z-index: 1;">
-            <img src="{{ asset('assets/images/logopalsu.png') }}" alt="Siluet Logo" class="img-fluid"
+            <img src="{{ asset('assets/images/landpage/logopalsu.png') }}" alt="Siluet Logo" class="img-fluid"
                 style="max-width: 300px;">
         </div>
 
@@ -115,7 +115,7 @@
                 </div>
                 <div class="col-md-6 text-end">
                     <div class="position-relative">
-                        <img src="{{ asset('assets/images/iconpetugas1.png') }}" alt="Petugas Sampah" class="img-fluid">
+                        <img src="{{ asset('assets/images/landpage/iconpetugas1.png') }}" alt="Petugas Sampah" class="img-fluid">
                     </div>
                 </div>
             </div>
@@ -127,7 +127,7 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <img src="{{ asset('assets/images/tempatsampah.png') }}" alt="Pengelolaan Sampah" class="img-fluid">
+                    <img src="{{ asset('assets/images/landpage/tempatsampah.png') }}" alt="Pengelolaan Sampah" class="img-fluid">
                 </div>
                 <div class="col-md-6">
                 <h2 class="mb-4" style="font-weight: 650; font-family: 'Red Hat Text', sans-serif;">
@@ -171,7 +171,7 @@
                 <div class="col-md-5 text-center">
                     <h3 class="fw-semibold mb-4">Jemput Sampah</h3>
                     <div class="service-image mb-4">
-                        <img src="{{ asset('assets/images/truck1.png') }}" alt="Jemput Sampah" class="img-fluid"
+                        <img src="{{ asset('assets/images/landpage/truck1.png') }}" alt="Jemput Sampah" class="img-fluid"
                             style="max-height: 200px;">
                     </div>
                     <p class="text-center px-3">
@@ -189,7 +189,7 @@
                 <div class="col-md-5 text-center">
                     <h3 class="fw-semibold mb-4">Lapor Sampah</h3>
                     <div class="service-image mb-4">
-                        <img src="{{ asset('assets/images/petugas2.png') }}" alt="Lapor Sampah" class="img-fluid"
+                        <img src="{{ asset('assets/images/landpage/petugas2.png') }}" alt="Lapor Sampah" class="img-fluid"
                             style="max-height: 200px;">
                     </div>
                     <p class="text-center px-3">
@@ -213,37 +213,37 @@
             <div class="row g-4">
                 <div class="col-md-4 col-sm-6">
                     <div class="tps-card">
-                        <img src="{{ asset('assets/images/sampahtps.png') }}" alt="TPS Icon" class="tps-icon">
+                        <img src="{{ asset('assets/images/landpage/sampahtps.png') }}" alt="TPS Icon" class="tps-icon">
                         <p class="tps-title">TPS Tulus Harapan</p>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-6">
                     <div class="tps-card">
-                        <img src="{{ asset('assets/images/sampahtps.png') }}" alt="TPS Icon" class="tps-icon">
+                        <img src="{{ asset('assets/images/landpage/sampahtps.png') }}" alt="TPS Icon" class="tps-icon">
                         <p class="tps-title">TPS Ketileng Atas</p>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-6">
                     <div class="tps-card">
-                        <img src="{{ asset('assets/images/sampahtps.png') }}" alt="TPS Icon" class="tps-icon">
+                        <img src="{{ asset('assets/images/landpage/sampahtps.png') }}" alt="TPS Icon" class="tps-icon">
                         <p class="tps-title">TPS Ketileng Bawah</p>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-6">
                     <div class="tps-card">
-                        <img src="{{ asset('assets/images/sampahtps.png') }}" alt="TPS Icon" class="tps-icon">
+                        <img src="{{ asset('assets/images/landpage/sampahtps.png') }}" alt="TPS Icon" class="tps-icon">
                         <p class="tps-title">TPS PSIS</p>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-6">
                     <div class="tps-card">
-                        <img src="{{ asset('assets/images/sampahtps.png') }}" alt="TPS Icon" class="tps-icon">
+                        <img src="{{ asset('assets/images/landpage/sampahtps.png') }}" alt="TPS Icon" class="tps-icon">
                         <p class="tps-title">TPS Wanamukti</p>
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-6">
                     <div class="tps-card">
-                        <img src="{{ asset('assets/images/sampahtps.png') }}" alt="TPS Icon" class="tps-icon">
+                        <img src="{{ asset('assets/images/landpage/sampahtps.png') }}" alt="TPS Icon" class="tps-icon">
                         <p class="tps-title">TPS Perumahan Intan</p>
                     </div>
                 </div>
@@ -262,7 +262,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-4">
                         <!-- Worker with trash bags image -->
-                        <img src="{{ asset('assets/images/petugas1.png') }}" alt="Petugas Sampah" class="img-fluid">
+                        <img src="{{ asset('assets/images/landpage/petugas1.png') }}" alt="Petugas Sampah" class="img-fluid">
                     </div>
                     <div class="col-md-8">
                         <div class="row g-3">
@@ -387,7 +387,7 @@
 
             <!-- Gambar Sampah di Kanan Bawah -->
             <div class="position-absolute bottom-0 end-0" style="z-index: 1; max-width: 200px; overflow: hidden;">
-                <img src="{{ asset('assets/images/sampah1.png') }}" alt="Sampah" class="img-fluid">
+                <img src="{{ asset('assets/images/landpage/sampah1.png') }}" alt="Sampah" class="img-fluid">
             </div>
         </section>
 
@@ -404,7 +404,7 @@
                         <div class="card border-0 shadow-sm h-100">
                             <div class="row g-0">
                                 <div class="col-md-5">
-                                    <img src="assets/images/image-6.png" class="img-fluid rounded-start h-100"
+                                    <img src="assets/images/landpage/image-6.png" class="img-fluid rounded-start h-100"
                                         alt="Dampak Sampah Plastik" style="object-fit: cover;">
                                 </div>
                                 <div class="col-md-7">
@@ -429,7 +429,7 @@
                         <div class="card border-0 shadow-sm h-100">
                             <div class="row g-0">
                                 <div class="col-md-5">
-                                    <img src="assets/images/image.png" class="img-fluid rounded-start h-100"
+                                    <img src="assets/images/landpage/image.png" class="img-fluid rounded-start h-100"
                                         alt="Sampah Plastik di Sungai" style="object-fit: cover;">
                                 </div>
                                 <div class="col-md-7">
@@ -454,7 +454,7 @@
                         <div class="card border-0 shadow-sm h-100">
                             <div class="row g-0">
                                 <div class="col-md-5">
-                                    <img src="assets/images/imageyo.png" class="img-fluid rounded-start h-100"
+                                    <img src="assets/images/landpage/imageyo.png" class="img-fluid rounded-start h-100"
                                         alt="Festival LIKE 2" style="object-fit: cover;">
                                 </div>
                                 <div class="col-md-7">
@@ -483,7 +483,7 @@
                 <div class="row align-items-center">
                     <!-- Kolom untuk Gambar -->
                     <div class="col-12 col-sm-6 col-md-4 text-center text-sm-start mb-4 mb-sm-0">
-                        <img src="{{ asset('assets/images/kurakura.png') }}" alt="Turtle" class="img-fluid"
+                        <img src="{{ asset('assets/images/landpage/kurakura.png') }}" alt="Turtle" class="img-fluid"
                             style="max-width: 360px;">
                     </div>
 
@@ -503,7 +503,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-4 mb-4">
-                        <img src="{{ asset('assets/images/logoputih.png') }}" alt="TuNetic Logo" height="60"
+                        <img src="{{ asset('assets/images/landpage/logoputih.png') }}" alt="TuNetic Logo" height="60"
                             class="mb-3">
                         <ul class="list-unstyled d-flex">
                             <li class="me-3"><a href="#" class="text-white"><i class="fab fa-facebook-f fa-2x"></i></a>
