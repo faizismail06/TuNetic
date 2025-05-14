@@ -3,7 +3,7 @@
 @section('content')
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-11">
             <div class="card shadow-lg">
                 <div class="card-header text-white" style="background-color: #299E63">
                     <h4 class="mb-0">
@@ -12,106 +12,124 @@
                 </div>
 
                 <div class="card-body">
-                    {{-- Persyaratan --}}
-                    <div class="alert alert-info">
+                    {{-- Checklist Persyaratan --}}
+                    <div class="alert bg-white text-dark border shadow-sm">
                         <h5 class="alert-heading">
                             <i class="fas fa-info-circle me-2"></i> Sebelum Mendaftar, Pastikan Anda:
                         </h5>
-                        <ul class="mb-0">
-                            <li><i class="fas fa-check me-2" style="color: #299E63"></i> Berusia minimal 18 tahun</li>
-                            <li><i class="fas fa-check me-2" style="color: #299E63"></i> Berdomisili di area layanan TuNetic</li>
-                            <li><i class="fas fa-check me-2" style="color: #299E63"></i> Siap bekerja sesuai aturan kebersihan</li>
-                        </ul>
-                    </div>
-
-                    {{-- Status Pendaftaran --}}
-                    <div class="alert {{ auth()->user()->is_petugas ? 'alert-warning' : 'alert-primary' }} mb-4">
-                        <div class="d-flex align-items-center">
-                            <i class="fas {{ auth()->user()->is_petugas ? 'fa-user-check' : 'fa-user-clock' }} fa-2x me-3" style="color: #299E63"></i>
-                            <div>
-                                <h5 class="mb-1">
-                                    @if(auth()->user()->is_petugas)
-                                        Anda sudah terdaftar sebagai petugas kebersihan.
-                                    @else
-                                        Anda belum terdaftar sebagai petugas kebersihan.
-                                    @endif
-                                </h5>
-                                @if(auth()->user()->petugasRequest)
-                                    <small class="d-block">
-                                        Status pengajuan: 
-                                        <span class="badge" style="background-color: #299E63">
-                                            {{ auth()->user()->petugasRequest->status_label }}
-                                        </span>
-                                    </small>
-                                @endif
+                        <div id="checklist-container" class="mt-3">
+                            <div class="form-check checklist-item mb-3">
+                                <input class="form-check-input" type="checkbox" id="check1">
+                                <label class="form-check-label" for="check1">
+                                    <i class="fas fa-check-circle me-2 d-none text-success check-icon"></i>
+                                    Berusia minimal 18 tahun
+                                </label>
+                            </div>
+                            <div class="form-check checklist-item mb-3">
+                                <input class="form-check-input" type="checkbox" id="check2">
+                                <label class="form-check-label" for="check2">
+                                    <i class="fas fa-check-circle me-2 d-none text-success check-icon"></i>
+                                    Berdomisili di area layanan TuNic
+                                </label>
+                            </div>
+                            <div class="form-check checklist-item mb-3">
+                                <input class="form-check-input" type="checkbox" id="check3">
+                                <label class="form-check-label" for="check3">
+                                    <i class="fas fa-check-circle me-2 d-none text-success check-icon"></i>
+                                    Siap bekerja sesuai aturan kebersihan
+                                </label>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Formulir Pendaftaran --}}
-                    @unless(auth()->user()->is_petugas)
-                        <form method="POST" action="{{ route('user.petugas.submit') }}" enctype="multipart/form-data">
-                            @csrf
-
-                            <h5 class="mb-3 text-center">
-                                <i class="fas fa-edit me-2" style="color: #299E63"></i> Daftar Sekarang
-                            </h5>
-
-                            {{-- Data Pribadi --}}
-                            <div class="mb-3">
-                                <label class="form-label">Alamat Lengkap *</label>
-                                <textarea class="form-control @error('alamat') is-invalid @enderror" 
-                                    name="alamat" rows="3" required>{{ old('alamat') }}</textarea>
-                                @error('alamat')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                    {{-- Status Pendaftaran --}}
+                    <div class="alert alert-danger mb-4" id="statusPendaftaran">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-circle fa-2x me-3 text-danger"></i>
+                            <div>
+                                <h5 class="mb-1">Anda belum terdaftar sebagai petugas kebersihan.</h5>
                             </div>
+                        </div>
+                    </div>
 
-                            {{-- Upload Dokumen --}}
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Foto KTP *</label>
-                                    <input type="file" class="form-control @error('ktp') is-invalid @enderror" 
-                                        name="ktp" accept="image/*" required>
-                                    @error('ktp')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Format: JPG/PNG, maks 2MB</small>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Surat Keterangan Sehat (Opsional)</label>
-                                    <input type="file" class="form-control @error('sertifikat') is-invalid @enderror" 
-                                        name="sertifikat" accept=".pdf,.jpg,.png">
-                                    @error('sertifikat')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">Format: PDF/JPG/PNG, maks 5MB</small>
-                                </div>
-                            </div>
-
-                            {{-- Pengalaman --}}
-                            <div class="mb-4">
-                                <label class="form-label">Pengalaman Kerja (Jika Ada)</label>
-                                <textarea class="form-control @error('pengalaman') is-invalid @enderror" 
-                                    name="pengalaman" rows="3">{{ old('pengalaman') }}</textarea>
-                                @error('pengalaman')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            {{-- Tombol Submit --}}
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-lg" style="background-color: #299E63; color: white">
-                                    <i class="fas fa-paper-plane me-2"></i> Kirim Permohonan
-                                </button>
-                            </div>
-                        </form>
-                    @endunless
+                    {{-- Tombol Daftar --}}
+                    <button id="daftarBtn" class="btn btn-success w-100" disabled>
+                        <i class="fas fa-pencil-alt me-2"></i> Daftar Sekarang
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+{{-- Modal Peringatan --}}
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-white" style="background-color: #299E63">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle me-2"></i>Persyaratan Terpenuhi
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Selamat! Semua persyaratan telah terpenuhi. Klik "Lanjutkan" untuk mengisi formulir pendaftaran.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <a href="{{ route('user.jadipetugas.form') }}" class="btn text-white" style="background-color: #299E63">
+                    Lanjutkan
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('#checklist-container input[type="checkbox"]');
+        const daftarBtn = document.getElementById('daftarBtn');
+        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        const statusPendaftaran = document.getElementById('statusPendaftaran');
+
+        function checkAllChecked() {
+            let allChecked = true;
+            
+            checkboxes.forEach(checkbox => {
+                const label = checkbox.nextElementSibling;
+                const icon = label.querySelector('.check-icon');
+                
+                if (checkbox.checked) {
+                    icon.classList.remove('d-none');
+                    label.style.color = '#299E63';
+                } else {
+                    icon.classList.add('d-none');
+                    label.style.color = '';
+                    allChecked = false;
+                }
+            });
+            
+            daftarBtn.disabled = !allChecked;
+            
+            if (allChecked) {
+                successModal.show();
+                statusPendaftaran.classList.add('d-none');
+            } else {
+                statusPendaftaran.classList.remove('d-none');
+            }
+        }
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', checkAllChecked);
+        });
+
+        daftarBtn.addEventListener('click', function() {
+            successModal.show();
+        });
+    });
+</script>
 @endsection
 
 @section('styles')
@@ -122,22 +140,22 @@
     .card-header {
         border-radius: 15px 15px 0 0 !important;
     }
-    textarea {
-        resize: none;
+    .checklist-item {
+        transition: all 0.3s ease;
     }
-    /* Warna hijau untuk semua elemen yang membutuhkan */
-    .bg-success-custom {
-        background-color: #299E63 !important;
+    .checklist-item:hover {
+        transform: translateX(5px);
     }
-    .text-success-custom {
-        color: #299E63 !important;
-    }
-    .btn-success-custom {
+    .btn-success {
         background-color: #299E63;
-        color: white;
+        border-color: #299E63;
     }
-    .btn-success-custom:hover {
+    .btn-success:hover {
         background-color: #218753;
+        border-color: #218753;
+    }
+    .check-icon {
+        transition: all 0.3s ease;
     }
 </style>
 @endsection

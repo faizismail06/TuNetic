@@ -71,9 +71,9 @@ Route::prefix('user/akun')->name('user.akun.')->middleware('auth')->group(functi
 });
 
 // Route untuk pengajuan jadi petugas
-Route::prefix('user/jadipetugas-request')->name('user.jadipetugas.')->middleware('auth')->group(function () {
-    Route::get('/', [JadiPetugasController::class, 'petugasRequestForm'])->name('form');
-    Route::post('/', [JadiPetugasController::class, 'submitPetugasRequest'])->name('submit');
+Route::prefix('user/jadipetugas')->name('user.jadipetugas.')->middleware('auth')->group(function () {
+    Route::get('/', [jadipetugasController::class, 'jadipetugasForm'])->name('form');
+    Route::post('/', [jadipetugasController::class, 'submitPetugasRequest'])->name('submit');
 });
 
 // Route::resource('profile', ProfileController::class)->except('destroy');
