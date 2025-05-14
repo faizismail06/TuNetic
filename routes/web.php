@@ -72,7 +72,7 @@ Route::prefix('user/akun')->name('user.akun.')->middleware('auth')->group(functi
 
 // Route untuk pengajuan jadi petugas
 Route::prefix('user/jadipetugas')->name('user.jadipetugas.')->middleware('auth')->group(function () {
-    Route::get('/', [jadipetugasController::class, 'jadipetugasForm'])->name('form');
+    Route::get('/', [jadipetugasController::class, 'JadiPetugasForm'])->name('form');
     Route::post('/', [jadipetugasController::class, 'submitPetugasRequest'])->name('submit');
 });
 
