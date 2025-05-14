@@ -23,6 +23,7 @@ use App\Http\Controllers\TrackingArmadaController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RuteArmadaController;
+use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -58,7 +59,17 @@ Route::resource('profil', ProfilController::class)->except('destroy');
 Route::resource('manage-user', UserController::class);
 Route::resource('manage-role', RoleController::class);
 Route::resource('manage-menu', MenuController::class);
+Route::resource('manage-petugas', PetugasController::class);
+Route::resource('manage-rute', RuteController::class);
 Route::resource('manage-permission', PermissionController::class)->only('store', 'destroy');
+Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
+Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
+Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
+Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
+Route::post('petugas', [PetugasController::class, 'store'])->name('petugas.store');
+Route::get('/rute/{id}/detail', [RuteController::class, 'show'])->name('rute.detail');
+Route::get('manage-rute/{id}/detail', [RuteController::class, 'show'])->name('manage-rute.detail');
+Route::get('manage-rute/{id}/edit', [RuteController::class, 'edit'])->name('manage-rute.edit');
 
 // ===================
 // ARMADA
@@ -69,11 +80,13 @@ Route::resource('armada', ArmadaController::class);
 // PETUGAS
 // ===================
 Route::resource('petugas', PetugasController::class);
+Route::get('/petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
 
 Route::prefix('jadwal-template')->group(function () {
     Route::get('/', [JadwalTemplateController::class, 'index'])->name('jadwal-template.index');
     Route::get('/{hari}', [JadwalTemplateController::class, 'filterByDay'])->name('jadwal-template.filter');
     Route::post('/store', [JadwalTemplateController::class, 'store'])->name('jadwal-template.store');
+    Route::get('/{id}/edit', [JadwalTemplateController::class, 'edit'])->name('jadwal-template.edit');
     Route::put('/{id}', [JadwalTemplateController::class, 'update'])->name('jadwal-template.update');
     Route::delete('/{id}', [JadwalTemplateController::class, 'destroy'])->name('jadwal-template.destroy');
     Route::get('/filter/{hari}', [JadwalTemplateController::class, 'filterByDay']);
