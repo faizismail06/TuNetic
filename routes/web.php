@@ -259,9 +259,9 @@ Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
 
     Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         // Halaman Profil Admin
-        Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
-        Route::put('/profile', [ProfilController::class, 'update'])->name('profile.update');
-        Route::post('/profile/upload-photo', [ProfilController::class, 'uploadPhoto'])->name('profile.upload-photo');
+        Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+        Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
         Route::get('/register', [UserController::class, 'showRegistrationForm'])->name('register');
         Route::get('/get-regencies/{province_id}', [UserController::class, 'getRegencies']);
         Route::get('/get-districts/{regency_id}', [UserController::class, 'getDistricts']);
