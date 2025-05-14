@@ -112,12 +112,18 @@ class RuteController extends Controller
 
     public function getDetailJson($id)
     {
-        $rute = Rute::with(['tps', 'tpst', 'tpa'])->findOrFail($id);
+        $rute = Rute::with(['tps' => function ($query) {
+            $query->select('lokasi_tps.id', 'nama_lokasi', 'tipe');
+        }, 'tpst', 'tpa'])->findOrFail($id);
+
+        $tpsItems = $rute->tps->where('tipe', 'TPS')->values();
+        $tpstItem = $rute->tps->firstWhere('tipe', 'TPST');
+        $tpaItem  = $rute->tps->firstWhere('tipe', 'TPA');
 
         return response()->json([
-            'TPS' => $rute->tps->map(fn ($item) => $item->nama_lokasi)->toArray(),
-            'TPST' => $rute->tpst->nama_lokasi ?? '-',
-            'TPA' => $rute->tpa->nama_lokasi ?? '-',
+            'TPS'  => $tpsItems->map(fn ($item) => $item->nama_lokasi),
+            'TPST' => $tpstItem->nama_lokasi ?? '-',
+            'TPA'  => $tpaItem->nama_lokasi ?? '-',
         ]);
     }
 
