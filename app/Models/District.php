@@ -13,4 +13,14 @@ class District extends Model
     protected $fillable = [
         'name', // Kolom untuk nama provinsi
     ];
+
+    public function regency()
+    {
+        return $this->belongsTo(Regency::class);
+    }
+    
+    public function villages()
+    {
+        return $this->hasMany(Village::class);
+    }
 }

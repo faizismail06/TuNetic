@@ -16,19 +16,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-
-
-Route::prefix('tracking-armada')->group(function () {
-    Route::get('/', [ApiTrackingArmadaController::class, 'getTrackingData']);
-    Route::post('/', [ApiTrackingArmadaController::class, 'storeTrackingData']);
-});
-
-// API untuk menyimpan lokasi
-// Route::middleware(['auth:sanctum'])->group(function() {
-//     Route::post('petugas/jadwal-pengambilan/location', [JadwalPengambilanController::class, 'saveLocation']);
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
 // });
-

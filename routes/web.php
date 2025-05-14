@@ -3,7 +3,8 @@
 use App\Http\Controllers\DBBackupController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\JadiPetugasController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ArmadaController;
@@ -55,7 +56,32 @@ Route::resource('admin/home', DashboardController::class);
 // ===================
 // PROFILE
 // ===================
-Route::resource('profil', ProfilController::class)->except('destroy');
+// Halaman Profil untuk User Biasa
+Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'userIndex'])->name('profile.index');
+    Route::put('/profile', [ProfileController::class, 'userUpdate'])->name('profile.update');
+    Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
+
+    // Dropdown wilayah dinamis
+    Route::get('/get-regencies/{province_id}', [ProfileController::class, 'getRegencies'])->name('get.regencies');
+    Route::get('/get-districts/{regency_id}', [ProfileController::class, 'getDistricts'])->name('get.districts');
+    Route::get('/get-villages/{district_id}', [ProfileController::class, 'getVillages'])->name('get.villages');
+});
+
+// Route untuk pengaturan akun user
+Route::prefix('user/akun')->name('user.akun.')->middleware('auth')->group(function () {
+    Route::get('/', [ProfileController::class, 'akun'])->name('index');
+    Route::put('/update', [ProfileController::class, 'updateAkun'])->name('update');
+    Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+});
+
+// Route untuk pengajuan jadi petugas
+Route::prefix('user/jadipetugas')->name('user.jadipetugas.')->middleware('auth')->group(function () {
+    Route::get('/', [jadipetugasController::class, 'JadiPetugasForm'])->name('form');
+    Route::post('/', [jadipetugasController::class, 'submitPetugasRequest'])->name('submit');
+});
+
+// Route::resource('profile', ProfileController::class)->except('destroy');
 
 // ===================
 // USER, ROLE, MENU, PERMISSION MANAGEMENT
@@ -186,9 +212,16 @@ Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.
 Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
 Route::get('/lapor/{id}', [LaporanWargaController::class, 'show'])->name('lapor.detailRiwayat');
 
-Route::get('/get-regencies/{province}', [ProfilController::class, 'getRegencies'])->name('get.regencies');
-Route::get('/get-districts/{regency}', [ProfilController::class, 'getDistricts'])->name('get.districts');
-Route::get('/get-villages/{district}', [ProfilController::class, 'getVillages'])->name('get.villages');
+Route::get('/get-regencies/{province}', [ProfileController::class, 'getRegencies'])->name('get.regencies');
+Route::get('/get-districts/{regency}', [ProfileController::class, 'getDistricts'])->name('get.districts');
+Route::get('/get-villages/{district}', [ProfileController::class, 'getVillages'])->name('get.villages');
+
+
+Route::prefix('petugas')->name('petugas.')->middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'petugasIndex'])->name('profile.index');
+    Route::put('/profile/update', [ProfileController::class, 'petugasUpdate'])->name('profile.update');
+    Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
+});
 
 Route::get('/armada', function () {
     return view('armada');
@@ -271,6 +304,27 @@ Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
     return back()->with('resent', true);
 })->middleware(['auth', 'throttle:6,1'])->name('verification.resend');
+
+
+
+
+// Routes untuk pengguna biasa yang ingin menjadi petugas
+Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
+    Route::get('/jadi-petugas/form', [JadiPetugasController::class, 'showForm'])->name('jadi-petugas.form');
+    Route::post('/jadi-petugas/submit', [JadiPetugasController::class, 'submit'])->name('jadi-petugas.submit');
+    Route::get('/jadi-petugas/success', [JadiPetugasController::class, 'success'])->name('jadi-petugas.success');
+});
+
+// Routes untuk CRUD petugas (khusus admin)
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/petugas', [JadiPetugasController::class, 'index'])->name('jadi-petugas.index');
+    Route::get('/petugas/create', [JadiPetugasController::class, 'create'])->name('jadi-petugas.create');
+    Route::post('/petugas', [JadiPetugasController::class, 'store'])->name('jadi-petugas.store');
+    Route::get('/petugas/{id}', [JadiPetugasController::class, 'show'])->name('jadi-petugas.show');
+    Route::get('/petugas/{id}/edit', [JadiPetugasController::class, 'edit'])->name('jadi-petugas.edit');
+    Route::put('/petugas/{id}', [JadiPetugasController::class, 'update'])->name('jadi-petugas.update');
+    Route::delete('/petugas/{id}', [JadiPetugasController::class, 'destroy'])->name('jadi-petugas.destroy');
+});
 
 // ===================
 // JADWAL PENGAMBILAN - TRACKING PETUGAS

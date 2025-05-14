@@ -13,4 +13,9 @@ class Village extends Model
     protected $fillable = [
         'name', // Kolom untuk nama provinsi
     ];
+
+    public function district()
+    {
+        return $this->belongsTo(District::class);
+    }
 }

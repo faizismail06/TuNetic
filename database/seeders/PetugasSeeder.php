@@ -27,7 +27,6 @@ class PetugasSeeder extends Seeder
             'password' => $user->password, // bisa pakai ulang password-nya
             'nomor' => '081234567890',
             'tanggal_lahir' => '1995-05-10',
-            'alamat' => $user->alamat,
             'sim_image' => null,
             'alasan_bergabung' => 'Bergabung untuk bantu lingkungan.',
             'role' => 'Petugas',

@@ -4,13 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'TuNetic')</title>
-
-    <!-- Fonts -->
+    <title>TuNetic</title>
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@400;500;550;700&display=swap" rel="stylesheet">
-
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <!-- Additional styles -->
@@ -285,8 +280,8 @@
                 use Illuminate\Support\Facades\Auth;
             @endphp
 
-            @if(Auth::check())
-                <a href="{{ route('profil.index') }}" class="profile">
+            @if (Auth::check())
+                <a href="{{ route('user.profile.index') }}" class="profile">
                     {{ Auth::user()->name }}
                     <img src="{{ asset(Auth::user()->photo ?? 'assets/images/default-user.png') }}" alt="Profile">
                 </a>
@@ -370,7 +365,7 @@
                         <li style="margin-bottom: 10px;"><a href="#"
                                 style="color: white; text-decoration: none;">Jemput
                                 Sampah</a></li>
-                        <li style="margin-bottom: 10px;"><a href="{{ url('/masyarakat/lapor') }}"
+                        <li style="margin-bottom: 10px;"><a href="#"
                                 style="color: white; text-decoration: none;">Lapor
                                 Sampah</a></li>
                     </ul>

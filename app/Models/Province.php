@@ -12,9 +12,8 @@ class Province extends Model
     protected $table = 'reg_provinces'; // Pastikan nama tabel benar
     protected $fillable = ['name']; // Kolom yang bisa diisi mass assignment
 
-    // Relasi ke model Gunung
-    // public function gunungs()
-    // {
-    //     return $this->hasMany(Gunung::class, 'province_id'); // Menghubungkan Gunung dengan Province
-    // }
+    public function regencies()
+    {
+        return $this->hasMany(Regency::class);
+    }
 }
