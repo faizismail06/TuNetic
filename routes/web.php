@@ -23,6 +23,7 @@ use App\Http\Controllers\TrackingArmadaController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RuteArmadaController;
+use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -58,6 +59,7 @@ Route::resource('profil', ProfilController::class)->except('destroy');
 Route::resource('manage-user', UserController::class);
 Route::resource('manage-role', RoleController::class);
 Route::resource('manage-menu', MenuController::class);
+Route::resource('manage-petugas', PetugasController::class);
 Route::resource('manage-permission', PermissionController::class)->only('store', 'destroy');
 
 // ===================
@@ -69,6 +71,7 @@ Route::resource('armada', ArmadaController::class);
 // PETUGAS
 // ===================
 Route::resource('petugas', PetugasController::class);
+Route::get('/petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
 
 Route::prefix('jadwal-template')->group(function () {
     Route::get('/', [JadwalTemplateController::class, 'index'])->name('jadwal-template.index');
