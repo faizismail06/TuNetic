@@ -95,9 +95,11 @@
                                 <label for="tps[]">TPST</label>
                                 <select name="tps[]" class="form-control">
                                     <option value="">Pilih TPST</option>
-                                    @foreach ($lokasiTps as $lokasi)
-                                        <option value="{{ $lokasi->id }}">{{ $lokasi->nama_lokasi }}</option>
-                                    @endforeach
+                                        @foreach($lokasiTps as $tps)
+                                            @if($tps->tipe == 'TPST')
+                                                <option value="{{ $tps->id }}">{{ $tps->nama_lokasi }}</option>
+                                            @endif
+                                        @endforeach
                                 </select>
                             </div>
 
@@ -105,9 +107,11 @@
                                 <label for="tps[]">TPA</label>
                                 <select name="tps[]" class="form-control">
                                     <option value="">Pilih TPA</option>
-                                    @foreach ($lokasiTps as $lokasi)
-                                        <option value="{{ $lokasi->id }}">{{ $lokasi->nama_lokasi }}</option>
-                                    @endforeach
+                                        @foreach($lokasiTps as $tps)
+                                            @if($tps->tipe == 'TPA')
+                                                <option value="{{ $tps->id }}">{{ $tps->nama_lokasi }}</option>
+                                            @endif
+                                        @endforeach
                                 </select>
                             </div>
 
