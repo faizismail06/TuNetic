@@ -7,6 +7,7 @@ use App\Models\Rute;
 use App\Models\LokasiTps;
 use App\Models\RuteTps;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Exception;
 
 class RuteController extends Controller
@@ -18,14 +19,18 @@ class RuteController extends Controller
     {
         $rute = Rute::all();
 
-        // foreach ($rute as $item) {
-        //     if ($item->latitude && $item->longitude) {
-        //         $item->alamat = $this->getLocationName($item->latitude, $item->longitude);
-        //     } else {
-        //         $item->alamat = '-';
-        //     }
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - - -- - - - - - -
+        // PENGAMBILAN TANGGAL PADA TABEL JADWAL (Dibatalkan karena setiap TPS memiliki Tanggal yang berbeda")
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - - -- - - - - - -
 
-            // // Ambil tanggal dari relasi jadwal paling awal atau terakhir (tergantung kebutuhan)
+        // foreach ($rute as $item) {
+            // if ($item->latitude && $item->longitude) {
+            //     $item->alamat = $this->getLocationName($item->latitude, $item->longitude);
+            // } else {
+            //     $item->alamat = '-';
+            // }
+
+            // Ambil tanggal dari relasi jadwal paling awal atau terakhir (tergantung kebutuhan)
             // $jadwalDates = [];
 
             // foreach ($item->ruteTps as $ruteTps) {
@@ -54,21 +59,27 @@ class RuteController extends Controller
                 // 'latitude' => 'required|numeric|between:-90,90',
                 // 'longitude' => 'required|numeric|between:-180,180',
                 'wilayah' => 'required|string',
-                'tps' => 'array',
+                'tps' => 'required|array|min:1',
                 'tps.*' => 'nullable|exists:lokasi_tps,id', // validasi dropdown TPS
+                'tpst_id' => ['nullable', Rule::exists('lokasi_tps', 'id')->where('tipe', 'TPST')],
+                'tpa_id' => ['nullable', Rule::exists('lokasi_tps', 'id')->where('tipe', 'TPA')],
             ]);
 
             $rute = Rute::create([
                 'nama_rute' => $request->nama_rute,
                 'wilayah' => $request->wilayah,
+                'tpst_id' => $request->tpst_id,
+                'tpa_id' => $request->tpa_id,
             ]);
 
-            foreach ($request->tps as $id_lokasi_tps) {
-                RuteTps::create([
-                    'id_rute' => $rute->id,
-                    'id_lokasi_tps' => $id_lokasi_tps,
-                ]);
-            }
+            // foreach ($request->tps as $id_lokasi_tps) {
+            //     RuteTps::create([
+            //         'id_rute' => $rute->id,
+            //         'id_lokasi_tps' => $id_lokasi_tps,
+            //     ]);
+            // }
+
+            $rute->tps()->attach($request->tps);
             // return response()->json($rute, 201);
             return redirect()->route('manage-rute.index')->with('success', 'Rute berhasil ditambahkan');
         } catch (\Exception $e) {
@@ -92,8 +103,6 @@ class RuteController extends Controller
     {
         try {
             $rute = Rute::findOrFail($id);
-            // $rute->alamat = $this->getLocationName($rute->latitude, $rute->longitude);
-            // return response()->json($rute, 200);
 
             return view('adminpusat.manage-rute.detail', compact('id'));
         } catch (Exception $e) {
@@ -103,24 +112,26 @@ class RuteController extends Controller
 
     public function getDetailJson($id)
     {
-        $rute = Rute::with(['ruteTps.lokasi_tps'])->findOrFail($id);
-        $lokasiList = $rute->ruteTps->pluck('lokasi_tps.nama_lokasi')->toArray();
+        $rute = Rute::with(['tps' => function ($query) {
+            $query->select('lokasi_tps.id', 'nama_lokasi', 'tipe');
+        }, 'tpst', 'tpa'])->findOrFail($id);
 
-        $response = [
-            'TPS1' => $lokasiList[0] ?? '-',
-            'TPS2' => $lokasiList[1] ?? '-',
-            'TPS3' => $lokasiList[2] ?? '-',
-            'TPST' => $lokasiList[3] ?? '-',
-            'TPA'  => $lokasiList[4] ?? '-',
-        ];
+        $tpsItems = $rute->tps->where('tipe', 'TPS')->values();
+        $tpstItem = $rute->tps->firstWhere('tipe', 'TPST');
+        $tpaItem  = $rute->tps->firstWhere('tipe', 'TPA');
 
-        return response()->json($response);
+        return response()->json([
+            'TPS'  => $tpsItems->map(fn ($item) => $item->nama_lokasi),
+            'TPST' => $tpstItem->nama_lokasi ?? '-',
+            'TPA'  => $tpaItem->nama_lokasi ?? '-',
+        ]);
     }
 
     public function edit($id)
     {
         $rute = Rute::findOrFail($id);
-        return view('adminpusat.manage-rute.edit', compact('rute'));
+        $lokasiTps = LokasiTps::all();
+        return view('adminpusat.manage-rute.edit', compact('rute', 'lokasiTps'));
     }
 
     /**
@@ -133,8 +144,8 @@ class RuteController extends Controller
 
             $validatedData = $request->validate([
                 'nama_rute' => 'sometimes|string|max:255',
-                'latitude' => 'sometimes|numeric|between:-90,90',
-                'longitude' => 'sometimes|numeric|between:-180,180',
+                // 'latitude' => 'sometimes|numeric|between:-90,90',
+                // 'longitude' => 'sometimes|numeric|between:-180,180',
                 'wilayah' => 'sometimes|string',
             ]);
 
@@ -168,9 +179,10 @@ class RuteController extends Controller
         }
     }
 
-    /**
-     * Mengubah latitude dan longitude menjadi alamat jalan.
-     */
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - - -- - - - - - -
+    //  Mengubah latitude dan longitude menjadi alamat jalan menggunakan API OpenStreetMap (Nominatim)
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - - -- - - - - - -\
+
     // private function getLocationName($latitude, $longitude)
     // {
     //     try {
