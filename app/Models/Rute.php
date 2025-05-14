@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Model;
 
 class Rute extends Model
@@ -13,11 +14,18 @@ class Rute extends Model
 
     protected $fillable = [
         'nama_rute',
-        'map',
         'wilayah'
         // 'latitude',
         // 'longitude'
     ];
+
+    /**
+     * Semua lokasi yang berelasi (tanpa filter tipe)
+     */
+    public function lokasiTps()
+    {
+        return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps');
+    }
 
     /**
      * Relasi ke tabel rute_tps (ke primary key 'id')
@@ -27,19 +35,31 @@ class Rute extends Model
         return $this->hasMany(RuteTps::class, 'id_rute');
     }
 
+    /**
+     * Hanya lokasi yang bertipe 'TPS'
+     */
     public function tps()
     {
-        return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps');
+        return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps')
+                    ->where('lokasi_tps.tipe', 'TPS');
     }
 
+    /**
+     * Hanya lokasi yang bertipe 'TPS'
+     */
     public function tpst()
     {
-        return $this->belongsTo(LokasiTps::class, 'tpst_id');
+        return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps')
+                    ->where('lokasi_tps.tipe', 'TPST');
     }
 
+    /**
+     * Hanya lokasi yang bertipe 'TPS'
+     */
     public function tpa()
     {
-        return $this->belongsTo(LokasiTps::class, 'tpa_id');
+        return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps')
+                    ->where('lokasi_tps.tipe', 'TPA');
     }
 
     /**
