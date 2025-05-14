@@ -50,7 +50,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $item->nama_rute }}</td>
-                                            <td>{{ $item->updated_at }}</td>
+                                            <td>{{ $item->tanggal_jadwal }}</td>
                                             <td>
                                                 <a href="{{ route('rute.detail', $item->id) }}" class="btn btn-sm btn-warning text-white">
                                                     <i class="fas fa-info-circle mr-1 text-white"></i> Detail Rute
@@ -63,10 +63,10 @@
                                                         <i class="fas fa-cog"></i>
                                                     </button>
                                                     <div class="dropdown-menu dropdown-menu-right" role="menu">
-                                                        <a class="dropdown-item" href="{{ route('petugas.edit', $item->id) }}">Edit</a>
-                                                        <a class="dropdown-item" href="{{ route('petugas.detail', $item->id) }}">Detail</a>
+                                                        <a class="dropdown-item" href="{{ route('manage-rute.edit', $item->id) }}">Edit</a>
+                                                        <a class="dropdown-item" href="{{ route('manage-rute.detail', $item->id) }}">Detail</a>
                                                         <div class="dropdown-divider"></div>
-                                                        <form action="{{ route('petugas.destroy', $item->id) }}" method="POST" style="display:inline;">
+                                                        <form action="{{ route('manage-rute.destroy', $item->id) }}" method="POST" style="display:inline;">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="dropdown-item text-danger">Hapus</button>

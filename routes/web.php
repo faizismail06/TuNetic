@@ -63,6 +63,8 @@ Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->nam
 Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
 Route::post('petugas', [PetugasController::class, 'store'])->name('petugas.store');
 Route::get('/rute/{id}/detail', [RuteController::class, 'show'])->name('rute.detail');
+Route::get('manage-rute/{id}/detail', [RuteController::class, 'show'])->name('manage-rute.detail');
+Route::get('manage-rute/{id}/edit', [RuteController::class, 'edit'])->name('manage-rute.edit');
 
 // Armada Routes
 Route::resource('armada', ArmadaController::class);
