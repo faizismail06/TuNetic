@@ -40,8 +40,7 @@ class Rute extends Model
      */
     public function tps()
     {
-        return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps')
-                    ->where('lokasi_tps.tipe', 'TPS');
+        return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps');
     }
 
     /**
