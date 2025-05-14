@@ -46,9 +46,9 @@ $(document).ready(function () {
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="m-0">Daftar Jadwal</h5>
                 <div>
-                    <a href="{{ route('daftar-jadwal.generate.form') }}" class="btn btn-sm btn-success mr-2">
+                    {{-- <a href="{{ route('daftar-jadwal.generate.form') }}" class="btn btn-sm btn-success mr-2">
                         <i class="fas fa-sync-alt"></i> Generate Jadwal
-                    </a>
+                    </a> --}}
                     <a href="{{ route('daftar-jadwal.create') }}" class="btn btn-sm btn-success">
                         <i class="fas fa-plus-circle"></i> Tambah Jadwal
                     </a>
@@ -100,6 +100,44 @@ $(document).ready(function () {
                         </tbody>
                     </table>
                 </div> <!-- table responsive -->
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content">
+    <div class="container-fluid mt-4">
+        <div class="card card-success card-outline">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="m-0">Generate Jadwal Operasional</h5>
+                <div>
+                    <a href="/jadwal-template" class="btn btn-success">Kelola Template</a>
+                </div>
+            </div>
+            <div class="card-body">
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+                @if(session('error'))
+                    <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
+
+                <form action="{{ route('daftar-jadwal.generate.store') }}" method="POST">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="bulan_mulai">Bulan Mulai</label>
+                            <input type="month" name="bulan_mulai" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="bulan_akhir">Bulan Akhir</label>
+                            <input type="month" name="bulan_akhir" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">Generate</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

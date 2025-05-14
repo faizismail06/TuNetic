@@ -84,7 +84,7 @@ class JadwalOperasionalController extends Controller
         return view('adminpusat/jadwal-operasional.create', [
             'armadas' => Armada::all(),
             'jadwals' => Jadwal::all(),
-            'rute' => Rute::all(),
+            'rutes' => Rute::all(),
             'petugas' => Petugas::all(), // ✅ ini penting
         ]);
     }
