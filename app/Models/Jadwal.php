@@ -11,16 +11,28 @@ class Jadwal extends Model
 
     protected $table = 'jadwal';
 
+    public static function getStatusLabels(): array
+    {
+        return [
+            0 => 'Aktif',
+            1 => 'Tidak Aktif',
+        ];
+    }
+
+
     protected $fillable = [
-        // 'id_rute',
-        'tanggal',
         'hari',
         'status',
     ];
 
-    protected $casts = [
-        'tanggal' => 'date',
-    ];
+    public function jadwalOperasional()
+    {
+        return $this->hasMany(JadwalOperasional::class, 'id_jadwal', 'id');
+    }
+
+    // protected $casts = [
+    //     'tanggal' => 'date',
+    // ];
 
     /**
      * Relasi ke Rute.

@@ -11,17 +11,26 @@ class JadwalOperasional extends Model
 
     protected $table = 'jadwal_operasional';
 
+    public static function getStatusLabels(): array
+    {
+        return [
+            0 => 'Belum Berjalan',
+            1 => 'Sedang Berjalan',
+            2 => 'Selesai',
+        ];
+    }
+
     protected $fillable = [
         'id_armada',
         'id_jadwal',
-        'id_rute_tps',
+        'id_rute',
+        'tanggal',
         'jam_aktif',
         'status',
     ];
 
     protected $casts = [
-        'jam_aktif' => 'time',
-        'status' => 'integer',
+        'jam_aktif' => 'string',
     ];
 
     /**
@@ -41,10 +50,16 @@ class JadwalOperasional extends Model
     }
 
     /**
-     * Relasi ke tabel Rute TPS.
+     * Relasi ke tabel Rute.
      */
-    public function ruteTps()
+    public function rute()
     {
-        return $this->belongsTo(RuteTps::class, 'id_rute_tps');
+        return $this->belongsTo(Rute::class, 'id_rute');
+    }
+
+    // Relasi ke penugasan
+    public function penugasanPetugas()
+    {
+        return $this->hasMany(PenugasanPetugas::class, 'id_jadwal_operasional');
     }
 }

@@ -18,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // 
+        //
     }
 
     /**
@@ -32,5 +32,12 @@ class AppServiceProvider extends ServiceProvider
 
         //Use bootstrap 4 for pagination css
         Paginator::useBootstrapFour();
+         // Override mail configuration
+        config(['mail.default' => 'smtp']);
+        config(['mail.mailers.smtp.host' => 'smtp.gmail.com']);
+        config(['mail.mailers.smtp.port' => 587]);
+        config(['mail.mailers.smtp.encryption' => 'tls']);
+        config(['mail.mailers.smtp.username' => 'pbltunetic@gmail.com']);
+        config(['mail.mailers.smtp.password' => 'cyrykpprqfupgmwa']);
     }
 }

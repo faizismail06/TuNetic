@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
 
 
 class RegisterController extends Controller
@@ -40,7 +42,7 @@ class RegisterController extends Controller
     {
         $this->middleware('guest');
     }
-    
+
     /**
      * Get a validator for an incoming registration request.
      *
@@ -56,13 +58,13 @@ class RegisterController extends Controller
         ]);
     }
 
-    protected function registered($request, $user)
-{
-    auth()->guard('web')->logout(); // Pastikan logout menggunakan guard yang benar
-    return redirect('/login')->with('success', 'Registrasi berhasil! Silakan login.');
-}
+    //     protected function registered($request, $user)
+// {
+//     auth()->guard('web')->logout(); // Pastikan logout menggunakan guard yang benar
+//     return redirect('/login')->with('success', 'Registrasi berhasil! Silakan login.');
+// }
 
-    
+
 
     /**
      * Create a new user instance after a valid registration.
@@ -72,10 +74,19 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'level' => 4,
         ]);
+
+        $user->assignRole('user'); // assign role
+        return $user; // ✅ return User object, bukan redirect!
+    }
+    protected function registered($request, $user)
+    {
+        Auth::logout();
+        return redirect('/login')->with('success', 'Registrasi berhasil! Silakan cek email untuk verifikasi.');
     }
 }

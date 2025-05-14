@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>TuNetic</title>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -13,40 +15,41 @@
     <link rel="stylesheet" href="{{ asset('') }}dist/css/adminlte.min.css">
 
     <style>
-    .main-sidebar {
-        background-color: #299e63 !important;
-    }
+        .main-sidebar {
+            background-color: #299e63 !important;
+        }
 
-    .main-header {
-        background-color: #299e63 !important;
-    }
+        .main-header {
+            background-color: #299e63 !important;
+        }
 
-    /* .card-outline {
+        /* .card-outline {
         background-color: #299e63 !important;
     } */
 
-     .main-sidebar .nav-sidebar > .nav-item > .nav-link.active {
-        background-color: #25a05b !important;
-        color: #fff !important;
-    }
+        .main-sidebar .nav-sidebar>.nav-item>.nav-link.active {
+            background-color: #25a05b !important;
+            color: #fff !important;
+        }
 
-    /* .main-sidebar .nav-sidebar > .nav-item > .nav-link {
+        /* .main-sidebar .nav-sidebar > .nav-item > .nav-link {
         color: #fff !important;
     }
 
     .main-sidebar .nav-sidebar > .nav-item > .nav-link:hover {
         background-color: #258d54 !important;
         color: #fff !important;
-    } */ */
-</style>
+    } */
+        */
+    </style>
 
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <!-- Preloader -->
     {{-- <div class="preloader flex-column justify-content-center align-items-center">
-        <img class="animation__shake" src="{{ asset('') }}dist/img/logo-polines.png" alt="Polines Logo"
-            height="80" width="80">
+        <img class="animation__shake" src="{{ asset('') }}dist/img/logo-polines.png" alt="Polines Logo" height="80"
+            width="80">
     </div> --}}
     <div class="wrapper">
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -62,15 +65,23 @@
                     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
                         <img src="../../dist/img/user2-160x160.jpg" class="user-image img-circle elevation-2"
                             alt="User Image">
-                        <span class="d-none d-md-inline">{{ Auth::user()->name }}</span>
+                        <span class="d-none d-md-inline text-white">
+                            @auth
+                                {{ Auth::user()->name }}
+                            @else
+                                Guest
+                            @endauth
+                        </span>
+
+
                     </a>
                     <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
 
-                        <li class="user-header bg-info">
+                        <li class="user-header text-white" style="background-color: #299e63;" >
                             <img src="../../dist/img/user2-160x160.jpg" class="img-circle elevation-3" alt="User Image">
                             <p>
                                 {{ Auth::user()->name }}
-                                <small>Politeknik Negeri Semarang</small>
+                                <small>TuNetic</small>
                             </p>
                         </li>
                         <li class="user-footer">
@@ -82,7 +93,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+                    <a class="nav-link text-white" data-widget="fullscreen" href="#" role="button">
                         <i class="fas fa-expand-arrows-alt"></i>
                     </a>
                 </li>
@@ -114,12 +125,22 @@
         </div>
 
         <aside class="main-sidebar main-sidebar-custom sidebar-dark-info elevation-4">
-            <a href="{{ url('') }}" class="brand-link">
-                <img src="{{ asset('') }}dist/img/logo-polines.png" alt="Logo Polines"
-                    class="brand-image elevation-3" style="opacity: .8">
-                <span
-                    class="brand-text font-weight-light "><strong>TuNetic</strong></span>
-            </a>
+        <a href="{{ url('') }}" class="brand-link d-flex justify-content-center align-items-center">
+                    @php
+                $user = Auth::user();
+                $roleName = $user->getRoleNames()->first(); // Ambil 1 role pertama
+
+                $panelText = match ($roleName) {
+                    'admin_pusat' => 'ADMIN PANEL',
+                    'admin_tps', 'admin_tpst' => 'ADMIN TPS/TPST',
+                    'petugas' => 'PETUGAS',
+                    'user' => 'WARGA',
+                    default => 'USER',
+                };
+            @endphp
+
+            <span class="brand-text font-weight-bold text-white">{{ $panelText }}</span>
+        </a>
             <div class="sidebar">
                 <nav class="mt-2">
                     @include('layouts.sidebar')
@@ -129,10 +150,8 @@
             {{-- <div class="sidebar-custom">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <a class="btn btn-info btn-block" href="{{ route('logout') }}"
-                        onclick="event.preventDefault();
-                this.closest('form').submit();"><i
-                            class="fas fa-sign-out-alt"></i> <span>Keluar</span></a>
+                    <a class="btn btn-info btn-block" href="{{ route('logout') }}" onclick="event.preventDefault();
+                this.closest('form').submit();"><i class="fas fa-sign-out-alt"></i> <span>Keluar</span></a>
                 </form>
             </div> --}}
         </aside>
@@ -145,7 +164,7 @@
             <div class="float-right d-none d-sm-block">
                 <b>Version</b> 1.0.0
             </div>
-            <strong>&copy; {{ date('Y') }} <i>TuNetic </i> by Wizzy </strong>
+            <strong>&copy; {{ date('Y') }} <i>TuNetic </i> by Kelompok 3 </strong>
         </footer>
     </div>
 
@@ -178,7 +197,7 @@
                 pageLength: 50,
                 //"buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
             }).buttons().container().appendTo('#datatable-main_wrapper .col-md-6:eq(0)');
-            
+
             $('#datatable-sub').DataTable({
                 "paging": true,
                 "lengthChange": false,
@@ -211,6 +230,8 @@
                 });
         });
     </script>
+
+@stack('scripts') <!-- Wajib ada jika belum -->
 </body>
 
 </html>

@@ -3,7 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\JadwalOperasional;
+use App\Models\Armada;
+use App\Models\Jadwal;
+use App\Models\Rute;
+use App\Models\Petugas;
+use App\Models\PenugasanPetugas;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Exception;
+use App\Http\Resources\JadwalOperasionalResource;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class JadwalOperasionalController extends Controller
 {
@@ -12,25 +23,70 @@ class JadwalOperasionalController extends Controller
      */
     public function index()
     {
-        $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->get();
-        return response()->json($jadwal, 200);
+        $jadwals = JadwalOperasional::with([
+            'armada',
+            'jadwal',
+            'rute',
+            'penugasanPetugas.petugas'
+        ])->get();
+        return view('adminpusat/jadwal-operasional.index', compact('jadwals'));
     }
 
     /**
      * Menyimpan jadwal operasional baru.
      */
+
+
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'id_armada' => 'required|exists:armada,id',
-            'id_jadwal' => 'required|exists:jadwal,id',
-            'id_rute_tps' => 'required|exists:rute_tps,id',
-            'jam_aktif' => 'required|date_format:H:i:s',
-            'status' => 'required|integer|in:0,1,2',
-        ]);
+        DB::beginTransaction();
 
-        $jadwal = JadwalOperasional::create($validatedData);
-        return response()->json($jadwal, 201);
+        try {
+            $jadwal = JadwalOperasional::create($request->validate([
+                'id_armada' => 'required|exists:armada,id',
+                'id_jadwal' => 'required|exists:jadwal,id',
+                'id_rute' => 'required|exists:rute,id',
+                'tanggal' => 'required|date',
+                'jam_aktif' => [
+                    'required',
+                    'date_format:H:i',
+                    function ($attribute, $value, $fail) {
+                        if ($value < '05:00' || $value > '22:00') {
+                            $fail("Jam aktif harus antara 05:00 dan 22:00");
+                        }
+                    }
+                ],
+                'status' => 'required|integer|in:0,1,2',
+            ]));
+
+            // Simpan penugasan petugas
+            foreach ($request->input('petugas', []) as $p) {
+                \App\Models\PenugasanPetugas::create([
+                    'id_jadwal_operasional' => $jadwal->id,
+                    'id_petugas' => $p['id_petugas'],
+                    'tugas' => $p['tugas'],
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('jadwal-operasional.index')->with('success', 'Jadwal dan penugasan berhasil disimpan!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage())->withInput();
+        }
+    }
+
+
+    public function create()
+    {
+        return view('adminpusat/jadwal-operasional.create', [
+            'armadas' => Armada::all(),
+            'jadwals' => Jadwal::all(),
+            'rute' => Rute::all(),
+            'petugas' => Petugas::all(), // ✅ ini penting
+        ]);
     }
 
     /**
@@ -38,27 +94,87 @@ class JadwalOperasionalController extends Controller
      */
     public function show($id)
     {
-        $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->findOrFail($id);
-        return response()->json($jadwal, 200);
+        // $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->findOrFail($id);
+        // return response()->json($jadwal, 200);
+        try {
+            $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->findOrFail($id);
+            return response()->json($jadwal, 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Data tidak ditemukan!',
+                'error' => $e->getMessage()
+            ], 404);
+        }
     }
 
     /**
      * Memperbarui jadwal operasional.
      */
+    public function edit($id)
+    {
+        $jadwal = JadwalOperasional::with([
+            'jadwal',
+            'armada',
+            'rute',
+            'penugasanPetugas.petugas'
+        ])->findOrFail($id);
+
+        return view('adminpusat/jadwal-operasional.edit', [
+            'jadwalOperasional' => $jadwal,
+            'armadas' => Armada::all(),
+            'jadwals' => Jadwal::all(),
+            'rutes' => Rute::all(),
+            'petugas' => Petugas::all(),
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
-        $jadwal = JadwalOperasional::findOrFail($id);
+        DB::beginTransaction();
 
-        $validatedData = $request->validate([
-            'id_armada' => 'sometimes|exists:armada,id',
-            'id_jadwal' => 'sometimes|exists:jadwal,id',
-            'id_rute_tps' => 'sometimes|exists:rute_tps,id',
-            'jam_aktif' => 'sometimes|date_format:H:i:s',
-            'status' => 'sometimes|integer|in:0,1,2',
-        ]);
+        try {
+            $jadwal = JadwalOperasional::findOrFail($id);
 
-        $jadwal->update($validatedData);
-        return response()->json($jadwal, 200);
+            // Validasi
+            $validatedData = $request->validate([
+                'id_armada' => 'required|exists:armada,id',
+                'id_jadwal' => 'required|exists:jadwal,id',
+                'id_rute' => 'required|exists:rute,id',
+                'tanggal' => 'required|date',
+                'jam_aktif' => [
+                    'required',
+                    'date_format:H:i',
+                    function ($attribute, $value, $fail) {
+                        if ($value < '05:00' || $value > '22:00') {
+                            $fail("Jam aktif harus antara 05:00 dan 22:00");
+                        }
+                    }
+                ],
+                'status' => 'required|integer|in:0,1,2',
+            ]);
+
+            // Update jadwal operasional
+            $jadwal->update($validatedData);
+
+            // Hapus semua penugasan lama
+            $jadwal->penugasanPetugas()->delete();
+
+            // Tambahkan ulang penugasan yang baru dari form
+            foreach ($request->input('petugas', []) as $p) {
+                \App\Models\PenugasanPetugas::create([
+                    'id_jadwal_operasional' => $jadwal->id,
+                    'id_petugas' => $p['id_petugas'],
+                    'tugas' => $p['tugas'],
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('jadwal-operasional.index')->with('success', 'Jadwal operasional berhasil diperbarui!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage())->withInput();
+        }
     }
 
     /**
@@ -66,8 +182,21 @@ class JadwalOperasionalController extends Controller
      */
     public function destroy($id)
     {
-        $jadwal = JadwalOperasional::findOrFail($id);
-        $jadwal->delete();
-        return response()->json(["message" => "Jadwal operasional berhasil dihapus"], 204);
+        try {
+            $jadwal = JadwalOperasional::findOrFail($id);
+            $jadwal->delete();
+
+
+            // return response()->json(["message" => "Jadwal operasional berhasil dihapus"], 200);
+
+            return redirect()->route('jadwal-operasional.index')
+                            ->with('success', 'Jadwal operasional berhasil disimpan!');
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat menghapus!',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

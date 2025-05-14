@@ -21,20 +21,27 @@ class PenugasanPetugas extends Model
     {
         return $this->belongsTo(Petugas::class, 'id_petugas');
     }
-    public function jadwal_operasional()
+
+    public function jadwalOperasional()
     {
         return $this->belongsTo(JadwalOperasional::class, 'id_jadwal_operasional');
     }
+
     public function getTugasAttribute($value)
     {
-        return $value == 1 ? 'driver' : ($value == 2 ? 'picker' : 'undefined');
+        $map = [
+            1 => 'Driver',
+            2 => 'Picker',
+        ];
+        return $map[$value] ?? 'Undefined';
     }
-    // Setter untuk memastikan hanya menerima 1 (driver) atau 2 (picker)
+
     public function setTugasAttribute($value)
     {
         if (!in_array($value, [1, 2])) {
             throw new \InvalidArgumentException('Tugas harus 1 (driver) atau 2 (picker)');
         }
+
         $this->attributes['tugas'] = $value;
     }
 }

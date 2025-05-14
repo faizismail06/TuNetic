@@ -1,0 +1,12 @@
+.dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.tps-item {
+    font-size: 14px;
+}
+.tps-item i {
+    margin-right: 5px;
+}

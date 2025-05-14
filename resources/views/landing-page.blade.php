@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TuRetic - Buang Sampah Tanpa Ribet</title>
+    <title>TuNetic - Buang Sampah Tanpa Ribet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family='Red Hat Text':wght@100..900&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
         /* Jadwal section styles */
         #jadwal h2,
         #jadwal h6 {
-            font-family: ''Red Hat Text'', sans-serif;
+            font-family: '' Red Hat Text'', sans-serif;
             font-weight: 700;
         }
 
@@ -91,8 +91,8 @@
                     </div>
                 </div>
                 <div class="d-flex">
-                    <a href="#masuk" class="auth-btn sign-in me-2">Sign in</a>
-                    <a href="#daftar" class="auth-btn sign-up">Sign up</a>
+                    <a href="login" class="auth-btn sign-in me-2">Sign in</a>
+                    <a href="login" class="auth-btn sign-up">Sign up</a>
                 </div>
             </div>
         </nav>
@@ -108,15 +108,25 @@
 
         <div class="container position-relative pt-5" style="z-index: 2;">
             <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h1 class="display-4 fw-bold" style="font-family: 'Red Hat Text'">Buang Sampah <br /> Tanpa Ribet</h1>
-                    <p class="lead mt-4" style="font-size: 2rem; font-family: 'Red Hat Text', sans-serif;">#Small Steps, Big Impact</p>
+                <!-- Teks Kiri -->
+                <div class="col-md-6" style="padding-left: 40px; padding-top: 100px;">
+                    <h1 class="display-4 fw-bold" style="font-family: 'Red Hat Text'; font-size: 4rem;">
+                        Buang Sampah <br /> Tanpa Ribet
+                    </h1>
+
+                    <p class="lead mt-4" style="font-size: 2rem; font-family: 'Red Hat Text', sans-serif;">#Small Steps,
+                        Big Impact</p>
                     <a href="" class="btn btn-warning px-5 py-3 mt-3 start-now-btn">Mulai Sekarang</a>
                 </div>
                 <div class="col-md-6 text-end">
                     <div class="position-relative">
                         <img src="{{ asset('assets/images/landpage/iconpetugas1.png') }}" alt="Petugas Sampah" class="img-fluid">
                     </div>
+
+                <!-- Gambar Kanan -->
+                <div class="col-md-6 text-end d-flex justify-content-end align-items-end">
+                    <img src="{{ asset('assets/images/iconpetugas1.png') }}" alt="Petugas Sampah" class="img-fluid"
+                        style="max-width: 100%; transform: translate(115px, 20px);">
                 </div>
             </div>
         </div>
@@ -130,9 +140,9 @@
                     <img src="{{ asset('assets/images/landpage/tempatsampah.png') }}" alt="Pengelolaan Sampah" class="img-fluid">
                 </div>
                 <div class="col-md-6">
-                <h2 class="mb-4" style="font-weight: 650; font-family: 'Red Hat Text', sans-serif;">
-                    Mengelola Sampah Mudah untuk Kota Lestari
-                </h2>
+                    <h2 class="mb-4" style="font-weight: 650; font-family: 'Red Hat Text', sans-serif;">
+                        Mengelola Sampah Mudah untuk Kota Lestari
+                    </h2>
 
                     <p class="font-redhat">TuNetic membantu masyarakat mengelola sampah dengan mudah dan bertanggung
                         jawab. Setiap langkah kecil bisa berdampak besar bagi lingkungan.</p>
@@ -257,7 +267,8 @@
         <section class="py-5 position-relative" id="jadwal">
             <div class="container">
                 <h2 class="fw-semibold mb-2" style="font-family: 'Red Hat Text', sans-serif;">Jadwal</h2>
-                <p class="mb-4" style="font-family: 'Red Hat Text', sans-serif;">Lihat dan Pantau Jadwal Penjemputan Sampah</p>
+                <p class="mb-4" style="font-family: 'Red Hat Text', sans-serif;">Lihat dan Pantau Jadwal Penjemputan
+                    Sampah</p>
 
                 <div class="row align-items-center">
                     <div class="col-md-4">
@@ -517,26 +528,34 @@
                     <div class="col-md-2 mb-4">
                         <h5 class="mb-3 fw-bold">TuNetic</h5>
                         <ul class="list-unstyled">
-                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Tentang Kami</a></li>
-                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Layanan</a></li>
+                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Tentang
+                                    Kami</a></li>
+                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Layanan</a>
+                            </li>
                             <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">TPS</a></li>
-                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Jadwal</a></li>
-                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Edukasi</a></li>
+                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Jadwal</a>
+                            </li>
+                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Edukasi</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="col-md-2 mb-4">
                         <h5 class="mb-3 fw-semibold">Layanan</h5>
                         <ul class="list-unstyled">
-                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Jemput Sampah</a></li>
-                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Lapor Sampah</a></li>
-                    </ul>
+                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Jemput
+                                    Sampah</a></li>
+                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Lapor
+                                    Sampah</a></li>
+                        </ul>
                     </div>
                     <div class="col-md-4 mb-4">
                         <h5 class="mb-3 fw-bold">Contact</h5>
                         <ul class="list-unstyled">
-                            <li class="mb-3"><i class="fas fa-map-marker-alt me-2"></i> <span class="fw-light">Semarang, Indonesia</span>
+                            <li class="mb-3"><i class="fas fa-map-marker-alt me-2"></i> <span class="fw-light">Semarang,
+                                    Indonesia</span>
                             </li>
-                            <li class="mb-3"><i class="fas fa-envelope me-2 fw-light"></i> <span class="fw-light">TuNetic@gmail.com</span></li>
+                            <li class="mb-3"><i class="fas fa-envelope me-2 fw-light"></i> <span
+                                    class="fw-light">TuNetic@gmail.com</span></li>
                         </ul>
                     </div>
                 </div>

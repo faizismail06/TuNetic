@@ -46,7 +46,7 @@
                                         <h3 class="">PENDAFTARAN AKUN</h3>
                                     </div>
                                     <div class="form-body">
-                                        <form class="row g-3" action="{{ route('register') }}" method="POST">
+                                        <form class="row g-3" action="{{ route('register.store') }}" method="POST">
                                             @csrf
                                             <div class="col-12">
                                                 <label for="inputUsername" class="form-label">Nama Lengkap</label>
@@ -99,6 +99,46 @@
                                                         href="javascript:;" class="input-group-text bg-transparent"><i
                                                             class='bx bx-hide'></i></a>
                                                 </div>
+                                            </div>
+
+                                            {{-- START Wilayah --}}
+                                            {{-- Script ada dibawah --}}
+                                            <div class="form-group">
+                                                <label for="province">Provinsi</label>
+                                                <select name="province_id" id="province" class="form-control">
+                                                    <option>Pilih Provinsi</option>
+                                                    @foreach($provinces as $province)
+                                                        <option value="{{ $province->id }}">{{ $province->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="regency">Kabupaten/Kota</label>
+                                                <select name="regency_id" id="regency" class="form-control">
+                                                    <option>Pilih Kabupaten</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="district">Kecamatan</label>
+                                                <select name="district_id" id="district" class="form-control">
+                                                    <option>Pilih Kecamatan</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="village">Desa/Kelurahan</label>
+                                                <select name="village_id" id="village" class="form-control">
+                                                    <option>Pilih Desa</option>
+                                                </select>
+                                            </div>
+
+                                            {{-- END Wilayah --}}
+
+                                            <div class="col-12">
+                                                <label for="alamat" class="form-label">Alamat Lengkap</label>
+                                                <textarea name="alamat" id="alamat" class="form-control" placeholder="Masukan Alamat Lengkap" rows="5"></textarea>
                                             </div>
                                             <div class="col-12">
                                                 <div class="d-grid">
@@ -162,6 +202,47 @@
     </script>
     <!--app JS-->
     <script src="{{ asset('') }}assets/js/app.js"></script>
+
+    {{-- START Wilayah --}}
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $('#province').change(function () {
+            var id = $(this).val();
+            $.get('/get-regencies/' + id, function (data) {
+                $('#regency').empty().append('<option>Pilih Kabupaten</option>');
+                $('#district').empty().append('<option>Pilih Kecamatan</option>');
+                $('#village').empty().append('<option>Pilih Desa</option>');
+                $.each(data, function (index, item) {
+                    $('#regency').append('<option value="' + item.id + '">' + item.name + '</option>');
+                });
+            });
+        });
+
+        $('#regency').change(function () {
+            var id = $(this).val();
+            $.get('/get-districts/' + id, function (data) {
+                $('#district').empty().append('<option>Pilih Kecamatan</option>');
+                $('#village').empty().append('<option>Pilih Desa</option>');
+                $.each(data, function (index, item) {
+                    $('#district').append('<option value="' + item.id + '">' + item.name + '</option>');
+                });
+            });
+        });
+
+        $('#district').change(function () {
+            var id = $(this).val();
+            $.get('/get-villages/' + id, function (data) {
+                $('#village').empty().append('<option>Pilih Desa</option>');
+                $.each(data, function (index, item) {
+                    $('#village').append('<option value="' + item.id + '">' + item.name + '</option>');
+                });
+            });
+        });
+    </script>
+
+    {{-- END Wilayah --}}
+
 </body>
 
 </html>
