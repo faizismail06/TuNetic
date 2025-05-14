@@ -55,7 +55,7 @@
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i
+                    <a class="nav-link text-white" data-widget="pushmenu" href="#" role="button"><i
                             class="fas fa-bars"></i></a>
                 </li>
             </ul>
@@ -86,7 +86,7 @@
                         </li>
                         <li class="user-footer">
                             <a href="{{ route('profil.index') }}" class="btn btn-default btn-flat">Profil</a>
-                            <a href="#" class="btn btn-default btn-flat float-right" data-toggle="modal"
+                            <a href="#" class="btn btn-success btn-flat float-right" data-toggle="modal"
                                 data-target="#modal-logout"><i class="fas fa-sign-out-alt"></i> <span>Keluar</span></a>
                         </li>
 
@@ -112,7 +112,7 @@
                         <div class="modal-footer justify-content-between">
                             <button type="button" class="btn btn-sm btn-default btn-flat"
                                 data-dismiss="modal">Tidak</button>
-                            <a class="btn btn-sm btn-info btn-flat float-right" href="{{ route('logout') }}"
+                            <a class="btn btn-sm btn-success btn-flat float-right" href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
                             this.closest('form').submit();"><span>Ya,
                                     Keluar</span></a>

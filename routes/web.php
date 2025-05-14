@@ -24,6 +24,7 @@ use App\Http\Controllers\TrackingArmadaController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RuteArmadaController;
+use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -83,6 +84,7 @@ Route::resource('kelola-armada', KelolaArmadaController::class);
 // PETUGAS
 // ===================
 Route::resource('petugas', PetugasController::class);
+Route::get('/petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
 
 Route::prefix('jadwal-template')->group(function () {
     Route::get('/', [JadwalTemplateController::class, 'index'])->name('jadwal-template.index');
