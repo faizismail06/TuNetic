@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Armada;
 
 class KelolaArmadaController extends Controller
 {
     public function index()
     {
         // Menampilkan daftar armada
+        $armada = Armada::all();
+
+        return view('adminpusat.manage-armada.index', compact('armada'));
     }
 
     public function create()

@@ -78,7 +78,7 @@ Route::delete('/manage-rute/{id}', [RuteController::class, 'destroy'])->name('ma
 // ARMADA
 // ===================
 Route::resource('armada', ArmadaController::class);
-Route::resource('kelola-armada', KelolaArmadaController::class);
+Route::resource('manage-armada', KelolaArmadaController::class);
 
 // ===================
 // PETUGAS
