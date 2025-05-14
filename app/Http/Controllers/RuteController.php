@@ -18,14 +18,18 @@ class RuteController extends Controller
     {
         $rute = Rute::all();
 
-        // foreach ($rute as $item) {
-        //     if ($item->latitude && $item->longitude) {
-        //         $item->alamat = $this->getLocationName($item->latitude, $item->longitude);
-        //     } else {
-        //         $item->alamat = '-';
-        //     }
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - - -- - - - - - -
+        // PENGAMBILAN TANGGAL PADA TABEL JADWAL (Dibatalkan karena setiap TPS memiliki Tanggal yang berbeda")
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - - -- - - - - - -
 
-            // // Ambil tanggal dari relasi jadwal paling awal atau terakhir (tergantung kebutuhan)
+        // foreach ($rute as $item) {
+            // if ($item->latitude && $item->longitude) {
+            //     $item->alamat = $this->getLocationName($item->latitude, $item->longitude);
+            // } else {
+            //     $item->alamat = '-';
+            // }
+
+            // Ambil tanggal dari relasi jadwal paling awal atau terakhir (tergantung kebutuhan)
             // $jadwalDates = [];
 
             // foreach ($item->ruteTps as $ruteTps) {
@@ -92,8 +96,6 @@ class RuteController extends Controller
     {
         try {
             $rute = Rute::findOrFail($id);
-            // $rute->alamat = $this->getLocationName($rute->latitude, $rute->longitude);
-            // return response()->json($rute, 200);
 
             return view('adminpusat.manage-rute.detail', compact('id'));
         } catch (Exception $e) {
@@ -120,7 +122,8 @@ class RuteController extends Controller
     public function edit($id)
     {
         $rute = Rute::findOrFail($id);
-        return view('adminpusat.manage-rute.edit', compact('rute'));
+        $lokasiTps = LokasiTps::all();
+        return view('adminpusat.manage-rute.edit', compact('rute', 'lokasiTps'));
     }
 
     /**
@@ -133,8 +136,8 @@ class RuteController extends Controller
 
             $validatedData = $request->validate([
                 'nama_rute' => 'sometimes|string|max:255',
-                'latitude' => 'sometimes|numeric|between:-90,90',
-                'longitude' => 'sometimes|numeric|between:-180,180',
+                // 'latitude' => 'sometimes|numeric|between:-90,90',
+                // 'longitude' => 'sometimes|numeric|between:-180,180',
                 'wilayah' => 'sometimes|string',
             ]);
 
@@ -168,9 +171,10 @@ class RuteController extends Controller
         }
     }
 
-    /**
-     * Mengubah latitude dan longitude menjadi alamat jalan.
-     */
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - - -- - - - - - -
+    //  Mengubah latitude dan longitude menjadi alamat jalan menggunakan API OpenStreetMap (Nominatim)
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - - -- - - - - - -\
+
     // private function getLocationName($latitude, $longitude)
     // {
     //     try {
