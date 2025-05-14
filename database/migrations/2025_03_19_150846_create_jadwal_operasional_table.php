@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->date('tanggal');
             $table->tinyInteger('status')->default(0)->comment('0 = Belum Berjalan, 1 = Sedang Berjalan, 2 = Selesai');
             $table->time('jam_aktif');
-            $table->integer('status')->default(0);
+            // $table->integer('status')->default(0);
             $table->timestamps();
         });
     }

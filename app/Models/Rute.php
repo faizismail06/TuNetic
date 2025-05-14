@@ -14,9 +14,9 @@ class Rute extends Model
     protected $fillable = [
         'nama_rute',
         'map',
-        'wilayah',
-        'latitude',
-        'longitude'
+        'wilayah'
+        // 'latitude',
+        // 'longitude'
     ];
 
     /**
@@ -24,7 +24,12 @@ class Rute extends Model
      */
     public function ruteTps()
     {
-        return $this->hasMany(RuteTps::class, 'id_rute', 'id');
+        return $this->hasMany(RuteTps::class, 'id_rute');
+    }
+
+    public function tps()
+    {
+        return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps');
     }
 
     /**

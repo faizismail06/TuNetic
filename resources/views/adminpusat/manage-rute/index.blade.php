@@ -37,39 +37,41 @@
                             <table id="datatable-main" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Nama Rute</th>
-                                        <th>Tanggal</th>
-                                        <th>Rute</th>
-                                        <th>Lokasi Laporan</th>
-                                        <th>Aksi</th>
+                                        <th style="width: 1%;" class="text-center">ID</th>
+                                        <th class="text-center">Nama Rute</th>
+                                        {{-- <th>Tanggal</th> --}}
+                                        <th style="width: 30%;" class="text-center">Rute</th>
+                                        {{-- <th>Lokasi Laporan</th> --}}
+                                        <th style="width: 25%;" class="text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($rute as $item)
                                         <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $item->nama_rute }}</td>
-                                            <td>{{ $item->tanggal_jadwal }}</td>
-                                            <td>
-                                                <a href="{{ route('rute.detail', $item->id) }}" class="btn btn-sm btn-warning text-white">
+                                            <td class="text-center">{{ $loop->iteration }}</td>
+                                            <td class="text-center">{{ $item->nama_rute }}</td>
+                                            {{-- <td>{{ $item->tanggal_jadwal }}</td> --}}
+                                            <td class="text-center">
+                                                {{-- <a href="{{ route('manage-rute.detail', $item->id) }}" class="btn btn-sm btn-warning text-white" style="width: 180px; height: 36px">
                                                     <i class="fas fa-info-circle mr-1 text-white"></i> Detail Rute
-                                                </a>
+                                                </a> --}}
+                                                <button class="btn btn-sm btn-warning text-white btn-detail-rute" data-id="{{ $item->id }}" style="width: 180px; height: 36px">
+                                                    <i class="fas fa-info-circle mr-1 text-white"></i> Detail Rute
+                                                </button>
                                             </td>
-                                            <td>{{ $item->alamat ?? '-' }}</td>
+                                            {{-- <td>{{ $item->alamat ?? '-' }}</td> --}}
                                             <td class="text-center">
                                                 <div class="dropdown">
-                                                    <button type="button" class="btn btn-sm btn-outline-info" data-toggle="dropdown" aria-expanded="false">
+                                                    <button type="button" class="btn btn-outline-info" data-toggle="dropdown" aria-expanded="false" style="width: 120px; height: 36px">
                                                         <i class="fas fa-cog"></i>
                                                     </button>
                                                     <div class="dropdown-menu dropdown-menu-right" role="menu">
                                                         <a class="dropdown-item" href="{{ route('manage-rute.edit', $item->id) }}">Edit</a>
-                                                        <a class="dropdown-item" href="{{ route('manage-rute.detail', $item->id) }}">Detail</a>
                                                         <div class="dropdown-divider"></div>
-                                                        <form action="{{ route('manage-rute.destroy', $item->id) }}" method="POST" style="display:inline;">
+                                                        <form action="{{ route('manage-rute.destroy', $item->id) }}" class="form-delete" method="POST">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="dropdown-item text-danger">Hapus</button>
+                                                            <button type="button" class="dropdown-item text-danger btn-delete">Hapus</button>
                                                         </form>
                                                     </div>
                                                 </div>
@@ -86,7 +88,18 @@
     </div>
 @endsection
 
+<div id="modalOverlay" style="display: none; position: fixed; inset: 0; backdrop-filter: blur(6px); background-color: rgba(0, 0, 0, 0.35); z-index: 9999; justify-content: center; align-items: center;">
+    <div id="modalContent" style="background: white; padding: 30px 40px; border-radius: 16px; width: 500px; max-width: 95%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative;">
+        <h1 style="text-align: center; font-weight: bold; margin-bottom: 25px; color: #343a40;"> <i class="fas fa-info-circle mr-1"></i> DETAIL RUTE</h1>
+        <div id="ruteContent" style="font-size: 20px; line-height: 1.6; color: #444;"></div>
+        <button id="closeModalBtn" style="margin-top: 20px; display: block; margin-left: auto; margin-right: auto; background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+            Tutup
+        </button>
+    </div>
+</div>
+
 @push('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
@@ -101,6 +114,44 @@
     <script src="{{ asset('plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
 
     <script>
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '{{ session('success') }}',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            });
+        @endif
+
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan',
+                text: '{{ session('error') }}',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+        @endif
+        document.querySelectorAll('.btn-delete').forEach(button => {
+            button.addEventListener('click', function () {
+                const form = this.closest('.form-delete');
+                Swal.fire({
+                    title: 'Yakin ingin menghapus?',
+                    text: "Data ini tidak bisa dikembalikan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
         document.addEventListener('DOMContentLoaded', function () {
             // Cek dan hapus inisialisasi sebelumnya jika ada
             if ( $.fn.dataTable.isDataTable(table) ) {
@@ -122,6 +173,43 @@
                     }
                 }
             });
+        });
+        document.querySelectorAll('.btn-detail-rute').forEach(button => {
+            button.addEventListener('click', async () => {
+                const id = button.getAttribute('data-id');
+                const overlay = document.getElementById('modalOverlay');
+                const content = document.getElementById('ruteContent');
+
+                overlay.style.display = 'flex'; // Agar bisa center via flex
+                content.innerHTML = 'Memuat...';
+
+                try {
+                    const response = await fetch(`/api/rute/${id}`);
+                    const data = await response.json();
+
+                    content.innerHTML = `
+                        <p><strong>TPS 1:</strong> ${data.TPS1}</p>
+                        <p><strong>TPS 2:</strong> ${data.TPS2}</p>
+                        <p><strong>TPS 3:</strong> ${data.TPS3}</p>
+                        <p><strong>TPST:</strong> ${data.TPST}</p>
+                        <p><strong>TPA:</strong> ${data.TPA}</p>
+                    `;
+                } catch (err) {
+                    content.innerHTML = '<p class="text-danger">Gagal memuat data.</p>';
+                }
+            });
+        });
+
+        // Tutup jika klik tombol
+        document.getElementById('closeModalBtn').addEventListener('click', function () {
+            document.getElementById('modalOverlay').style.display = 'none';
+        });
+
+        // Tutup jika klik di luar konten
+        document.getElementById('modalOverlay').addEventListener('click', function (e) {
+            if (!document.getElementById('modalContent').contains(e.target)) {
+                this.style.display = 'none';
+            }
         });
     </script>
 @endpush

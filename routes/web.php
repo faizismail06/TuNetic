@@ -12,6 +12,7 @@ use App\Http\Controllers\JadwalOperasionalController;
 use App\Http\Controllers\JadwalPengambilanController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\JadwalTemplateController;
+use App\Http\Controllers\KelolaArmadaController;
 use App\Http\Controllers\LokasiTpsController;
 use App\Http\Controllers\PenugasanPetugasController;
 use App\Http\Controllers\RuteController;
@@ -67,13 +68,16 @@ Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->nam
 Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
 Route::post('petugas', [PetugasController::class, 'store'])->name('petugas.store');
 Route::get('/rute/{id}/detail', [RuteController::class, 'show'])->name('rute.detail');
-Route::get('manage-rute/{id}/detail', [RuteController::class, 'show'])->name('manage-rute.detail');
+Route::get('/rute/{id_rute}/detail', [RuteController::class, 'detail'])->name('rute.detail');
+Route::get('/api/rute/{id}', [RuteController::class, 'getDetailJson'])->name('api.rute.detail');
 Route::get('manage-rute/{id}/edit', [RuteController::class, 'edit'])->name('manage-rute.edit');
-
+Route::get('manage-rute/create', [RuteController::class, 'create'])->name('manage-rute.create');
+Route::delete('/manage-rute/{id}', [RuteController::class, 'destroy'])->name('manage-rute.destroy');
 // ===================
 // ARMADA
 // ===================
 Route::resource('armada', ArmadaController::class);
+Route::resource('kelola-armada', KelolaArmadaController::class);
 
 // ===================
 // PETUGAS
