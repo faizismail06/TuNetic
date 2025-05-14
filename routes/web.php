@@ -39,7 +39,10 @@ use Illuminate\Http\Request;
 // ===================
 // AUTH & LANDING PAGE
 // ===================
-Route::permanentRedirect('/', '/login');
+Route::get('/', function () {
+    return view('landing-page');
+});
+
 Auth::routes(['verify' => true]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -87,7 +90,7 @@ Route::resource('petugas', PetugasController::class);
 Route::get('/petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
 
 Route::prefix('jadwal-template')->group(function () {
-    Route::get('/', [JadwalTemplateController::class, 'index'])->name('jadwal-template.index');
+    // Route::get('/', [JadwalTemplateController::class, 'index'])->name('jadwal-template.index');
     Route::get('/{hari}', [JadwalTemplateController::class, 'filterByDay'])->name('jadwal-template.filter');
     Route::post('/store', [JadwalTemplateController::class, 'store'])->name('jadwal-template.store');
     Route::get('/{id}/edit', [JadwalTemplateController::class, 'edit'])->name('jadwal-template.edit');

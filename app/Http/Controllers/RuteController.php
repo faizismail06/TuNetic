@@ -59,6 +59,7 @@ class RuteController extends Controller
 
             $rute = Rute::create([
                 'nama_rute' => $request->nama_rute,
+                'wilayah' => $request->wilayah,
             ]);
 
             foreach ($request->tps as $id_lokasi_tps) {
