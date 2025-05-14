@@ -7,6 +7,7 @@ use App\Models\Rute;
 use App\Models\LokasiTps;
 use App\Models\RuteTps;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Exception;
 
 class RuteController extends Controller
@@ -58,21 +59,27 @@ class RuteController extends Controller
                 // 'latitude' => 'required|numeric|between:-90,90',
                 // 'longitude' => 'required|numeric|between:-180,180',
                 'wilayah' => 'required|string',
-                'tps' => 'array',
+                'tps' => 'required|array|min:1',
                 'tps.*' => 'nullable|exists:lokasi_tps,id', // validasi dropdown TPS
+                'tpst_id' => ['nullable', Rule::exists('lokasi_tps', 'id')->where('tipe', 'TPST')],
+                'tpa_id' => ['nullable', Rule::exists('lokasi_tps', 'id')->where('tipe', 'TPA')],
             ]);
 
             $rute = Rute::create([
                 'nama_rute' => $request->nama_rute,
                 'wilayah' => $request->wilayah,
+                'tpst_id' => $request->tpst_id,
+                'tpa_id' => $request->tpa_id,
             ]);
 
-            foreach ($request->tps as $id_lokasi_tps) {
-                RuteTps::create([
-                    'id_rute' => $rute->id,
-                    'id_lokasi_tps' => $id_lokasi_tps,
-                ]);
-            }
+            // foreach ($request->tps as $id_lokasi_tps) {
+            //     RuteTps::create([
+            //         'id_rute' => $rute->id,
+            //         'id_lokasi_tps' => $id_lokasi_tps,
+            //     ]);
+            // }
+
+            $rute->tps()->attach($request->tps);
             // return response()->json($rute, 201);
             return redirect()->route('manage-rute.index')->with('success', 'Rute berhasil ditambahkan');
         } catch (\Exception $e) {
@@ -105,18 +112,13 @@ class RuteController extends Controller
 
     public function getDetailJson($id)
     {
-        $rute = Rute::with(['ruteTps.lokasi_tps'])->findOrFail($id);
-        $lokasiList = $rute->ruteTps->pluck('lokasi_tps.nama_lokasi')->toArray();
+        $rute = Rute::with(['tps', 'tpst', 'tpa'])->findOrFail($id);
 
-        $response = [
-            'TPS1' => $lokasiList[0] ?? '-',
-            'TPS2' => $lokasiList[1] ?? '-',
-            'TPS3' => $lokasiList[2] ?? '-',
-            'TPST' => $lokasiList[3] ?? '-',
-            'TPA'  => $lokasiList[4] ?? '-',
-        ];
-
-        return response()->json($response);
+        return response()->json([
+            'TPS' => $rute->tps->map(fn ($item) => $item->nama_lokasi)->toArray(),
+            'TPST' => $rute->tpst->nama_lokasi ?? '-',
+            'TPA' => $rute->tpa->nama_lokasi ?? '-',
+        ]);
     }
 
     public function edit($id)

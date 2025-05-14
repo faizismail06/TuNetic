@@ -32,6 +32,16 @@ class Rute extends Model
         return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps');
     }
 
+    public function tpst()
+    {
+        return $this->belongsTo(LokasiTps::class, 'tpst_id');
+    }
+
+    public function tpa()
+    {
+        return $this->belongsTo(LokasiTps::class, 'tpa_id');
+    }
+
     /**
      * Relasi ke Lokasi.
      * Satu rute memiliki satu lokasi.

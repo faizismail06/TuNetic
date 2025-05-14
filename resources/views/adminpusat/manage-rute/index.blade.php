@@ -187,12 +187,19 @@
                     const response = await fetch(`/api/rute/${id}`);
                     const data = await response.json();
 
+                    let tpsContent = '';
+                    if (data.TPS && data.TPS.length > 0) {
+                        data.TPS.forEach((tps, index) => {
+                            tpsContent += `<p><strong>TPS ${index + 1}:</strong> ${tps ?? '-'}</p>`;
+                        });
+                    } else {
+                        tpsContent = '<p><strong>TPS:</strong> -</p>';
+                    }
+
                     content.innerHTML = `
-                        <p><strong>TPS 1:</strong> ${data.TPS1}</p>
-                        <p><strong>TPS 2:</strong> ${data.TPS2}</p>
-                        <p><strong>TPS 3:</strong> ${data.TPS3}</p>
-                        <p><strong>TPST:</strong> ${data.TPST}</p>
-                        <p><strong>TPA:</strong> ${data.TPA}</p>
+                        ${tpsContent}
+                        <p><strong>TPST:</strong> ${data.TPST ?? '-'}</p>
+                        <p><strong>TPA:</strong> ${data.TPA ?? '-'}</p>
                     `;
                 } catch (err) {
                     content.innerHTML = '<p class="text-danger">Gagal memuat data.</p>';
