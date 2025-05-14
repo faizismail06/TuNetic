@@ -219,3 +219,24 @@ Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
     return back()->with('resent', true);
 })->middleware(['auth', 'throttle:6,1'])->name('verification.resend');
+
+
+
+
+// Routes untuk pengguna biasa yang ingin menjadi petugas
+Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
+    Route::get('/jadi-petugas/form', [JadiPetugasController::class, 'showForm'])->name('jadi-petugas.form');
+    Route::post('/jadi-petugas/submit', [JadiPetugasController::class, 'submit'])->name('jadi-petugas.submit');
+    Route::get('/jadi-petugas/success', [JadiPetugasController::class, 'success'])->name('jadi-petugas.success');
+});
+
+// Routes untuk CRUD petugas (khusus admin)
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/petugas', [JadiPetugasController::class, 'index'])->name('jadi-petugas.index');
+    Route::get('/petugas/create', [JadiPetugasController::class, 'create'])->name('jadi-petugas.create');
+    Route::post('/petugas', [JadiPetugasController::class, 'store'])->name('jadi-petugas.store');
+    Route::get('/petugas/{id}', [JadiPetugasController::class, 'show'])->name('jadi-petugas.show');
+    Route::get('/petugas/{id}/edit', [JadiPetugasController::class, 'edit'])->name('jadi-petugas.edit');
+    Route::put('/petugas/{id}', [JadiPetugasController::class, 'update'])->name('jadi-petugas.update');
+    Route::delete('/petugas/{id}', [JadiPetugasController::class, 'destroy'])->name('jadi-petugas.destroy');
+});
