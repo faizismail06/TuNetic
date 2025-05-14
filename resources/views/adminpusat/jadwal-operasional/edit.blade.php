@@ -26,22 +26,32 @@
             const container = document.getElementById('petugasList');
 
             const row = document.createElement('div');
-            row.className = 'form-row mb-2';
+            row.className = 'form-group';
             row.id = 'petugasRow-' + petugasIndex;
 
             row.innerHTML = `
-                <select name="petugas[${petugasIndex}][id_petugas]" class="form-control">
-                    @foreach($petugas as $p)
-                        <option value="{{ $p->id }}">{{ $p->name }}</option>
-                    @endforeach
-                </select>
-
-                <select name="petugas[${petugasIndex}][tugas]" class="form-control ml-2">
-                    <option value="1">Driver</option>
-                    <option value="2">Picker</option>
-                </select>
-
-                <button type="button" class="btn btn-sm btn-danger ml-2" onclick="hapusPetugas(${petugasIndex})">X</button>
+                <div class="border p-3 mb-2 rounded">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Nama Petugas</label>
+                            <select name="petugas[${petugasIndex}][id_petugas]" class="form-control">
+                                @foreach($petugas as $p)
+                                    <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label>Tugas</label>
+                            <select name="petugas[${petugasIndex}][tugas]" class="form-control">
+                                <option value="1">Driver</option>
+                                <option value="2">Picker</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="hapusPetugas(${petugasIndex})">X</button>
+                        </div>
+                    </div>
+                </div>
             `;
 
             container.appendChild(row);
@@ -60,7 +70,7 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6 text-uppercase">
-                <h4 class="m-0">Tambah Jadwal Operasional</h4>
+                <h4 class="m-0">Edit Jadwal Operasional</h4>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -97,7 +107,7 @@
             <div class="col-md-12">
                 <div class="card card-success card-outline">
                     <div class="card-header d-flex justify-content-between">
-                        <h5 class="m-0">Form Tambah Jadwal Operasional</h5>
+                        <h5 class="m-0">Form Edit Jadwal Operasional</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('jadwal-operasional.update', $jadwalOperasional->id) }}" method="POST">
@@ -111,7 +121,8 @@
                                     <label>Jadwal (Tanggal & Hari)</label>
                                     <select name="id_jadwal" class="form-control" required>
                                         @foreach ($jadwals as $jadwal)
-                                            <option value="{{ $jadwal->id }}">{{ $jadwal->hari }} - {{ $jadwal->tanggal }}</option>
+                                            {{-- <option value="{{ $jadwal->id }}">{{ $jadwal->hari }} - {{ $jadwal->tanggal }}</option> --}}
+                                            <option value="{{ $jadwal->id }}">{{ $jadwal->hari }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -134,10 +145,12 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Rute TPS</label>
-                                    <select name="id_rute_tps" class="form-control" required>
-                                        @foreach ($ruteTps as $rute)
-                                            <option value="{{ $rute->id }}"{{ $jadwalOperasional->id_rute_tps == $rute->id ? 'selected' : '' }}>Rute #{{ $rute->id }}</option>
+                                    <label>Rute</label>
+                                    <select name="id_rute" class="form-control" required>
+                                        @foreach($rutes as $rute)
+                                            <option value="{{ $rute->id }}" {{ $jadwalOperasional->id_rute == $rute->id ? 'selected' : '' }}>
+                                                {{ $rute->nama_rute }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -170,26 +183,30 @@
                                 <h5>Penugasan Petugas</h5>
 
                                 <div id="petugasList">
-                                    @foreach ($jadwalOperasional->penugasanPetugas as $index => $penugasan)
-                                        <div class="form-row mb-2" id="petugasRow-{{ $index }}">
-                                            <select name="petugas[{{ $index }}][id_petugas]" class="form-control">
-                                                @foreach ($petugas as $p)
-                                                    <option value="{{ $p->id }}"
-                                                        {{ $penugasan->id_petugas == $p->id ? 'selected' : '' }}>
-                                                        {{ $p->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-
-                                            <select name="petugas[{{ $index }}][tugas]" class="form-control ml-2">
-                                                <option value="1" {{ $penugasan->tugas == 'Driver' ? 'selected' : '' }}>Driver</option>
-                                                <option value="2" {{ $penugasan->tugas == 'Picker' ? 'selected' : '' }}>Picker</option>
-                                            </select>
-
-                                            <button type="button" class="btn btn-sm btn-danger ml-2" onclick="hapusPetugas({{ $index }})">X</button>
+                                    <div class="border p-3 mb-2 rounded" id="petugasRow-0">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Nama Petugas</label>
+                                                <select name="petugas[0][id_petugas]" class="form-control">
+                                                    @foreach($petugas as $p)
+                                                        <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <label>Tugas</label>
+                                                <select name="petugas[0][tugas]" class="form-control">
+                                                    <option value="1">Driver</option>
+                                                    <option value="2">Picker</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-1 d-flex align-items-end">
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="hapusPetugas(${petugasIndex})">X</button>
+                                            </div>
                                         </div>
-                                    @endforeach
+                                    </div>
                                 </div>
+
 
                                 <button type="button" class="btn btn-sm btn-outline-primary mb-3" onclick="tambahPetugas()">+ Tambah Petugas</button>
 

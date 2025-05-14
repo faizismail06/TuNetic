@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\JadwalOperasional;
 use App\Models\Jadwal;
 use App\Models\Armada;
-use App\Models\RuteTps;
+use App\Models\Rute;
 use Illuminate\Support\Carbon;
 
 class JadwalOperasionalSeeder extends Seeder
@@ -18,7 +18,7 @@ class JadwalOperasionalSeeder extends Seeder
     public function run()
     {
         $armadas = Armada::all();
-        $rutes = RuteTps::all();
+        $rutes = Rute::all();
         $jadwals = Jadwal::all();
 
         if ($armadas->isEmpty() || $rutes->isEmpty() || $jadwals->isEmpty()) {
@@ -27,15 +27,24 @@ class JadwalOperasionalSeeder extends Seeder
         }
 
         foreach ($jadwals as $jadwal) {
-            for ($j = 0; $j < rand(1, 3); $j++) {
-                JadwalOperasional::create([
-                    'id_armada' => $armadas->random()->id,
-                    'id_jadwal' => $jadwal->id,
-                    'id_rute_tps' => $rutes->random()->id,
-                    'jam_aktif' => Carbon::createFromTime(rand(6, 10), 0, 0)->format('H:i:s'),
-                    'status' => 1
-                ]);
-            }
+            // for ($j = 0; $j < rand(1, 3); $j++) {
+            //     JadwalOperasional::create([
+            //         'id_armada' => $armadas->random()->id,
+            //         'id_jadwal' => $jadwal->id,
+            //         'id_rute' => $rutes->random()->id,
+            //         'tanggal' => '2025-05-30',
+            //         'jam_aktif' => Carbon::createFromTime(rand(6, 10), 0, 0)->format('H:i:s'),
+            //         'status' => 1
+            //     ]);
+            // }
+            JadwalOperasional::create([
+                'id_armada' => $armadas->random()->id,
+                'id_jadwal' => $jadwal->id,
+                'id_rute' => $rutes->random()->id,
+                'tanggal' => '2025-05-30',
+                'jam_aktif' => Carbon::createFromTime(rand(6, 10), 0, 0)->format('H:i:s'),
+                'status' => 1
+            ]);
         }
 
         $this->command->info('Jadwal Operasional berhasil dibuat.');

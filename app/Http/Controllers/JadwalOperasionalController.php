@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\JadwalOperasional;
 use App\Models\Armada;
 use App\Models\Jadwal;
-use App\Models\RuteTps;
+use App\Models\Rute;
 use App\Models\Petugas;
 use App\Models\PenugasanPetugas;
 use Illuminate\Http\Request;
@@ -26,7 +26,7 @@ class JadwalOperasionalController extends Controller
         $jadwals = JadwalOperasional::with([
             'armada',
             'jadwal',
-            'ruteTps.rute',
+            'rute',
             'penugasanPetugas.petugas'
         ])->get();
         return view('adminpusat/jadwal-operasional.index', compact('jadwals'));
@@ -45,7 +45,7 @@ class JadwalOperasionalController extends Controller
             $jadwal = JadwalOperasional::create($request->validate([
                 'id_armada' => 'required|exists:armada,id',
                 'id_jadwal' => 'required|exists:jadwal,id',
-                'id_rute_tps' => 'required|exists:rute_tps,id',
+                'id_rute' => 'required|exists:rute,id',
                 'tanggal' => 'required|date',
                 'jam_aktif' => [
                     'required',
@@ -84,7 +84,7 @@ class JadwalOperasionalController extends Controller
         return view('adminpusat/jadwal-operasional.create', [
             'armadas' => Armada::all(),
             'jadwals' => Jadwal::all(),
-            'ruteTps' => RuteTps::all(),
+            'rute' => Rute::all(),
             'petugas' => Petugas::all(), // ✅ ini penting
         ]);
     }
@@ -115,7 +115,7 @@ class JadwalOperasionalController extends Controller
         $jadwal = JadwalOperasional::with([
             'jadwal',
             'armada',
-            'ruteTps.rute',
+            'rute',
             'penugasanPetugas.petugas'
         ])->findOrFail($id);
 
@@ -123,7 +123,7 @@ class JadwalOperasionalController extends Controller
             'jadwalOperasional' => $jadwal,
             'armadas' => Armada::all(),
             'jadwals' => Jadwal::all(),
-            'ruteTps' => RuteTps::with('rute')->get(),
+            'rutes' => Rute::all(),
             'petugas' => Petugas::all(),
         ]);
     }
@@ -139,7 +139,7 @@ class JadwalOperasionalController extends Controller
             $validatedData = $request->validate([
                 'id_armada' => 'required|exists:armada,id',
                 'id_jadwal' => 'required|exists:jadwal,id',
-                'id_rute_tps' => 'required|exists:rute_tps,id',
+                'id_rute' => 'required|exists:rute,id',
                 'tanggal' => 'required|date',
                 'jam_aktif' => [
                     'required',

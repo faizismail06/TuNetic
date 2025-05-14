@@ -24,5 +24,6 @@ class TambahanSeeder extends Seeder
         $this->call(UserSeeder::class);
         $this->call(PetugasSeeder::class);
         // $this->call(PenugasanPetugasSeeder::class);
+        $this->call(JadwalTemplateSeeder::class);
     }
 }
