@@ -54,11 +54,13 @@ class RuteController extends Controller
                 // 'latitude' => 'required|numeric|between:-90,90',
                 // 'longitude' => 'required|numeric|between:-180,180',
                 'wilayah' => 'required|string',
-                'tps.*' => 'required|exists:lokasi_tps,id', // validasi dropdown TPS
+                'tps' => 'array',
+                'tps.*' => 'nullable|exists:lokasi_tps,id', // validasi dropdown TPS
             ]);
 
             $rute = Rute::create([
                 'nama_rute' => $request->nama_rute,
+                'wilayah' => $request->wilayah,
             ]);
 
             foreach ($request->tps as $id_lokasi_tps) {
@@ -68,6 +70,7 @@ class RuteController extends Controller
                 ]);
             }
             // return response()->json($rute, 201);
+            return redirect()->route('manage-rute.index')->with('success', 'Rute berhasil ditambahkan');
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Gagal menyimpan rute',

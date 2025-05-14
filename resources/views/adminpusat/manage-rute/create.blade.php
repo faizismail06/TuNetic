@@ -52,7 +52,7 @@
                             <label>TPS</label>
                             <div id="tps-container">
                                 <div class="form-group">
-                                    <select name="tps_ids[]" class="form-control" required>
+                                    <select name="tps[]" class="form-control" required>
                                         <option value="">Pilih TPS</option>
                                         @foreach ($lokasiTps as $lokasi)
                                             <option value="{{ $lokasi->id }}">{{ $lokasi->nama_lokasi }}</option>
@@ -74,8 +74,8 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="tps_ids[]">TPST</label>
-                                <select name="tps_ids[]" class="form-control">
+                                <label for="tps[]">TPST</label>
+                                <select name="tps[]" class="form-control">
                                     <option value="">Pilih TPST</option>
                                     @foreach ($lokasiTps as $lokasi)
                                         <option value="{{ $lokasi->id }}">{{ $lokasi->nama_lokasi }}</option>
@@ -84,8 +84,8 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="tps_ids[]">TPA</label>
-                                <select name="tps_ids[]" class="form-control">
+                                <label for="tps[]">TPA</label>
+                                <select name="tps[]" class="form-control">
                                     <option value="">Pilih TPA</option>
                                     @foreach ($lokasiTps as $lokasi)
                                         <option value="{{ $lokasi->id }}">{{ $lokasi->nama_lokasi }}</option>
