@@ -9,7 +9,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $countWarga = DB::table('users')->count();
+        $countWarga = DB::table('users')->where('level','4')->count();
         $countPetugas = DB::table('petugas')->count();
         $countArmada = DB::table('armada')->count();
         $countLaporan = DB::table('laporan_warga')->count();
@@ -37,7 +37,7 @@ class DashboardController extends Controller
             $tpsData = [];
             foreach ($nomorKendaraan as $kendaraan) {
                 $jumlah = $pengangkutanData
-                    ->where('plat_nomor', $kendaraan)
+                    ->where('no_polisi', $kendaraan)
                     ->where('tps_id', $tps->id)
                     ->first();
                 $tpsData[] = $jumlah ? $jumlah->jumlah_pengangkutan : 0;

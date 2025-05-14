@@ -26,7 +26,11 @@ class LokasiTps extends Model
         'longitude' => 'decimal:7',
     ];
 
-
+    public function rutes()
+    {
+        return $this->belongsToMany(Rute::class, 'rute_tps');
+    }
+    
     public function province()
     {
         return $this->belongsTo(Province::class, 'province_id');

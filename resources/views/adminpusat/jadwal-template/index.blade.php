@@ -1,5 +1,12 @@
 @extends('layouts.app')
 
+@push('css')
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+@endpush
+
 @section('content')
     <div class="container-fluid mt-4">
         <div class="card card-success card-outline">
@@ -115,8 +122,8 @@
                             return;
                         }
 
-                        let html = `<table class="table table-bordered table-sm">
-                        <thead>
+                        let html = `<table id="datatable-main" class="table table-bordered table-striped text-sm">
+                        <thead class="text-center">
                             <tr>
                                 <th>Armada</th>
                                 <th>Rute</th>
@@ -135,11 +142,19 @@
                                 ${template.petugas_template.map(p => `${p.petugas?.name ?? 'Petugas'} (${p.tugas == 1 ? 'Driver' : 'Picker'})`).join('<br>')}
                             </td>
                             <td>
-                                <form action="/jadwal-template/${template.id}" method="POST" onsubmit="return confirm('Yakin hapus template ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                                </form>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-info dropdown-toggle" data-toggle="dropdown">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="/jadwal-template/${template.id}/edit">Edit</a>
+                                        <form action="/jadwal-template/${template.id}" method="POST" onsubmit="return confirm('Yakin hapus template ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="dropdown-item confirm-button">Hapus</button>
+                                        </form>
+                                    </div>
+                                </div>
                             </td>
                         </tr>`;
                         });
@@ -160,50 +175,58 @@
             $('#hariInput').val(hari);
         });
 
-        // Submit form via AJAX
-        $('#formTambahTemplate').on('submit', function(e) {
-            e.preventDefault();
+    $('#formTambahTemplate').on('submit', function(e) {
+        e.preventDefault();
 
-            // Ambil data
-            const hari = $('#hariInput').val();
-            const id_armada = $('#id_armada').val();
-            const id_rute = $('#id_rute').val();
-            const petugasSelected = [];
+        const hari = $('#hariInput').val();
+        const id_armada = $('#id_armada').val();
+        const id_rute = $('#id_rute').val();
+        const petugasSelected = [];
 
-            $('#petugas-container input[type="checkbox"]:checked').each(function() {
-                const id = $(this).val();
-                const tugas = $(`select[name="tugas[${id}]"]`).val();
+        $('#petugas-container input[type="checkbox"]:checked').each(function() {
+            const id = $(this).val();
+            const tugas = $(`select[name="tugas[${id}]"]`).val();
+            if (id && tugas) {
                 petugasSelected.push({
                     id_petugas: id,
                     tugas: tugas
                 });
-            });
-
-            if (petugasSelected.length === 0) {
-                alert('Pilih minimal 1 petugas.');
-                return;
             }
-
-            $.ajax({
-                url: '{{ route('jadwal-template.store') }}',
-                method: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    hari,
-                    id_armada,
-                    id_rute,
-                    petugas: petugasSelected
-                },
-                success: function(res) {
-                    $('#tambahTemplateModal').modal('hide');
-                    alert(res.message);
-                    loadTemplates(hari); // refresh list
-                },
-                error: function(err) {
-                    alert('Gagal menyimpan template.');
-                    console.error(err);
-                }
-            });
         });
+
+        if (petugasSelected.length === 0) {
+            alert('Pilih minimal 1 petugas.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('_token', '{{ csrf_token() }}');
+        formData.append('hari', hari);
+        formData.append('id_armada', id_armada);
+        formData.append('id_rute', id_rute);
+
+        petugasSelected.forEach((petugas, index) => {
+            formData.append(`petugas[${index}][id_petugas]`, petugas.id_petugas);
+            formData.append(`petugas[${index}][tugas]`, petugas.tugas);
+        });
+
+        $.ajax({
+            url: '{{ route("jadwal-template.store") }}',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(res) {
+                $('#tambahTemplateModal').modal('hide');
+                alert(res.message);
+                loadTemplates(hari); // reload list
+            },
+            error: function(xhr) {
+                const msg = xhr.responseJSON?.message ?? 'Terjadi kesalahan saat menyimpan.';
+                alert(msg);
+                console.error(xhr.responseJSON ?? xhr);
+            }
+        });
+    });
     </script>
 @endpush
