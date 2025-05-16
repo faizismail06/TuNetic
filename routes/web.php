@@ -225,7 +225,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 
 // Routes untuk pengguna biasa yang ingin menjadi petugas
 Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
-    Route::get('/jadi-petugas/form', [JadiPetugasController::class, 'showForm'])->name('jadi-petugas.form');
+    Route::get('/jadi-petugas/form', [JadiPetugasController::class, 'JadipetugasForm'])->name('jadi-petugas.form');
     Route::post('/jadi-petugas/submit', [JadiPetugasController::class, 'submit'])->name('jadi-petugas.submit');
     Route::get('/jadi-petugas/success', [JadiPetugasController::class, 'success'])->name('jadi-petugas.success');
 });
