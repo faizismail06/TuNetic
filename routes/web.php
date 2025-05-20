@@ -39,8 +39,9 @@ use Illuminate\Http\Request;
 // Route::permanentRedirect('/', '/login');
 
 Route::get('/', function () {
-    return view('landing-page');
+    return view('home-petugas');
 });
+
 
 // Auth::routes();
 Auth::routes(['verify' => true]);
