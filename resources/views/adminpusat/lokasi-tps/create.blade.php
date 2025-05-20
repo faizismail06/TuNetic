@@ -2,15 +2,17 @@
 
 @push('css')
     <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
     <!-- Leaflet Geocoder CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <style>
         #map {
             height: 400px;
             border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         .coordinates-display {
             margin-top: 10px;
             padding: 10px;
@@ -18,9 +20,11 @@
             border-radius: 5px;
             border: 1px solid #dee2e6;
         }
+
         .search-container {
             margin-bottom: 10px;
         }
+
         .search-container .input-group {
             margin-bottom: 8px;
         }
@@ -58,19 +62,43 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="nama_lokasi">Nama Lokasi TPS <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control @error('nama_lokasi') is-invalid @enderror" id="nama_lokasi" name="nama_lokasi" value="{{ old('nama_lokasi') }}" required>
+                                            <label for="nama_lokasi">Nama Lokasi TPS <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text"
+                                                class="form-control @error('nama_lokasi') is-invalid @enderror"
+                                                id="nama_lokasi" name="nama_lokasi" value="{{ old('nama_lokasi') }}"
+                                                required>
                                             @error('nama_lokasi')
+                                                <span class="invalid-feedback">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <!-- Tambahkan form group untuk level TPS -->
+                                        <div class="form-group">
+                                            <label for="level">Kategori TPS <span class="text-danger">*</span></label>
+                                            <select class="form-control @error('level') is-invalid @enderror" id="level"
+                                                name="level" required>
+                                                <option value="">-- Pilih Kategori --</option>
+                                                <option value="0" {{ old('level') == '0' ? 'selected' : '' }}>TPS
+                                                    (Tempat Pembuangan Sampah)</option>
+                                                <option value="1" {{ old('level') == '1' ? 'selected' : '' }}>TPST
+                                                    (Tempat Pembuangan Sampah Terpadu)</option>
+                                                <option value="2" {{ old('level') == '2' ? 'selected' : '' }}>TPA
+                                                    (Tempat Pembuangan Akhir)</option>
+                                            </select>
+                                            @error('level')
                                                 <span class="invalid-feedback">{{ $message }}</span>
                                             @enderror
                                         </div>
 
                                         <div class="form-group">
                                             <label for="province_id">Provinsi <span class="text-danger">*</span></label>
-                                            <select class="form-control @error('province_id') is-invalid @enderror" id="province_id" name="province_id" required>
+                                            <select class="form-control @error('province_id') is-invalid @enderror"
+                                                id="province_id" name="province_id" required>
                                                 <option value="">-- Pilih Provinsi --</option>
                                                 @foreach ($provinces as $province)
-                                                    <option value="{{ $province->id }}" {{ old('province_id') == $province->id ? 'selected' : '' }}>
+                                                    <option value="{{ $province->id }}"
+                                                        {{ old('province_id') == $province->id ? 'selected' : '' }}>
                                                         {{ $province->name }}
                                                     </option>
                                                 @endforeach
@@ -81,12 +109,15 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="regency_id">Kabupaten/Kota <span class="text-danger">*</span></label>
-                                            <select class="form-control @error('regency_id') is-invalid @enderror" id="regency_id" name="regency_id" required>
+                                            <label for="regency_id">Kabupaten/Kota <span
+                                                    class="text-danger">*</span></label>
+                                            <select class="form-control @error('regency_id') is-invalid @enderror"
+                                                id="regency_id" name="regency_id" required>
                                                 <option value="">-- Pilih Kabupaten/Kota --</option>
-                                                @if(old('province_id'))
-                                                    @foreach($regencies as $regency)
-                                                        <option value="{{ $regency->id }}" {{ old('regency_id') == $regency->id ? 'selected' : '' }}>
+                                                @if (old('province_id'))
+                                                    @foreach ($regencies as $regency)
+                                                        <option value="{{ $regency->id }}"
+                                                            {{ old('regency_id') == $regency->id ? 'selected' : '' }}>
                                                             {{ $regency->name }}
                                                         </option>
                                                     @endforeach
@@ -99,11 +130,13 @@
 
                                         <div class="form-group">
                                             <label for="district_id">Kecamatan <span class="text-danger">*</span></label>
-                                            <select class="form-control @error('district_id') is-invalid @enderror" id="district_id" name="district_id" required>
+                                            <select class="form-control @error('district_id') is-invalid @enderror"
+                                                id="district_id" name="district_id" required>
                                                 <option value="">-- Pilih Kecamatan --</option>
-                                                @if(old('regency_id'))
-                                                    @foreach($districts as $district)
-                                                        <option value="{{ $district->id }}" {{ old('district_id') == $district->id ? 'selected' : '' }}>
+                                                @if (old('regency_id'))
+                                                    @foreach ($districts as $district)
+                                                        <option value="{{ $district->id }}"
+                                                            {{ old('district_id') == $district->id ? 'selected' : '' }}>
                                                             {{ $district->name }}
                                                         </option>
                                                     @endforeach
@@ -115,12 +148,15 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="village_id">Desa/Kelurahan <span class="text-danger">*</span></label>
-                                            <select class="form-control @error('village_id') is-invalid @enderror" id="village_id" name="village_id" required>
+                                            <label for="village_id">Desa/Kelurahan <span
+                                                    class="text-danger">*</span></label>
+                                            <select class="form-control @error('village_id') is-invalid @enderror"
+                                                id="village_id" name="village_id" required>
                                                 <option value="">-- Pilih Desa/Kelurahan --</option>
-                                                @if(old('district_id'))
-                                                    @foreach($villages as $village)
-                                                        <option value="{{ $village->id }}" {{ old('village_id') == $village->id ? 'selected' : '' }}>
+                                                @if (old('district_id'))
+                                                    @foreach ($villages as $village)
+                                                        <option value="{{ $village->id }}"
+                                                            {{ old('village_id') == $village->id ? 'selected' : '' }}>
                                                             {{ $village->name }}
                                                         </option>
                                                     @endforeach
@@ -138,7 +174,8 @@
 
                                             <div class="search-container">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control" id="search-input" placeholder="Cari lokasi (alamat, nama tempat, atau koordinat)">
+                                                    <input type="text" class="form-control" id="search-input"
+                                                        placeholder="Cari lokasi (alamat, nama tempat, atau koordinat)">
                                                     <div class="input-group-append">
                                                         <button type="button" class="btn btn-primary" id="search-button">
                                                             <i class="fas fa-search"></i> Cari
@@ -156,8 +193,12 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group mb-0">
-                                                            <label for="latitude">Latitude <span class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control @error('latitude') is-invalid @enderror" id="latitude" name="latitude" value="{{ old('latitude') }}" required>
+                                                            <label for="latitude">Latitude <span
+                                                                    class="text-danger">*</span></label>
+                                                            <input type="text"
+                                                                class="form-control @error('latitude') is-invalid @enderror"
+                                                                id="latitude" name="latitude"
+                                                                value="{{ old('latitude') }}" required>
                                                             @error('latitude')
                                                                 <span class="invalid-feedback">{{ $message }}</span>
                                                             @enderror
@@ -165,8 +206,12 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group mb-0">
-                                                            <label for="longitude">Longitude <span class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control @error('longitude') is-invalid @enderror" id="longitude" name="longitude" value="{{ old('longitude') }}" required>
+                                                            <label for="longitude">Longitude <span
+                                                                    class="text-danger">*</span></label>
+                                                            <input type="text"
+                                                                class="form-control @error('longitude') is-invalid @enderror"
+                                                                id="longitude" name="longitude"
+                                                                value="{{ old('longitude') }}" required>
                                                             @error('longitude')
                                                                 <span class="invalid-feedback">{{ $message }}</span>
                                                             @enderror
@@ -175,7 +220,9 @@
                                                 </div>
                                             </div>
                                             <small class="form-text text-muted mt-2">
-                                                <i class="fas fa-info-circle"></i> Klik pada peta untuk menentukan lokasi TPS, cari lokasi menggunakan kotak pencarian, atau masukkan koordinat secara manual
+                                                <i class="fas fa-info-circle"></i> Klik pada peta untuk menentukan lokasi
+                                                TPS, cari lokasi menggunakan kotak pencarian, atau masukkan koordinat secara
+                                                manual
                                             </small>
                                         </div>
                                     </div>
@@ -200,12 +247,13 @@
 
 @push('js')
     <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
     <!-- Leaflet Geocoder JS -->
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
-        $(function () {
+        $(function() {
             // Initialize map (default to center of Indonesia)
             const map = L.map('map').setView([-7.056325, 110.454250], 13);
 
@@ -269,7 +317,8 @@
                 if (!searchText) return;
 
                 // Cek apakah input adalah koordinat
-                const coordsRegex = /^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
+                const coordsRegex =
+                    /^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
 
                 if (coordsRegex.test(searchText)) {
                     // Input adalah koordinat
@@ -348,14 +397,20 @@
                     $.ajax({
                         url: "{{ route('lokasi-tps.getRegencies') }}",
                         type: "GET",
-                        data: { province_id: provinceId },
+                        data: {
+                            province_id: provinceId
+                        },
                         success: function(data) {
-                            $('#regency_id').empty().append('<option value="">-- Pilih Kabupaten/Kota --</option>');
-                            $('#district_id').empty().append('<option value="">-- Pilih Kecamatan --</option>');
-                            $('#village_id').empty().append('<option value="">-- Pilih Desa/Kelurahan --</option>');
+                            $('#regency_id').empty().append(
+                                '<option value="">-- Pilih Kabupaten/Kota --</option>');
+                            $('#district_id').empty().append(
+                                '<option value="">-- Pilih Kecamatan --</option>');
+                            $('#village_id').empty().append(
+                                '<option value="">-- Pilih Desa/Kelurahan --</option>');
 
                             $.each(data, function(key, value) {
-                                $('#regency_id').append('<option value="' + value.id + '">' + value.name + '</option>');
+                                $('#regency_id').append('<option value="' + value.id +
+                                    '">' + value.name + '</option>');
                             });
                         }
                     });
@@ -372,13 +427,18 @@
                     $.ajax({
                         url: "{{ route('lokasi-tps.getDistricts') }}",
                         type: "GET",
-                        data: { regency_id: regencyId },
+                        data: {
+                            regency_id: regencyId
+                        },
                         success: function(data) {
-                            $('#district_id').empty().append('<option value="">-- Pilih Kecamatan --</option>');
-                            $('#village_id').empty().append('<option value="">-- Pilih Desa/Kelurahan --</option>');
+                            $('#district_id').empty().append(
+                                '<option value="">-- Pilih Kecamatan --</option>');
+                            $('#village_id').empty().append(
+                                '<option value="">-- Pilih Desa/Kelurahan --</option>');
 
                             $.each(data, function(key, value) {
-                                $('#district_id').append('<option value="' + value.id + '">' + value.name + '</option>');
+                                $('#district_id').append('<option value="' + value.id +
+                                    '">' + value.name + '</option>');
                             });
                         }
                     });
@@ -394,12 +454,16 @@
                     $.ajax({
                         url: "{{ route('lokasi-tps.getVillages') }}",
                         type: "GET",
-                        data: { district_id: districtId },
+                        data: {
+                            district_id: districtId
+                        },
                         success: function(data) {
-                            $('#village_id').empty().append('<option value="">-- Pilih Desa/Kelurahan --</option>');
+                            $('#village_id').empty().append(
+                                '<option value="">-- Pilih Desa/Kelurahan --</option>');
 
                             $.each(data, function(key, value) {
-                                $('#village_id').append('<option value="' + value.id + '">' + value.name + '</option>');
+                                $('#village_id').append('<option value="' + value.id +
+                                    '">' + value.name + '</option>');
                             });
                         }
                     });
@@ -415,17 +479,23 @@
                 // Tunggu sebentar agar data regency diload
                 setTimeout(() => {
                     if ({{ old('regency_id') ? old('regency_id') : 'null' }}) {
-                        $('#regency_id').val({{ old('regency_id') ? old('regency_id') : 'null' }}).trigger('change');
+                        $('#regency_id').val({{ old('regency_id') ? old('regency_id') : 'null' }}).trigger(
+                            'change');
 
                         // Tunggu sebentar agar data district diload
                         setTimeout(() => {
                             if ({{ old('district_id') ? old('district_id') : 'null' }}) {
-                                $('#district_id').val({{ old('district_id') ? old('district_id') : 'null' }}).trigger('change');
+                                $('#district_id').val(
+                                        {{ old('district_id') ? old('district_id') : 'null' }})
+                                    .trigger('change');
 
                                 // Tunggu sebentar agar data village diload
                                 setTimeout(() => {
-                                    if ({{ old('village_id') ? old('village_id') : 'null' }}) {
-                                        $('#village_id').val({{ old('village_id') ? old('village_id') : 'null' }});
+                                    if (
+                                        {{ old('village_id') ? old('village_id') : 'null' }}) {
+                                        $('#village_id').val(
+                                            {{ old('village_id') ? old('village_id') : 'null' }}
+                                            );
                                     }
                                 }, 500);
                             }

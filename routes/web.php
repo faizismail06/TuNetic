@@ -132,16 +132,23 @@ Route::resource('sampah', SampahController::class);
 // ===================
 // LOKASI TPS
 // ===================
+// 1. Route dengan pola tetap harus didefinisikan lebih dulu
 Route::get('/lokasi-tps', [LokasiTpsController::class, 'index'])->name('lokasi-tps.index');
 Route::get('/lokasi-tps/create', [LokasiTpsController::class, 'create'])->name('lokasi-tps.create');
 Route::post('/lokasi-tps', [LokasiTpsController::class, 'store'])->name('lokasi-tps.store');
+Route::get('/lokasi-tps/get-regencies', [LokasiTpsController::class, 'getRegencies'])->name('lokasi-tps.getRegencies');
+Route::get('/lokasi-tps/get-districts', [LokasiTpsController::class, 'getDistricts'])->name('lokasi-tps.getDistricts');
+Route::get('/lokasi-tps/get-villages', [LokasiTpsController::class, 'getVillages'])->name('lokasi-tps.getVillages');
+Route::get('/lokasi-tps/filter/{level}', [LokasiTpsController::class, 'filterByLevel'])->name('lokasi-tps.filterByLevel');
+Route::post('/lokasi-tps/find-nearest', [LokasiTpsController::class, 'findNearestTps'])->name('lokasi-tps.findNearest');
+Route::get('/lokasi-tps-view', [LokasiTpsController::class, 'indexView'])->name('lokasi-tps.indexView');
+Route::get('/rute-armada', [LokasiTpsController::class, 'ruteArmada'])->name('rute-armada.index');
+
+// 2. Kemudian route dengan parameter dinamis
+Route::get('/lokasi-tps/{id}', [LokasiTpsController::class, 'show'])->name('lokasi-tps.show');
 Route::get('/lokasi-tps/{lokasiTps}/edit', [LokasiTpsController::class, 'edit'])->name('lokasi-tps.edit');
 Route::put('/lokasi-tps/{lokasiTps}', [LokasiTpsController::class, 'update'])->name('lokasi-tps.update');
 Route::delete('/lokasi-tps/{lokasiTps}', [LokasiTpsController::class, 'destroy'])->name('lokasi-tps.destroy');
-Route::get('lokasi-tps/get-regencies', [LokasiTpsController::class, 'getRegencies'])->name('lokasi-tps.getRegencies');
-Route::get('lokasi-tps/get-districts', [LokasiTpsController::class, 'getDistricts'])->name('lokasi-tps.getDistricts');
-Route::get('lokasi-tps/get-villages', [LokasiTpsController::class, 'getVillages'])->name('lokasi-tps.getVillages');
-
 // ===================
 // TRACKING ARMADA
 // ===================

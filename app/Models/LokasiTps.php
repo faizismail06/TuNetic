@@ -19,6 +19,7 @@ class LokasiTps extends Model
         'village_id',
         'latitude',
         'longitude',
+        'level',
     ];
 
     protected $casts = [
@@ -30,7 +31,7 @@ class LokasiTps extends Model
     {
         return $this->belongsToMany(Rute::class, 'rute_tps');
     }
-    
+
     public function province()
     {
         return $this->belongsTo(Province::class, 'province_id');
@@ -48,5 +49,4 @@ class LokasiTps extends Model
     {
         return $this->belongsTo(Village::class, 'village_id');
     }
-
 }
