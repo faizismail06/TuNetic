@@ -13,13 +13,13 @@ class LokasiTps extends Model
 
     protected $fillable = [
         'nama_lokasi',
+        'tipe',
         'province_id',
         'regency_id',
         'district_id',
         'village_id',
         'latitude',
         'longitude',
-        'level',
     ];
 
     protected $casts = [
@@ -41,10 +41,12 @@ class LokasiTps extends Model
     {
         return $this->belongsTo(Regency::class, 'regency_id');
     }
+
     public function district()
     {
         return $this->belongsTo(District::class, 'district_id');
     }
+
     public function village()
     {
         return $this->belongsTo(Village::class, 'village_id');

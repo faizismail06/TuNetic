@@ -68,13 +68,13 @@
                         <h5 class="mb-3">Filter berdasarkan kategori:</h5>
                         <div class="btn-group" role="group">
                             <a href="{{ route('lokasi-tps.index') }}"
-                                class="btn btn-outline-secondary {{ !request()->has('level') ? 'active' : '' }}">Semua</a>
-                            <a href="{{ route('lokasi-tps.filterByLevel', 0) }}"
-                                class="btn btn-outline-primary {{ request()->level == '0' ? 'active' : '' }}">TPS</a>
-                            <a href="{{ route('lokasi-tps.filterByLevel', 1) }}"
-                                class="btn btn-outline-info {{ request()->level == '1' ? 'active' : '' }}">TPST</a>
-                            <a href="{{ route('lokasi-tps.filterByLevel', 2) }}"
-                                class="btn btn-outline-warning {{ request()->level == '2' ? 'active' : '' }}">TPA</a>
+                                class="btn btn-outline-secondary {{ !request()->has('tipe') ? 'active' : '' }}">Semua</a>
+                            <a href="{{ route('lokasi-tps.filterByTipe', 'TPS') }}"
+                                class="btn btn-outline-primary {{ request()->tipe == 'TPS' ? 'active' : '' }}">TPS</a>
+                            <a href="{{ route('lokasi-tps.filterByTipe', 'TPST') }}"
+                                class="btn btn-outline-info {{ request()->tipe == 'TPST' ? 'active' : '' }}">TPST</a>
+                            <a href="{{ route('lokasi-tps.filterByTipe', 'TPA') }}"
+                                class="btn btn-outline-warning {{ request()->tipe == 'TPA' ? 'active' : '' }}">TPA</a>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -98,73 +98,73 @@
             </div>
 
             <div id="map"></div>
-        </div>
-    </div>
 
-    <div class="content">
-        <div class="container-fluid mt-4">
-            <div class="card card-success card-outline">
-                <div class="card-header">
-                    <h5 class="m-0">Daftar Lokasi TPS</h5>
-                    <div class="card-tools">
-                        <a href="{{ route('lokasi-tps.create') }}" class="btn btn-sm btn-primary">
-                            <i class="fas fa-plus-circle"></i> Tambah Lokasi TPS
-                        </a>
+            <div class="content">
+                <div class="container-fluid mt-4">
+                    <div class="card card-success card-outline">
+                        <div class="card-header">
+                            <h5 class="m-0">Daftar Lokasi TPS</h5>
+                            <div class="card-tools">
+                                <a href="{{ route('lokasi-tps.create') }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus-circle"></i> Tambah Lokasi TPS
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table id="datatable-main" class="table table-bordered table-striped text-sm">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Lokasi</th>
+                                        <th>Kategori</th>
+                                        <th>Latitude</th>
+                                        <th>Longitude</th>
+                                        <th>Wilayah</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($lokasiTps as $item)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $item->nama_lokasi }}</td>
+                                            <td>
+                                                @if ($item->tipe == 'TPS')
+                                                    <span class="badge badge-success">TPS</span>
+                                                @elseif($item->tipe == 'TPST')
+                                                    <span class="badge badge-info">TPST</span>
+                                                @elseif($item->tipe == 'TPA')
+                                                    <span class="badge badge-warning">TPA</span>
+                                                @else
+                                                    <span class="badge badge-secondary">Tidak Diketahui</span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $item->latitude }}</td>
+                                            <td>{{ $item->longitude }}</td>
+                                            <td>
+                                                {{ $item->village->name ?? '-' }},
+                                                {{ $item->district->name ?? '-' }},
+                                                {{ $item->regency->name ?? '-' }},
+                                                {{ $item->province->name ?? '-' }}
+                                            </td>
+                                            <td>
+                                                <div class="text-center">
+                                                    <a href="{{ route('lokasi-tps.edit', $item->id) }}"
+                                                        class="btn btn-sm btn-warning">Edit</a>
+                                                    <form action="{{ route('lokasi-tps.destroy', $item->id) }}"
+                                                        method="POST" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="btn btn-sm btn-danger confirm-button">Hapus</button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-                <div class="card-body">
-                    <table id="datatable-main" class="table table-bordered table-striped text-sm">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Nama Lokasi</th>
-                                <th>Kategori</th>
-                                <th>Latitude</th>
-                                <th>Longitude</th>
-                                <th>Wilayah</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($lokasiTps as $item)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $item->nama_lokasi }}</td>
-                                    <td>
-                                        @if ($item->level == 0)
-                                            <span class="badge badge-primary">TPS</span>
-                                        @elseif($item->level == 1)
-                                            <span class="badge badge-info">TPST</span>
-                                        @elseif($item->level == 2)
-                                            <span class="badge badge-warning">TPA</span>
-                                        @else
-                                            <span class="badge badge-secondary">Tidak Diketahui</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $item->latitude }}</td>
-                                    <td>{{ $item->longitude }}</td>
-                                    <td>
-                                        {{ $item->village->name ?? '-' }},
-                                        {{ $item->district->name ?? '-' }},
-                                        {{ $item->regency->name ?? '-' }},
-                                        {{ $item->province->name ?? '-' }}
-                                    </td>
-                                    <td>
-                                        <div class="text-center">
-                                            <a href="{{ route('lokasi-tps.edit', $item->id) }}"
-                                                class="btn btn-sm btn-warning">Edit</a>
-                                            <form action="{{ route('lokasi-tps.destroy', $item->id) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-sm btn-danger confirm-button">Hapus</button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
@@ -172,7 +172,7 @@
 @endsection
 
 @push('js')
-    <!-- DataTables JS -->
+    {{-- <!-- DataTables JS -->
     <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
@@ -180,7 +180,8 @@
     <script src="{{ asset('plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
     <script src="{{ asset('plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
 
-    {{-- <script>
+    <!-- DataTables Initialization -->
+    <script>
         $(document).ready(function() {
             // Pastikan destroy DataTable yang ada terlebih dahulu
             if ($.fn.DataTable.isDataTable('#datatable-main')) {
@@ -222,24 +223,23 @@
 
         const lokasiTps = @json($lokasiTps);
 
-        // Fungsi untuk mendapatkan icon berdasarkan level
-        function getMarkerIcon(level) {
-            // Jika ada gambar kustom, gunakan itu
-            if (level == 0) {
+        // Fungsi untuk mendapatkan icon berdasarkan tipe
+        function getMarkerIcon(tipe) {
+            if (tipe === 'TPS') {
                 return L.divIcon({
                     className: 'custom-div-icon',
                     html: `<div style="background-color: #28a745; width: 15px; height: 15px; border-radius: 50%; border: 2px solid #fff;"></div>`,
                     iconSize: [15, 15],
                     iconAnchor: [7, 7]
                 });
-            } else if (level == 1) {
+            } else if (tipe === 'TPST') {
                 return L.divIcon({
                     className: 'custom-div-icon',
                     html: `<div style="background-color: #17a2b8; width: 15px; height: 15px; border-radius: 50%; border: 2px solid #fff;"></div>`,
                     iconSize: [15, 15],
                     iconAnchor: [7, 7]
                 });
-            } else if (level == 2) {
+            } else if (tipe === 'TPA') {
                 return L.divIcon({
                     className: 'custom-div-icon',
                     html: `<div style="background-color: #ffc107; width: 15px; height: 15px; border-radius: 50%; border: 2px solid #fff;"></div>`,
@@ -257,13 +257,13 @@
         }
 
         // Fungsi untuk mendapatkan nama kategori
-        function getKategoriName(level) {
-            switch (level) {
-                case 0:
+        function getKategoriName(tipe) {
+            switch (tipe) {
+                case 'TPS':
                     return 'TPS (Tempat Pembuangan Sampah)';
-                case 1:
+                case 'TPST':
                     return 'TPST (Tempat Pembuangan Sampah Terpadu)';
-                case 2:
+                case 'TPA':
                     return 'TPA (Tempat Pembuangan Akhir)';
                 default:
                     return 'Tidak Diketahui';
@@ -279,22 +279,22 @@
         // Tambahkan marker ke layer yang sesuai
         lokasiTps.forEach(function(item) {
             const marker = L.marker([item.latitude, item.longitude], {
-                icon: getMarkerIcon(item.level)
+                icon: getMarkerIcon(item.tipe)
             });
 
             marker.bindPopup(`
                 <b>${item.nama_lokasi}</b><br>
-                Kategori: ${getKategoriName(item.level)}<br>
+                Kategori: ${getKategoriName(item.tipe)}<br>
                 Lat: ${item.latitude}, Lng: ${item.longitude}<br>
-                <small>${item.village?.name}, ${item.district?.name}</small>
+                <small>${item.village?.name || '-'}, ${item.district?.name || '-'}</small>
             `);
 
             // Tambahkan ke layer yang sesuai
-            if (item.level == 0) {
+            if (item.tipe === 'TPS') {
                 tpsLayer.addLayer(marker);
-            } else if (item.level == 1) {
+            } else if (item.tipe === 'TPST') {
                 tpstLayer.addLayer(marker);
-            } else if (item.level == 2) {
+            } else if (item.tipe === 'TPA') {
                 tpaLayer.addLayer(marker);
             } else {
                 unknownLayer.addLayer(marker);

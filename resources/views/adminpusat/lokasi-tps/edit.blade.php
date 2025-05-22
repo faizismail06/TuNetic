@@ -74,23 +74,23 @@
                                             @enderror
                                         </div>
 
-                                        <!-- Tambahkan form group untuk level TPS -->
+                                        <!-- Tambahkan form group untuk tipe TPS -->
                                         <div class="form-group">
-                                            <label for="level">Kategori TPS <span class="text-danger">*</span></label>
-                                            <select class="form-control @error('level') is-invalid @enderror" id="level"
-                                                name="level" required>
+                                            <label for="tipe">Kategori TPS <span class="text-danger">*</span></label>
+                                            <select class="form-control @error('tipe') is-invalid @enderror" id="tipe"
+                                                name="tipe" required>
                                                 <option value="">-- Pilih Kategori --</option>
-                                                <option value="0"
-                                                    {{ old('level', $lokasiTps->level) == '0' ? 'selected' : '' }}>TPS
+                                                <option value="TPS"
+                                                    {{ old('tipe', $lokasiTps->tipe) == 'TPS' ? 'selected' : '' }}>TPS
                                                     (Tempat Pembuangan Sampah)</option>
-                                                <option value="1"
-                                                    {{ old('level', $lokasiTps->level) == '1' ? 'selected' : '' }}>TPST
+                                                <option value="TPST"
+                                                    {{ old('tipe', $lokasiTps->tipe) == 'TPST' ? 'selected' : '' }}>TPST
                                                     (Tempat Pembuangan Sampah Terpadu)</option>
-                                                <option value="2"
-                                                    {{ old('level', $lokasiTps->level) == '2' ? 'selected' : '' }}>TPA
+                                                <option value="TPA"
+                                                    {{ old('tipe', $lokasiTps->tipe) == 'TPA' ? 'selected' : '' }}>TPA
                                                     (Tempat Pembuangan Akhir)</option>
                                             </select>
-                                            @error('level')
+                                            @error('tipe')
                                                 <span class="invalid-feedback">{{ $message }}</span>
                                             @enderror
                                         </div>
