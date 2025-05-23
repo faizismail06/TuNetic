@@ -23,7 +23,7 @@ class LoginController extends Controller
         } elseif ($role === 'admin_tpst') {
             return '/admin-tpst/home';
         } elseif ($role === 'petugas') {
-            return '/petugas/home';
+            return '/petugas';
         } elseif ($role === 'user') {
             return '/masyarakat';
         } else {

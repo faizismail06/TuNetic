@@ -70,7 +70,7 @@ Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petug
 Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
 Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
 Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
-Route::post('petugas', [PetugasController::class, 'store'])->name('petugas.store');
+// Route::post('petugas', [PetugasController::class, 'store'])->name('petugas.store');
 Route::get('/rute/{id}/detail', [RuteController::class, 'show'])->name('rute.detail');
 Route::get('/rute/{id_rute}/detail', [RuteController::class, 'detail'])->name('rute.detail');
 Route::get('/api/rute/{id}', [RuteController::class, 'getDetailJson'])->name('api.rute.detail');
@@ -86,7 +86,9 @@ Route::resource('manage-armada', KelolaArmadaController::class);
 // ===================
 // PETUGAS
 // ===================
-Route::resource('petugas', PetugasController::class);
+// Route::resource('petugas', PetugasController::class);
+
+Route::get('/petugas', [LaporanWargaController::class, 'index']);
 Route::get('/petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
 
 Route::prefix('jadwal-template')->group(function () {
@@ -288,21 +290,24 @@ Route::post('/email/verification-notification', function (Request $request) {
 // ===================
 // JADWAL PENGAMBILAN - TRACKING PETUGAS
 // ===================
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->prefix('petugas')->group(function () {
     Route::get('/jadwal-pengambilan', [JadwalPengambilanController::class, 'index'])
         ->name('petugas.jadwal-pengambilan.index');
 
     // Put the specific route FIRST
     Route::get('/jadwal-pengambilan/auto-tracking', [JadwalPengambilanController::class, 'showAutoTrackingPage'])
         ->name('jadwal-pengambilan.auto-tracking');
-    Route::post('/petugas/jadwal-pengambilan/start-tracking/{id}', [JadwalPengambilanController::class, 'startTracking'])
-        ->name('jadwal-pengambilan.start-tracking');
-    Route::post('/petugas/jadwal-pengambilan/finish-tracking/{id}', [JadwalPengambilanController::class, 'finishTracking'])
-        ->name('jadwal-pengambilan.finish-tracking');
-    Route::post('/petugas/jadwal-pengambilan/save-location', [JadwalPengambilanController::class, 'saveLocation'])
-        ->name('jadwal-pengambilan.save-location');
-});
 
-Route::get('/jadwal-pengambilan/detail', function () {
-    return view('petugas.jadwal-pengambilan.details');
-})->name('jadwal.penjemputan');
+    Route::post('/jadwal-pengambilan/start-tracking/{id}', [JadwalPengambilanController::class, 'startTracking'])
+        ->name('jadwal-pengambilan.start-tracking');
+
+    Route::post('/jadwal-pengambilan/finish-tracking/{id}', [JadwalPengambilanController::class, 'finishTracking'])
+        ->name('jadwal-pengambilan.finish-tracking');
+
+    Route::post('/jadwal-pengambilan/save-location', [JadwalPengambilanController::class, 'saveLocation'])
+        ->name('jadwal-pengambilan.save-location');
+
+    Route::get('/jadwal-pengambilan/detail', function () {
+        return view('petugas.jadwal-pengambilan.details');
+    })->name('jadwal.penjemputan');
+});

@@ -64,7 +64,7 @@ class UserMenuSeeder extends Seeder
         // Akun Submenu
         $akun = Menu::create([
             'nama_menu' => 'Akun',
-            'url' => 'user/profile/akun',
+            'url' => 'masyarakat/profile/akun',
             'icon' => 'fa-solid fa-key',
             'parent_id' => $profileUser->id,
             'urutan' => 1
@@ -75,7 +75,7 @@ class UserMenuSeeder extends Seeder
         // Jadi Petugas Submenu
         $jadiPetugas = Menu::create([
             'nama_menu' => 'Jadi Petugas',
-            'url' => 'user/profile/akun',
+            'url' => 'masyarakat/profile/akun',
             'icon' => 'fa-solid fa-repeat',
             'parent_id' => $profileUser->id,
             'urutan' => 2

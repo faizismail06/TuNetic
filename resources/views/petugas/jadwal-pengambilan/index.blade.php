@@ -1405,7 +1405,7 @@
                 const timestamp = position.timestamp;
 
                 // Filter lokasi berdasarkan akurasi
-                if (accuracy > 50) { // Jika akurasi lebih dari 50 meter, abaikan
+                if (accuracy > 100) { // Jika akurasi lebih dari 50 meter, abaikan
                     console.log(`Mengabaikan lokasi dengan akurasi rendah: ${accuracy}m`);
                     document.getElementById('location-info').textContent =
                         `Mencari sinyal GPS yang lebih akurat... (${accuracy.toFixed(1)}m)`;

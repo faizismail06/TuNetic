@@ -27,7 +27,7 @@ class PetugasMenuSeeder extends Seeder
         // Dashboard Petugas
         $dashboardPetugas = Menu::create([
             'nama_menu' => 'Home',
-            'url' => 'petugas/home',
+            'url' => 'petugas',
             'icon' => 'fas fa-home',
             'parent_id' => $menuPetugas->id,
             'urutan' => 1
@@ -38,7 +38,7 @@ class PetugasMenuSeeder extends Seeder
         // Jadwal Pengambilan
         $jadwalPengambilan = Menu::create([
             'nama_menu' => 'Jadwal Pengambilan',
-            'url' => '/jadwal-pengambilan',
+            'url' => 'petugas/jadwal-pengambilan',
             'icon' => 'fas fa-calendar-alt',
             'parent_id' => $menuPetugas->id,
             'urutan' => 2
