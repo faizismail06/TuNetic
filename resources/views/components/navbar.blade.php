@@ -247,36 +247,44 @@
             </button>
 
             <div class="nav-links" id="navLinks">
+                @php
+                    // Define an array of menu names you want to exclude
+                    $excludedMenuNames = ['Profile', 'Akun', 'Jadi Petugas'];
+                @endphp
+
                 @foreach (json_decode(MenuHelper::Menu()) as $menu)
                     @foreach ($menu->submenus as $submenu)
-                        @if (count($submenu->submenus) == '0')
-                            <a href="{{ url($submenu->url) }}"
-                                class="nav-link {{ Request::segment(1) == $submenu->url ? 'active' : '' }}">
-                                <i class="{{ $submenu->icon }}"></i>
-                                {{ ucwords($submenu->nama_menu) }}
-                            </a>
-                        @else
-                            @php
-                                $urls = [];
-                                foreach ($submenu->submenus as $url) {
-                                    $urls[] = $url->url;
-                                }
-                            @endphp
-                            <div class="dropdown">
-                                <a href="#" class="{{ in_array(Request::segment(1), $urls) ? 'active' : '' }}">
+                        {{-- Check if the current submenu's name is in the excluded list --}}
+                        @if (!in_array(ucwords($submenu->nama_menu), $excludedMenuNames))
+                            @if (count($submenu->submenus) == '0')
+                                <a href="{{ url($submenu->url) }}"
+                                    class="nav-link {{ Request::segment(1) == $submenu->url ? 'active' : '' }}">
                                     <i class="{{ $submenu->icon }}"></i>
                                     {{ ucwords($submenu->nama_menu) }}
                                 </a>
-                                <div class="dropdown-content">
-                                    @foreach ($submenu->submenus as $endmenu)
-                                        <a href="{{ url($endmenu->url) }}"
-                                            class="{{ Request::segment(1) == $endmenu->url ? 'active' : '' }}">
-                                            <i class="far fa-circle"></i>
-                                            {{ ucwords($endmenu->nama_menu) }}
-                                        </a>
-                                    @endforeach
+                            @else
+                                @php
+                                    $urls = [];
+                                    foreach ($submenu->submenus as $url) {
+                                        $urls[] = $url->url;
+                                    }
+                                @endphp
+                                <div class="dropdown">
+                                    <a href="#" class="{{ in_array(Request::segment(1), $urls) ? 'active' : '' }}">
+                                        <i class="{{ $submenu->icon }}"></i>
+                                        {{ ucwords($submenu->nama_menu) }}
+                                    </a>
+                                    <div class="dropdown-content">
+                                        @foreach ($submenu->submenus as $endmenu)
+                                            <a href="{{ url($endmenu->url) }}"
+                                                class="{{ Request::segment(1) == $endmenu->url ? 'active' : '' }}">
+                                                <i class="far fa-circle"></i>
+                                                {{ ucwords($endmenu->nama_menu) }}
+                                            </a>
+                                        @endforeach
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
                         @endif
                     @endforeach
                 @endforeach
