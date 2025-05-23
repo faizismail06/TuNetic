@@ -23,16 +23,14 @@
                     <i class="fas fa-comment icon"></i> {{ $lapor->deskripsi ?? '-' }}
                 </div>
 
-                @if($lapor->status == 0)
+                @if($lapor->status == 1)
                     <span class="status belum"><i class="fas fa-circle-exclamation icon-status"></i> Belum diangkut</span>
-                @elseif($lapor->status == 1)
-                    <span class="status sedang"><i class="fas fa-spinner icon-status"></i> Sedang proses</span>
                 @elseif($lapor->status == 2)
-                    <span class="status selesai"><i class="fas fa-circle-check icon-status"></i> Sudah diangkut</span>
-                @elseif($lapor->status == -1)
+                    <span class="status sedang"><i class="fas fa-spinner icon-status"></i> Sedang proses</span>
+                @elseif($lapor->status == 3)
                     <span class="status belum"><i class="fas fa-circle-xmark icon-status"></i> Ditolak</span>
-                @elseif($lapor->status == -2)
-                    <span class="status belum"><i class="fas fa-ban icon-status"></i> Unverifikasi</span>
+                @elseif($lapor->status == 4)
+                    <span class="status selesai"><i class="fas fa-circle-check icon-status"></i> Sudah diangkut</span>
                 @endif
 
                 @if($lapor->status == 2 && !empty($lapor->tanggal_diangkut))
@@ -124,7 +122,7 @@
                 margin-left: 20px;
                 font-size: 20px;
                 margin-bottom: 20px;
-                margin-right: 10px; 
+                margin-right: 10px;
             }
 
             .status {
