@@ -6,6 +6,7 @@ use App\Models\JadwalTemplate;
 use App\Models\JadwalTemplatePetugas;
 use App\Models\Armada;
 use App\Models\Rute;
+use App\Models\Petugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -55,7 +56,7 @@ class JadwalTemplateController extends Controller
 
             foreach ($data['petugas'] as $p) {
                 JadwalTemplatePetugas::create([
-                    'id_jadwal_template' => $template->id,
+                    'jadwal_template_id' => $template->id,
                     'id_petugas' => $p['id_petugas'],
                     'tugas' => $p['tugas'],
                 ]);
@@ -65,7 +66,10 @@ class JadwalTemplateController extends Controller
             return response()->json(['message' => 'Template berhasil ditambahkan']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Gagal menyimpan template: ' . $e->getMessage()], 500);
+            return response()->json([
+                'message' => 'Gagal menyimpan template',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -77,4 +81,57 @@ class JadwalTemplateController extends Controller
         return response()->json(['message' => 'Template berhasil dihapus']);
         // return view('adminpusat.jadwal-template.index');
     }
+
+    public function edit($id)
+    {
+        $template = JadwalTemplate::findOrFail($id);
+        return view('adminpusat.jadwal-template.edit', [
+        'template' => $template,
+        'armadas' => Armada::all(),
+        'rutes' => Rute::all(),
+        'petugas' => Petugas::all(),
+    ]);
+
+    }
+
+    public function update(Request $request, $id)
+    {
+        $data = $request->validate([
+            'hari' => 'required',
+            'id_armada' => 'required|exists:armada,id',
+            'id_rute' => 'required|exists:rute,id',
+            'petugas' => 'required|array',
+            'petugas.*.id_petugas' => 'required|exists:users,id',
+            'petugas.*.tugas' => 'required|in:1,2',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $template = JadwalTemplate::findOrFail($id);
+            $template->update([
+                'hari' => $data['hari'],
+                'id_armada' => $data['id_armada'],
+                'id_rute' => $data['id_rute'],
+            ]);
+
+            // Hapus semua petugas lama
+            $template->petugasTemplate()->delete();
+
+            // Simpan ulang petugas baru
+            foreach ($data['petugas'] as $p) {
+                JadwalTemplatePetugas::create([
+                    'jadwal_template_id' => $template->id,
+                    'id_petugas' => $p['id_petugas'],
+                    'tugas' => $p['tugas'],
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('jadwal-template.index')->with('success', 'Template berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menyimpan perubahan: ' . $e->getMessage());
+        }
+    }
+
 }

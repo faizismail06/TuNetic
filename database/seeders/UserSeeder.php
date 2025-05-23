@@ -50,5 +50,17 @@ class UserSeeder extends Seeder
         ]);
         $petugas2->assignRole('petugas');
 
+        $petugas3 = User::create([
+            'name' => 'Petugas3 ResQ',
+            'email' => 'petugas3@resq.local',
+            'password' => Hash::make('password'),
+            'province_id' => '11',
+            'regency_id' => '1101',
+            'district_id' => '110101',
+            'village_id' => '1101012001',
+            'alamat' => 'Jl. Contoh No. 123',
+            'level' => 3,
+        ]);
+        $petugas3->assignRole('petugas');
     }
 }

@@ -15,6 +15,11 @@ class RuteTps extends Model
         'id_lokasi_tps',
     ];
 
+    public function jadwalOperasional()
+    {
+        return $this->hasMany(JadwalOperasional::class, 'id_rute_tps', 'id');
+    }
+
     /**
      * Relasi ke tabel petugas
      */

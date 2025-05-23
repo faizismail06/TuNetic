@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>TuNetic</title>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -54,6 +56,7 @@
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link text-white" data-widget="pushmenu" href="#" role="button"><i
+                           
                             class="fas fa-bars"></i></a>
                 </li>
             </ul>
@@ -83,8 +86,8 @@
                             </p>
                         </li>
                         <li class="user-footer">
-                            <a href="{{ route('user.profile.index') }}" class="btn btn-default btn-flat">Profil</a>
-                            <a href="#" class="btn btn-default btn-flat float-right" data-toggle="modal"
+                            <a href="{{ route('profil.index') }}" class="btn btn-default btn-flat">Profil</a>
+                            <a href="#" class="btn btn-success btn-flat float-right" data-toggle="modal"
                                 data-target="#modal-logout"><i class="fas fa-sign-out-alt"></i> <span>Keluar</span></a>
                         </li>
 

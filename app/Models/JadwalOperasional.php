@@ -34,6 +34,14 @@ class JadwalOperasional extends Model
     ];
 
     /**
+     * Relasi ke tabel Rute_Tps.
+     */
+    public function ruteTps()
+    {
+        return $this->belongsTo(RuteTps::class, 'id_rute_tps', 'id');
+    }
+
+    /**
      * Relasi ke tabel Armada.
      */
     public function armada()
@@ -46,7 +54,7 @@ class JadwalOperasional extends Model
      */
     public function jadwal()
     {
-        return $this->belongsTo(Jadwal::class, 'id_jadwal');
+        return $this->belongsTo(Jadwal::class, 'id_jadwal', 'id');
     }
 
     /**

@@ -13,11 +13,18 @@ document.addEventListener('DOMContentLoaded', function () {
             indexAxis: 'y',
             plugins: { legend: { display: false } },
             scales: {
-                x: { max: 3000 },
-                y: { grid: { display: false } }
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 500
+                    }
+                },
+                y: {
+                    grid: { display: false }
+                }
             }
         }
-    });
+    });    
 
     new Chart(document.getElementById('pengangkutanChart').getContext('2d'), {
         type: 'bar',

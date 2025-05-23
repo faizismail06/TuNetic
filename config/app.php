@@ -211,7 +211,10 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
-        'MenuHelper'=> \App\Helpers\MenuHelper::class,
+
+    'MenuHelper'=> \App\Helpers\MenuHelper::class,
+    // Alias lainnya...
+    'Auth' => Illuminate\Support\Facades\Auth::class,
     ])->toArray(),
 
 ];

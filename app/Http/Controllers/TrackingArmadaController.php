@@ -3,17 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\TrackingArmada;
+use App\Models\JadwalOperasional;
+use App\Models\Jadwal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TrackingArmadaController extends Controller
 {
     /**
-     * Tampilkan daftar tracking armada.
+     * Tampilkan halaman tracking armada.
      */
     public function index()
     {
-        $trackingData = TrackingArmada::with('jadwalOperasional')->latest()->get();
-        return view('tracking_armada.index', compact('trackingData'));
+        $jadwalList = Jadwal::all();
+        return view('user.rute-armada.index',   compact('jadwalList'));
+    }
+
+    /**
+     * Tampilkan halaman detail tracking untuk jadwal operasional tertentu.
+     */
+    public function detail($id)
+    {
+        $jadwalOperasional = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps.rute', 'penugasanPetugas.petugas'])
+            ->findOrFail($id);
+
+        // Ambil data tracking untuk jadwal operasional ini
+        $trackingData = TrackingArmada::where('id_jadwal_operasional', $id)
+            ->orderBy('timestamp', 'desc')
+            ->get();
+
+        return view('user.rute-armada.detail', compact('jadwalOperasional', 'trackingData'));
     }
 
     /**
@@ -24,8 +43,8 @@ class TrackingArmadaController extends Controller
         $request->validate([
             'id_jadwal_operasional' => 'required|exists:jadwal_operasional,id',
             'timestamp' => 'required|date',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
         ]);
 
         TrackingArmada::create($request->all());
@@ -41,5 +60,31 @@ class TrackingArmadaController extends Controller
         $trackingArmada->delete();
 
         return redirect()->route('tracking-armada.index')->with('success', 'Tracking Armada berhasil dihapus.');
+    }
+
+    /**
+     * Hapus semua data tracking untuk jadwal operasional tertentu.
+     */
+    public function destroyAll($idJadwalOperasional)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Memastikan jadwal operasional ada
+            $jadwal = JadwalOperasional::findOrFail($idJadwalOperasional);
+
+            // Hapus semua data tracking
+            TrackingArmada::where('id_jadwal_operasional', $idJadwalOperasional)->delete();
+
+            DB::commit();
+
+            return redirect()->route('tracking-armada.index')
+                ->with('success', 'Semua data tracking untuk jadwal operasional ini berhasil dihapus.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->route('tracking-armada.index')
+                ->with('error', 'Gagal menghapus data tracking: ' . $e->getMessage());
+        }
     }
 }
