@@ -215,11 +215,124 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <script>
-        const map = L.map('map').setView([-7.056325, 110.454250], 15); // Fokus ke Tembalang
+        // Inisialisasi peta dengan koordinat default (Tembalang)
+        // Akan diubah ke lokasi pengguna jika geolocation berhasil
+        const map = L.map('map').setView([-7.056325, 110.454250], 15);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
+
+        // Variabel untuk menyimpan marker lokasi pengguna
+        let userLocationMarker = null;
+
+        // Fungsi untuk mendapatkan dan menampilkan lokasi pengguna
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                // Tampilkan loading indicator (opsional)
+                console.log("Mencari lokasi pengguna...");
+
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+                        const accuracy = position.coords.accuracy;
+
+                        console.log(`Lokasi pengguna ditemukan: ${userLat}, ${userLng}`);
+
+                        // Pindahkan view peta ke lokasi pengguna
+                        map.setView([userLat, userLng], 15);
+
+                        // Buat marker untuk lokasi pengguna
+                        const userIcon = L.divIcon({
+                            className: 'user-location-icon',
+                            html: `<div style="
+                                background-color: #007bff;
+                                width: 20px;
+                                height: 20px;
+                                border-radius: 50%;
+                                border: 3px solid #fff;
+                                box-shadow: 0 0 10px rgba(0,123,255,0.5);
+                                position: relative;
+                            ">
+                                <div style="
+                                    position: absolute;
+                                    top: 50%;
+                                    left: 50%;
+                                    transform: translate(-50%, -50%);
+                                    width: 8px;
+                                    height: 8px;
+                                    background-color: #fff;
+                                    border-radius: 50%;
+                                "></div>
+                            </div>`,
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 10]
+                        });
+
+                        // // Hapus marker lokasi pengguna sebelumnya jika ada
+                        // if (userLocationMarker) {
+                        //     map.removeLayer(userLocationMarker);
+                        // }
+
+                        // // Tambahkan marker lokasi pengguna
+                        // userLocationMarker = L.marker([userLat, userLng], {
+                        //     icon: userIcon
+                        // }).addTo(map);
+
+                        // userLocationMarker.bindPopup(`
+                        //     <b>📍 Lokasi Anda</b><br>
+                        //     Koordinat: ${userLat.toFixed(6)}, ${userLng.toFixed(6)}<br>
+                        //     Akurasi: ±${Math.round(accuracy)} meter
+                        // `);
+
+                        // // Tambahkan circle untuk menunjukkan akurasi
+                        // L.circle([userLat, userLng], {
+                        //     radius: accuracy,
+                        //     color: '#007bff',
+                        //     fillColor: '#007bff',
+                        //     fillOpacity: 0.1,
+                        //     weight: 1
+                        // }).addTo(map);
+
+                    },
+                    function(error) {
+                        console.log("Error mendapatkan lokasi:", error.message);
+
+                        let errorMessage = "";
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage = "Akses lokasi ditolak oleh pengguna.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage = "Informasi lokasi tidak tersedia.";
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage = "Waktu permintaan lokasi habis.";
+                                break;
+                            default:
+                                errorMessage = "Terjadi kesalahan yang tidak diketahui.";
+                                break;
+                        }
+
+                        // Tampilkan notifikasi error (opsional)
+                        alert(
+                            `Tidak dapat mendapatkan lokasi: ${errorMessage}\nMenggunakan lokasi default (Tembalang).`
+                            );
+                    }, {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 300000 // Cache lokasi selama 5 menit
+                    }
+                );
+            } else {
+                console.log("Geolocation tidak didukung oleh browser ini.");
+                alert("Browser Anda tidak mendukung geolocation.\nMenggunakan lokasi default (Tembalang).");
+            }
+        }
+
+        // Panggil fungsi untuk mendapatkan lokasi pengguna
+        getUserLocation();
 
         const lokasiTps = @json($lokasiTps);
 
@@ -315,6 +428,41 @@
         };
 
         L.control.layers(null, overlays).addTo(map);
+
+        // Tambahan: Tombol untuk kembali ke lokasi pengguna
+        L.Control.UserLocation = L.Control.extend({
+            onAdd: function(map) {
+                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+                container.style.backgroundColor = 'white';
+                container.style.backgroundImage =
+                    "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Im0zIDExIDEzLTkgMS4yIDIuNCA2LjItLjlMMTQgMTdsMiA3LjYtNi0uOUw3IDIxWiIvPjwvc3ZnPg==')";
+                container.style.backgroundSize = '20px 20px';
+                container.style.backgroundPosition = 'center';
+                container.style.backgroundRepeat = 'no-repeat';
+                container.style.width = '34px';
+                container.style.height = '34px';
+                container.style.cursor = 'pointer';
+                container.title = 'Kembali ke lokasi saya';
+
+                container.onclick = function() {
+                    getUserLocation();
+                }
+
+                return container;
+            },
+
+            onRemove: function(map) {
+                // Nothing to do here
+            }
+        });
+
+        L.control.userLocation = function(opts) {
+            return new L.Control.UserLocation(opts);
+        }
+
+        L.control.userLocation({
+            position: 'topright'
+        }).addTo(map);
 
         // Tambahan: Fungsi klik di peta
         const popup = L.popup();
