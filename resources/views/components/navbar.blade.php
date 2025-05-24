@@ -418,65 +418,55 @@
 
             <div class="nav-links" id="navLinks">
                 @php
-                    $excludedMenuNames = ['profile', 'akun', 'jadi petugas'];
+                    // Define an array of menu names you want to exclude
+                    $excludedMenuNames = ['Profile', 'Akun', 'Jadi Petugas'];
                 @endphp
 
                 @foreach (json_decode(MenuHelper::Menu()) as $menu)
                     @foreach ($menu->submenus as $submenu)
-                        @php
-                            $namaMenu = strtolower($submenu->nama_menu);
-                        @endphp
-
-                        {{-- Lewati jika termasuk menu yang dikecualikan --}}
-                        @if (in_array($namaMenu, $excludedMenuNames) || str_contains($namaMenu, 'profil'))
-                            @continue
-                        @endif
-
-                        @if (count($submenu->submenus) == 0)
-                            @php
-                                $route = ltrim($submenu->url, '/');
-                                $isActive = Request::is($route);
-                            @endphp
-
-                            <a href="{{ url($submenu->url) }}" class="nav-link {{ $isActive ? 'active' : '' }}">
-                                <i class="{{ $submenu->icon }}"></i>
-                                {{ ucwords($submenu->nama_menu) }}
-                            </a>
-                        @else
-                            @php
-                                $urls = array_map(function ($sm) {
-                                    return ltrim($sm->url, '/');
-                                }, $submenu->submenus);
-
-                                $isActiveDropdown = in_array(Request::segment(1), $urls);
-                            @endphp
-
-                            <div class="dropdown">
-                                <a href="#" class="{{ $isActiveDropdown ? 'active' : '' }}">
+                        {{-- Check if the current submenu's name is in the excluded list --}}
+                        @if (!in_array(ucwords($submenu->nama_menu), $excludedMenuNames))
+                            @if (count($submenu->submenus) == '0')
+                                {{-- Tautan Tunggal --}}
+                                <a href="{{ url($submenu->url) }}"
+                                class="nav-link {{ Request::is(ltrim($submenu->url, '/')) ? 'active' : '' }}">
                                     <i class="{{ $submenu->icon }}"></i>
                                     {{ ucwords($submenu->nama_menu) }}
                                 </a>
-                                <div class="dropdown-content">
-                                    @foreach ($submenu->submenus as $endmenu)
-                                        @php
-                                            $route = ltrim($endmenu->url, '/');
-                                            $isActive = Request::is($route);
-                                        @endphp
-
-                                        <a href="{{ url($endmenu->url) }}" class="{{ $isActive ? 'active' : '' }}">
-                                            <i class="far fa-circle"></i>
-                                            {{ ucwords($endmenu->nama_menu) }}
-                                        </a>
-                                    @endforeach
+                            @else
+                                {{-- Dropdown --}}
+                                @php
+                                    $isDropdownActive = false;
+                                    $urls = [];
+                                    foreach ($submenu->submenus as $endmenu) {
+                                        $urls[] = $endmenu->url;
+                                        // Check if any of the submenu URLs match the current request
+                                        if (Request::is(ltrim($endmenu->url, '/'))) {
+                                            $isDropdownActive = true;
+                                        }
+                                    }
+                                @endphp
+                                <div class="dropdown">
+                                    <a href="#" class="{{ $isDropdownActive ? 'active' : '' }}">
+                                        <i class="{{ $submenu->icon }}"></i>
+                                        {{ ucwords($submenu->nama_menu) }}
+                                    </a>
+                                    <div class="dropdown-content">
+                                        @foreach ($submenu->submenus as $endmenu)
+                                            <a href="{{ url($endmenu->url) }}"
+                                            class="{{ Request::is(ltrim($endmenu->url, '/')) ? 'active' : '' }}">
+                                                <i class="far fa-circle"></i>
+                                                {{ ucwords($endmenu->nama_menu) }}
+                                            </a>
+                                        @endforeach
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
                         @endif
                     @endforeach
                 @endforeach
             </div>
-
-
-
+            
             @if (Auth::check())
                 <div class="profile-container">
                     <div class="profile" id="profileToggle">

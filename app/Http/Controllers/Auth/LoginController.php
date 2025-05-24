@@ -21,7 +21,7 @@ class LoginController extends Controller
         if ($role === 'admin_pusat') {
             return '/admin/home';
         } elseif ($role === 'admin_tpst') {
-            return '/admin-tpst/home';
+            return '/tpst/home';
         } elseif ($role === 'petugas') {
             return '/petugas';
         } elseif ($role === 'user') {

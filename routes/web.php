@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 /*
 |--------------------------------------------------------------------------
@@ -195,6 +196,12 @@ Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
     Route::get('/rute-armada/all-tps', [RuteArmadaController::class, 'showAllTps'])->name('rute-armada.all-tps');
     Route::get('/rute-armada/jadwal/{id}', [RuteArmadaController::class, 'getJadwalDetail'])->name('rute-armada.jadwal-detail');
     Route::get('/rute-armada/tracking/{id}', [RuteArmadaController::class, 'getRealtimeTracking'])->name('rute-armada.realtime-tracking');
+});
+
+//  Route Admin TPST
+Route::prefix('tpst')->name('admin_tpst.')->group(function() {
+    Route::get('/home', [DashboardController::class, 'indexTpst'])->name('admintpst.dashboard.index');
+
 });
 
 Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
