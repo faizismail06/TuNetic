@@ -24,6 +24,7 @@ use App\Http\Controllers\TrackingArmadaController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RuteArmadaController;
+use App\Http\Controllers\JadwalRuteController;
 use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -199,9 +200,8 @@ Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
 });
 
 //  Route Admin TPST
-Route::prefix('tpst')->name('admin_tpst.')->group(function() {
+Route::prefix('tpst')->name('admin_tpst.')->group(function () {
     Route::get('/home', [DashboardController::class, 'indexTpst'])->name('admintpst.dashboard.index');
-
 });
 
 Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
@@ -317,4 +317,14 @@ Route::middleware(['auth'])->prefix('petugas')->group(function () {
     Route::get('/jadwal-pengambilan/detail', function () {
         return view('petugas.jadwal-pengambilan.details');
     })->name('jadwal.penjemputan');
+});
+// Route untuk Jadwal & Rute
+Route::prefix('tpst/jadwal-rute')->name('jadwal-rute.')->group(function () {
+    Route::get('/', [JadwalRuteController::class, 'index'])->name('index');
+    Route::get('/show/{id}', [JadwalRuteController::class, 'show'])->name('show');
+    Route::get('/export', [JadwalRuteController::class, 'export'])->name('export');
+
+    // API routes for AJAX calls
+    Route::get('/api/armada-detail/{id}', [JadwalRuteController::class, 'getArmadaDetail'])->name('api.armada-detail');
+    Route::get('/api/tracking/{id}', [JadwalRuteController::class, 'getTracking'])->name('api.tracking');
 });
