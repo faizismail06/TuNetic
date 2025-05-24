@@ -529,25 +529,26 @@
                                     <th>Tanggal</th>
                                     <th>Hari</th>
                                     <th>Armada</th>
+                                    <th>Rute</th>
+                                    <th>Jam Aktif</th>
                                     <th>Status</th>
-                                    {{-- <th>Aksi</th> --}}
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($tableData as $data)
                                     <tr>
-                                        <td class="text-center">{{ $data['id_jadwal'] }}</td>
+                                        <td class="text-center">{{ $data['id'] }}</td>
                                         <td class="text-center">{{ $data['tanggal'] }}</td>
                                         <td class="text-center">{{ $data['hari'] }}</td>
                                         <td class="text-center">{{ $data['armada'] }}</td>
+                                        <td class="text-center">{{ $data['rute'] }}</td>
+                                        <td class="text-center">{{ $data['jam_aktif'] }}</td>
                                         <td class="text-center">
-                                            @if ($data['status'] == 0)
-                                                <span class="status-badge status-belum">Belum Berjalan</span>
-                                            @elseif($data['status'] == 1)
-                                                <span class="status-badge status-sedang">Sedang Berjalan</span>
-                                            @else
-                                                <span class="status-badge status-selesai">Selesai</span>
-                                            @endif
+                                            <span
+                                                class="status-badge {{ $data['status_class'] == 'badge-danger' ? 'status-belum' : ($data['status_class'] == 'badge-warning' ? 'status-sedang' : 'status-selesai') }}">
+                                                {{ $data['status_text'] }}
+                                            </span>
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group">
@@ -560,16 +561,16 @@
                                                         onclick="showArmadaDetail({{ $data['id'] }})">
                                                         <i class="fas fa-eye me-1"></i>Detail
                                                     </a>
-                                                    <a class="dropdown-item" href="#">
+                                                    {{-- <a class="dropdown-item" href="#">
                                                         <i class="fas fa-edit me-1"></i>Edit
-                                                    </a>
+                                                    </a> --}}
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-4">
+                                        <td colspan="8" class="text-center py-4">
                                             <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                                             <p class="text-muted">Tidak ada data jadwal operasional</p>
                                         </td>
@@ -625,13 +626,12 @@
         const allTpsForMap = @json($allTpsForMap);
 
         // Inisialisasi map
-        let map = L.map('map').setView([-7.056325, 110.454250], 15); // Default ke Bandung
+        let map = L.map('map').setView([-7.056325, 110.454250], 15); // Default ke Semarang
 
         // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
-
 
         // Variabel untuk menyimpan markers dan routes
         let armadaMarkers = [];
@@ -680,9 +680,6 @@
             // Add armada markers
             addArmadaMarkers();
 
-            initializeMap();
-
-
             // Fit bounds if there's data
             if (mapData.length > 0 || allTpsForMap.length > 0) {
                 fitMapBounds();
@@ -704,7 +701,7 @@
         function addTpsMarkers() {
             allTpsForMap.forEach(tps => {
                 const icon = L.divIcon({
-                    html: `<div style="background: ${getTpsColor(tps.jenis)}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>`,
+                    html: `<div style="background: ${getTpsColor(tps.tipe)}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>`,
                     className: 'tps-marker',
                     iconSize: [20, 20],
                     iconAnchor: [10, 10]
@@ -714,10 +711,9 @@
                         icon
                     })
                     .bindPopup(`
-                    <div class="popup-header">${tps.nama}</div>
+                    <div class="popup-header">${tps.nama_lokasi}</div>
                     <div class="popup-content">
-                        <p><strong>Jenis:</strong> ${tps.jenis}</p>
-                        <p><strong>Alamat:</strong> ${tps.alamat}</p>
+                        <p><strong>Jenis:</strong> ${tps.tipe}</p>
                     </div>
                 `)
                     .addTo(map);
@@ -775,11 +771,8 @@
 
             const jadwal = mapData.find(j => j.id === jadwalId);
             if (jadwal && jadwal.tps_data && jadwal.tps_data.length > 0) {
-                // Sort TPS by urutan
-                const sortedTps = [...jadwal.tps_data].sort((a, b) => a.urutan - b.urutan);
-
                 // Create route line
-                const coordinates = sortedTps.map(tps => [tps.latitude, tps.longitude]);
+                const coordinates = jadwal.tps_data.map(tps => [tps.latitude, tps.longitude]);
 
                 const routeLine = L.polyline(coordinates, {
                     color: jadwal.rute.color,
@@ -791,7 +784,7 @@
                 routeLines.push(routeLine);
 
                 // Add route markers with numbers
-                sortedTps.forEach((tps, index) => {
+                jadwal.tps_data.forEach((tps, index) => {
                     const routeMarker = L.divIcon({
                         html: `<div style="background: ${jadwal.rute.color}; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">${index + 1}</div>`,
                         className: 'route-marker',
@@ -803,10 +796,9 @@
                             icon: routeMarker
                         })
                         .bindPopup(`
-                        <div class="popup-header">Stop ${index + 1}: ${tps.nama}</div>
+                        <div class="popup-header">Stop ${index + 1}: ${tps.nama_lokasi}</div>
                         <div class="popup-content">
-                            <p><strong>Jenis:</strong> ${tps.jenis}</p>
-                            <p><strong>Alamat:</strong> ${tps.alamat}</p>
+                            <p><strong>Jenis:</strong> ${tps.tipe}</p>
                             <p><strong>Rute:</strong> ${jadwal.rute.nama}</p>
                         </div>
                     `)
@@ -845,7 +837,6 @@
             }
         }
 
-        // Helper functions
         function getTpsColor(jenis) {
             switch (jenis?.toLowerCase()) {
                 case 'tpa':
@@ -877,154 +868,157 @@
 
             // Show loading
             content.innerHTML = `
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Memuat detail armada...</p>
                 </div>
-                <p class="mt-2">Memuat detail armada...</p>
-            </div>
-        `;
+            `;
 
             modal.show();
 
-            // Fetch detail
-            fetch(`{{ route('jadwal-rute.api.armada-detail', '') }}/${jadwalId}`)
+            // Fetch detail - sesuaikan dengan route dari controller
+            fetch(`jadwal-rute/api/armada-detail/${jadwalId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         const detail = data.data;
                         content.innerHTML = `
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6 class="text-primary mb-3">
-                                    <i class="fas fa-truck me-2"></i>Informasi Armada
-                                </h6>
-                                <table class="table table-borderless">
-                                    <tr>
-                                        <td><strong>ID Jadwal:</strong></td>
-                                        <td>${detail.id_jadwal}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>No. Polisi:</strong></td>
-                                        <td>${detail.armada.no_polisi}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Jenis:</strong></td>
-                                        <td>${detail.armada.jenis}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Kapasitas:</strong></td>
-                                        <td>${detail.armada.kapasitas} ton</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="text-success mb-3">
-                                    <i class="fas fa-route me-2"></i>Informasi Jadwal
-                                </h6>
-                                <table class="table table-borderless">
-                                    <tr>
-                                        <td><strong>Rute:</strong></td>
-                                        <td>${detail.rute.nama}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Hari:</strong></td>
-                                        <td>${detail.jadwal.hari}
-                                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Jam Aktif:</strong></td>
-                        <td>${detail.jadwal.jam_aktif}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Status:</strong></td>
-                        <td>
-                            <span class="status-badge ${getStatusBadgeClass(detail.status)}">
-                                ${detail.status_text}
-                            </span>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-
-        ${detail.petugas && detail.petugas.length > 0 ? `
-                                                                                                            <div class="row mt-4">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-12">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <h6 class="text-info mb-3">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="fas fa-users me-2"></i>Tim Petugas
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </h6>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="row">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${detail.petugas.map(petugas => `
-                            <div class="col-md-6 mb-2">
-                                <div class="card border-0 bg-light">
-                                    <div class="card-body py-2">
-                                        <small class="text-muted">${petugas.posisi}</small>
-                                        <div class="fw-bold">${petugas.nama}</div>
-                                    </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="fas fa-truck me-2"></i>Informasi Armada
+                                    </h6>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>ID Jadwal:</strong></td>
+                                            <td>${detail.id}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>No. Polisi:</strong></td>
+                                            <td>${detail.armada.no_polisi}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Jenis:</strong></td>
+                                            <td>${detail.armada.jenis}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Kapasitas:</strong></td>
+                                            <td>${detail.armada.kapasitas} ton</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-success mb-3">
+                                        <i class="fas fa-route me-2"></i>Informasi Jadwal
+                                    </h6>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Rute:</strong></td>
+                                            <td>${detail.rute.nama}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Hari:</strong></td>
+                                            <td>${detail.jadwal.hari}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Jam Aktif:</strong></td>
+                                            <td>${detail.jadwal.jam_aktif}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Status:</strong></td>
+                                            <td>
+                                                <span class="status-badge ${getStatusBadgeClass(detail.status)}">
+                                                    ${detail.status_text}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </div>
                             </div>
-                        `).join('')}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ` : ''}
 
-        ${detail.last_tracking ? `
-                                        <div class="row mt-4">
-                                        <div class="col-12">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <h6 class="text-warning mb-3">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="fas fa-map-marker-alt me-2"></i>Tracking Terakhir
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </h6>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="card border-0 bg-light">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="card-body">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="row">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-md-4">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <small class="text-muted">Latitude</small>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="fw-bold">${detail.last_tracking.latitude}</div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-md-4">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <small class="text-muted">Longitude</small>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="fw-bold">${detail.last_tracking.longitude}</div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-md-4">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <small class="text-muted">Waktu Update</small>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="fw-bold">${detail.last_tracking.timestamp}</div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ` : `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="row mt-4">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-12">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="alert alert-info text-center">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="fas fa-info-circle me-2"></i>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    Belum ada data tracking untuk armada ini
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    `}
-                    `;
+                            ${detail.petugas && detail.petugas.length > 0 ? `
+                                            <div class="row mt-4">
+                                                <div class="col-12">
+                                                    <h6 class="text-info mb-3">
+                                                        <i class="fas fa-users me-2"></i>Tim Petugas
+                                                    </h6>
+                                                    <div class="row">
+                                                        ${detail.petugas.map(petugas => `
+                                                <div class="col-md-6 mb-2">
+                                                    <div class="card border-0 bg-light">
+                                                        <div class="card-body py-2">
+                                                            <small class="text-muted">${petugas.tugas}</small>
+                                                            <div class="fw-bold">${petugas.nama}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ` : ''}
+
+                            ${detail.last_tracking ? `
+                                            <div class="row mt-4">
+                                                <div class="col-12">
+                                                    <h6 class="text-warning mb-3">
+                                                        <i class="fas fa-map-marker-alt me-2"></i>Tracking Terakhir
+                                                    </h6>
+                                                    <div class="card border-0 bg-light">
+                                                        <div class="card-body">
+                                                            <div class="row">
+                                                                <div class="col-md-4">
+                                                                    <small class="text-muted">Latitude</small>
+                                                                    <div class="fw-bold">${detail.last_tracking.latitude}</div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <small class="text-muted">Longitude</small>
+                                                                    <div class="fw-bold">${detail.last_tracking.longitude}</div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <small class="text-muted">Waktu Update</small>
+                                                                    <div class="fw-bold">${detail.last_tracking.timestamp}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ` : `
+                                            <div class="row mt-4">
+                                                <div class="col-12">
+                                                    <div class="alert alert-info text-center">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        Belum ada data tracking untuk armada ini
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `}
+                        `;
                     } else {
                         content.innerHTML = `
-                        <div class="alert alert-danger text-center">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Gagal memuat detail armada: ${data.message}
-                        </div>
-                    `;
+                            <div class="alert alert-danger text-center">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Gagal memuat detail armada: ${data.message}
+                            </div>
+                        `;
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
+                    console.log('Error Response:', error.response); // jika pakai Axios, ini penting
+                    console.log('Full Error Object:', JSON.stringify(error)); // untuk debugging tambahan
+
                     content.innerHTML = `
-                    <div class="alert alert-danger text-center">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        Terjadi kesalahan saat memuat detail armada
-                    </div>
-                `;
+                        <div class="alert alert-danger text-center">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Terjadi kesalahan saat memuat detail armada
+                        </div>
+                    `;
                 });
+
         }
 
         // Function helper untuk status badge class
@@ -1044,33 +1038,38 @@
         // Function untuk export data
         function exportData() {
             const params = new URLSearchParams(window.location.search);
-            const exportUrl = `{{ route('jadwal-rute.export') }}?${params.toString()}`;
+            const exportUrl = `jadwal-rute/export?${params.toString()}`;
 
             // Show loading
-            const exportBtn = document.querySelector('.btn-export');
-            const originalText = exportBtn.innerHTML;
-            exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Exporting...';
-            exportBtn.disabled = true;
+            const exportBtn = document.querySelector('.btn:contains("Export")') || document.querySelector(
+                '[onclick="exportData()"]');
+            if (exportBtn) {
+                const originalText = exportBtn.innerHTML;
+                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Exporting...';
+                exportBtn.disabled = true;
 
-            fetch(exportUrl)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Convert to CSV and download
-                        const csv = convertToCSV(data.data);
-                        downloadCSV(csv, data.filename + '.csv');
-                    } else {
-                        alert('Gagal export data: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Export error:', error);
-                    alert('Terjadi kesalahan saat export data');
-                })
-                .finally(() => {
-                    exportBtn.innerHTML = originalText;
-                    exportBtn.disabled = false;
-                });
+                fetch(exportUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Convert to CSV and download
+                            const csv = convertToCSV(data.data);
+                            downloadCSV(csv, data.filename + '.csv');
+                        } else {
+                            alert('Gagal export data: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Export error:', error);
+                        alert('Terjadi kesalahan saat export data');
+                    })
+                    .finally(() => {
+                        if (exportBtn) {
+                            exportBtn.innerHTML = originalText;
+                            exportBtn.disabled = false;
+                        }
+                    });
+            }
         }
 
         // Function untuk convert data ke CSV
@@ -1111,7 +1110,7 @@
             window.URL.revokeObjectURL(url);
         }
 
-        // Function untuk update tracking real-time (optional)
+        // Function untuk update tracking real-time
         function startTrackingUpdates() {
             setInterval(() => {
                 updateArmadaPositions();
@@ -1122,7 +1121,7 @@
         function updateArmadaPositions() {
             mapData.forEach(jadwal => {
                 if (jadwal.status === 1) { // Hanya update yang sedang berjalan
-                    fetch(`{{ route('jadwal-rute.api.tracking', '') }}/${jadwal.id}`)
+                    fetch(`jadwal-rute/api/tracking/${jadwal.id}`)
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
@@ -1133,25 +1132,28 @@
 
                                     // Update popup content
                                     const popupContent = `
-                                    <div class="popup-header">
-                                        <i class="fas fa-truck me-2"></i>
-                                        ${jadwal.armada.no_polisi}
-                                    </div>
-                                    <div class="popup-content">
-                                        <p><strong>Rute:</strong> ${jadwal.rute.nama}</p>
-                                        <p><strong>Status:</strong> <span class="badge bg-${getStatusColor(jadwal.status)}">${jadwal.status_text}</span></p>
-                                        <p><strong>Jam Aktif:</strong> ${jadwal.jam_aktif}</p>
-                                        <p><strong>Update Terakhir:</strong> ${new Date(data.data.timestamp).toLocaleString('id-ID')}</p>
-                                    </div>
-                                    <div class="popup-footer">
-                                        <button class="btn-popup" onclick="showRouteForArmada(${jadwal.id})">
-                                            <i class="fas fa-route me-1"></i>Tampilkan Rute
-                                        </button>
-                                        <button class="btn-popup" onclick="showArmadaDetail(${jadwal.id})">
-                                            <i class="fas fa-info-circle me-1"></i>Detail
-                                        </button>
-                                    </div>
-                                `;
+                                        <div class="popup-header">
+                                            <i class="fas fa-truck me-2"></i>
+                                            ${jadwal.armada.no_polisi}
+                                        </div>
+                                        <div class="popup-content">
+                                            <p><strong>Rute:</strong> ${jadwal.rute.nama}</p>
+                                            <p><strong>Status:</strong> <span class="badge bg-${getStatusColor(jadwal.status)}">${jadwal.status_text}</span></p>
+                                            <p><strong>Jam Aktif:</strong> ${jadwal.jam_aktif}</p>
+                                            <p><strong>Update Terakhir:</strong> ${new Date(data.data.timestamp).toLocaleString('id-ID')}</p>
+                                        </div>
+                                        <div class="popup-footer">
+                                            <button class="btn-popup" onclick="showRouteForArmada(${jadwal.id})">
+                                                <i class="fas fa-route me-1"></i>Tampilkan Rute
+                                            </button>
+                                            <button class="btn-popup" onclick="hideRouteForArmada(${jadwal.id})">
+                                                <i class="fas fa-eye-slash me-1"></i>Sembunyikan Rute
+                                            </button>
+                                            <button class="btn-popup" onclick="showArmadaDetail(${jadwal.id})">
+                                                <i class="fas fa-info-circle me-1"></i>Detail
+                                            </button>
+                                        </div>
+                                    `;
                                     marker.setPopupContent(popupContent);
                                 }
                             }
@@ -1161,6 +1163,72 @@
                         });
                 }
             });
+        }
+
+        // Function untuk hide rute specific armada
+        function hideRouteForArmada(jadwalId) {
+            // Remove only routes for this specific armada
+            routeLines = routeLines.filter(line => {
+                if (line.jadwalId === jadwalId) {
+                    map.removeLayer(line);
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        // Enhanced show route function
+        function showRouteForArmadaEnhanced(jadwalId) {
+            // First hide existing route for this armada
+            hideRouteForArmada(jadwalId);
+
+            const jadwal = mapData.find(j => j.id === jadwalId);
+            if (jadwal && jadwal.tps_data && jadwal.tps_data.length > 0) {
+                // Create route line
+                const coordinates = jadwal.tps_data.map(tps => [tps.latitude, tps.longitude]);
+
+                const routeLine = L.polyline(coordinates, {
+                    color: jadwal.rute.color,
+                    weight: 4,
+                    opacity: 0.8,
+                    smoothFactor: 1
+                }).addTo(map);
+
+                // Add custom property
+                routeLine.jadwalId = jadwalId;
+                routeLines.push(routeLine);
+
+                // Add route markers with numbers
+                jadwal.tps_data.forEach((tps, index) => {
+                    const routeMarker = L.divIcon({
+                        html: `<div style="background: ${jadwal.rute.color}; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">${index + 1}</div>`,
+                        className: 'route-marker',
+                        iconSize: [25, 25],
+                        iconAnchor: [12, 12]
+                    });
+
+                    const marker = L.marker([tps.latitude, tps.longitude], {
+                            icon: routeMarker
+                        })
+                        .bindPopup(`
+                            <div class="popup-header">Stop ${index + 1}: ${tps.nama_lokasi}</div>
+                            <div class="popup-content">
+                                <p><strong>Jenis:</strong> ${tps.tipe}</p>
+                                <p><strong>Rute:</strong> ${jadwal.rute.nama}</p>
+                            </div>
+                        `)
+                        .addTo(map);
+
+                    // Add custom property
+                    marker.jadwalId = jadwalId;
+                    routeLines.push(marker);
+                });
+
+                // Fit bounds to route with padding
+                map.fitBounds(routeLine.getBounds(), {
+                    padding: [20, 20]
+                });
+            }
         }
 
         // Function untuk handle resize map
@@ -1219,28 +1287,28 @@
                             icon
                         })
                         .bindPopup(`
-                        <div class="popup-header">
-                            <i class="fas fa-truck me-2"></i>
-                            ${jadwal.armada.no_polisi}
-                        </div>
-                        <div class="popup-content">
-                            <p><strong>Rute:</strong> ${jadwal.rute.nama}</p>
-                            <p><strong>Status:</strong> <span class="badge bg-${getStatusColor(jadwal.status)}">${jadwal.status_text}</span></p>
-                            <p><strong>Jam Aktif:</strong> ${jadwal.jam_aktif}</p>
-                            <p><strong>Update Terakhir:</strong> ${new Date(jadwal.last_tracking.timestamp).toLocaleString('id-ID')}</p>
-                        </div>
-                        <div class="popup-footer">
-                            <button class="btn-popup" onclick="showRouteForArmada(${jadwal.id})">
-                                <i class="fas fa-route me-1"></i>Tampilkan Rute
-                            </button>
-                            <button class="btn-popup" onclick="hideRouteForArmada(${jadwal.id})">
-                                <i class="fas fa-eye-slash me-1"></i>Sembunyikan Rute
-                            </button>
-                            <button class="btn-popup" onclick="showArmadaDetail(${jadwal.id})">
-                                <i class="fas fa-info-circle me-1"></i>Detail
-                            </button>
-                        </div>
-                    `)
+                            <div class="popup-header">
+                                <i class="fas fa-truck me-2"></i>
+                                ${jadwal.armada.no_polisi}
+                            </div>
+                            <div class="popup-content">
+                                <p><strong>Rute:</strong> ${jadwal.rute.nama}</p>
+                                <p><strong>Status:</strong> <span class="badge bg-${getStatusColor(jadwal.status)}">${jadwal.status_text}</span></p>
+                                <p><strong>Jam Aktif:</strong> ${jadwal.jam_aktif}</p>
+                                <p><strong>Update Terakhir:</strong> ${new Date(jadwal.last_tracking.timestamp).toLocaleString('id-ID')}</p>
+                            </div>
+                            <div class="popup-footer">
+                                <button class="btn-popup" onclick="showRouteForArmadaEnhanced(${jadwal.id})">
+                                    <i class="fas fa-route me-1"></i>Tampilkan Rute
+                                </button>
+                                <button class="btn-popup" onclick="hideRouteForArmada(${jadwal.id})">
+                                    <i class="fas fa-eye-slash me-1"></i>Sembunyikan Rute
+                                </button>
+                                <button class="btn-popup" onclick="showArmadaDetail(${jadwal.id})">
+                                    <i class="fas fa-info-circle me-1"></i>Detail
+                                </button>
+                            </div>
+                        `)
                         .addTo(map);
 
                     // Add custom properties
@@ -1248,77 +1316,6 @@
                     armadaMarkers.push(marker);
                 }
             });
-        }
-
-        // Function untuk hide rute specific armada
-        function hideRouteForArmada(jadwalId) {
-            // Remove only routes for this specific armada
-            routeLines = routeLines.filter(line => {
-                if (line.jadwalId === jadwalId) {
-                    map.removeLayer(line);
-                    return false;
-                }
-                return true;
-            });
-        }
-
-        // Enhanced show route function
-        function showRouteForArmadaEnhanced(jadwalId) {
-            // First hide existing route for this armada
-            hideRouteForArmada(jadwalId);
-
-            const jadwal = mapData.find(j => j.id === jadwalId);
-            if (jadwal && jadwal.tps_data && jadwal.tps_data.length > 0) {
-                // Sort TPS by urutan
-                const sortedTps = [...jadwal.tps_data].sort((a, b) => a.urutan - b.urutan);
-
-                // Create route line
-                const coordinates = sortedTps.map(tps => [tps.latitude, tps.longitude]);
-
-                const routeLine = L.polyline(coordinates, {
-                    color: jadwal.rute.color,
-                    weight: 4,
-                    opacity: 0.8,
-                    smoothFactor: 1
-                }).addTo(map);
-
-                // Add custom property
-                routeLine.jadwalId = jadwalId;
-                routeLines.push(routeLine);
-
-                // Add route markers with numbers
-                sortedTps.forEach((tps, index) => {
-                    const routeMarker = L.divIcon({
-                        html: `<div style="background: ${jadwal.rute.color}; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">${index + 1}</div>`,
-                        className: 'route-marker',
-                        iconSize: [25, 25],
-                        iconAnchor: [12, 12]
-                    });
-
-                    const marker = L.marker([tps.latitude, tps.longitude], {
-                            icon: routeMarker
-                        })
-                        .bindPopup(`
-                        <div class="popup-header">Stop ${index + 1}: ${tps.nama}</div>
-                        <div class="popup-content">
-                            <p><strong>Jenis:</strong> ${tps.jenis}</p>
-                            <p><strong>Alamat:</strong> ${tps.alamat}</p>
-                            <p><strong>Rute:</strong> ${jadwal.rute.nama}</p>
-                            <p><strong>Urutan:</strong> ${tps.urutan}</p>
-                        </div>
-                    `)
-                        .addTo(map);
-
-                    // Add custom property
-                    marker.jadwalId = jadwalId;
-                    routeLines.push(marker);
-                });
-
-                // Fit bounds to route with padding
-                map.fitBounds(routeLine.getBounds(), {
-                    padding: [20, 20]
-                });
-            }
         }
 
         // Update the original function to use enhanced version

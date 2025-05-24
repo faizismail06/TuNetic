@@ -33,7 +33,7 @@ class JadwalRuteController extends Controller
             $statusFilter = $request->get('status');
             $dateFilter = $request->get('date');
 
-            // Query dasar dengan relasi
+            // Query dasar dengan relasi yang benar
             $query = JadwalOperasional::with([
                 'armada',
                 'jadwal',
@@ -43,17 +43,19 @@ class JadwalRuteController extends Controller
 
             // Filter berdasarkan pencarian
             if ($search) {
-                $query->whereHas('armada', function ($q) use ($search) {
-                    $q->where('no_polisi', 'like', '%' . $search . '%')
-                        ->orWhere('merk_kendaraan', 'like', '%' . $search . '%')
-                        ->orWhere('jenis_kendaraan', 'like', '%' . $search . '%');
-                })
-                    ->orWhereHas('rute', function ($q) use ($search) {
-                        $q->where('nama_rute', 'like', '%' . $search . '%');
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('armada', function ($subQ) use ($search) {
+                        $subQ->where('no_polisi', 'like', '%' . $search . '%')
+                            ->orWhere('merk_kendaraan', 'like', '%' . $search . '%')
+                            ->orWhere('jenis_kendaraan', 'like', '%' . $search . '%');
                     })
-                    ->orWhereHas('jadwal', function ($q) use ($search) {
-                        $q->where('hari', 'like', '%' . $search . '%');
-                    });
+                        ->orWhereHas('rute', function ($subQ) use ($search) {
+                            $subQ->where('nama_rute', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('jadwal', function ($subQ) use ($search) {
+                            $subQ->where('hari', 'like', '%' . $search . '%');
+                        });
+                });
             }
 
             // Filter berdasarkan status
@@ -83,7 +85,6 @@ class JadwalRuteController extends Controller
                 // Data untuk tabel
                 $tableData[] = [
                     'id' => $jadwal->id,
-                    'id_jadwal' => $this->generateIdJadwal($jadwal->id, $jadwal->tanggal),
                     'tanggal' => Carbon::parse($jadwal->tanggal)->format('d-m-Y'),
                     'hari' => $this->formatHari($jadwal->jadwal->hari ?? 'N/A'),
                     'armada' => $jadwal->armada->no_polisi ?? 'N/A',
@@ -109,17 +110,11 @@ class JadwalRuteController extends Controller
                                 'nama_lokasi' => $ruteTps->lokasi_tps->nama_lokasi,
                                 'latitude' => (float) $ruteTps->lokasi_tps->latitude,
                                 'longitude' => (float) $ruteTps->lokasi_tps->longitude,
-                                'tipe' => $ruteTps->lokasi_tps->tipe ?? 'TPS',
-                                // 'urutan' => $ruteTps->urutan ?? 0
+                                'tipe' => $ruteTps->lokasi_tps->tipe ?? 'TPS'
                             ];
                         }
                     }
                 }
-
-                // Urutkan TPS berdasarkan urutan
-                usort($tpsData, function ($a, $b) {
-                    return $a['urutan'] <=> $b['urutan'];
-                });
 
                 $allTps[$jadwal->id] = $tpsData;
 
@@ -130,7 +125,6 @@ class JadwalRuteController extends Controller
 
                 $mapData[] = [
                     'id' => $jadwal->id,
-                    'id_jadwal' => $this->generateIdJadwal($jadwal->id, $jadwal->tanggal),
                     'armada' => [
                         'no_polisi' => $jadwal->armada->no_polisi ?? 'N/A',
                         'jenis' => $jadwal->armada->jenis_kendaraan ?? $jadwal->armada->merk_kendaraan ?? 'N/A',
@@ -152,7 +146,7 @@ class JadwalRuteController extends Controller
                 ];
             }
 
-            // Ambil semua TPS untuk ditampilkan di peta
+            // Ambil semua TPS untuk ditampilkan di peta (perbaikan query)
             $allTpsForMap = LokasiTps::select('id', 'nama_lokasi', 'latitude', 'longitude', 'tipe')
                 ->whereNotNull('latitude')
                 ->whereNotNull('longitude')
@@ -160,20 +154,17 @@ class JadwalRuteController extends Controller
                 ->map(function ($tps) {
                     return [
                         'id' => $tps->id,
-                        'nama_lokasi' => $tps->nama,
+                        'nama_lokasi' => $tps->nama_lokasi, // Perbaikan: nama_lokasi bukan nama
                         'latitude' => (float) $tps->latitude,
                         'longitude' => (float) $tps->longitude,
-                        'tipe' => $tps->tipe  ?? 'TPS',
+                        'tipe' => $tps->tipe ?? 'TPS',
                     ];
                 })->toArray();
 
-            // Data untuk dropdown filter
+            // Data untuk dropdown filter - menggunakan static method dari model
             $statusOptions = [
-                '' => 'Semua Status',
-                '0' => 'Belum Berjalan',
-                '1' => 'Sedang Berjalan',
-                '2' => 'Selesai'
-            ];
+                '' => 'Semua Status'
+            ] + JadwalOperasional::getStatusLabels();
 
             return view('admintpst.jadwal-rute.index', [
                 'jadwalOperasional' => $jadwalOperasional,
@@ -221,7 +212,7 @@ class JadwalRuteController extends Controller
 
             // Siapkan data detail
             $detailData = [
-                'id_jadwal' => $this->generateIdJadwal($jadwal->id, $jadwal->tanggal),
+                'id' => $jadwal->id,
                 'tanggal' => Carbon::parse($jadwal->tanggal)->format('d F Y'),
                 'hari' => $this->formatHari($jadwal->jadwal->hari ?? 'N/A'),
                 'jam_aktif' => $jadwal->jam_aktif ? Carbon::parse($jadwal->jam_aktif)->format('H:i') . ' WIB' : 'N/A',
@@ -240,7 +231,7 @@ class JadwalRuteController extends Controller
                 'petugas' => $jadwal->penugasanPetugas->map(function ($penugasan) {
                     return [
                         'nama' => $penugasan->petugas->user->name ?? $penugasan->petugas->name ?? 'N/A',
-                        'posisi' => $penugasan->tugas ?? 'N/A'
+                        'tugas' => $penugasan->tugas // Menggunakan helper function
                     ];
                 }) ?? collect(),
                 'last_tracking' => $lastTracking ? [
@@ -283,7 +274,6 @@ class JadwalRuteController extends Controller
 
             $data = [
                 'id' => $jadwal->id,
-                'id_jadwal' => $this->generateIdJadwal($jadwal->id, $jadwal->tanggal),
                 'armada' => [
                     'no_polisi' => $jadwal->armada->no_polisi ?? 'N/A',
                     'jenis' => $jadwal->armada->jenis_kendaraan ?? $jadwal->armada->merk_kendaraan ?? 'N/A',
@@ -299,7 +289,7 @@ class JadwalRuteController extends Controller
                 'petugas' => $jadwal->penugasanPetugas->map(function ($penugasan) {
                     return [
                         'nama' => $penugasan->petugas->user->name ?? $penugasan->petugas->name ?? 'N/A',
-                        'posisi' => $penugasan->tugas ?? 'N/A'
+                        'tugas' => $penugasan->tugas // Menggunakan helper function
                     ];
                 }),
                 'status' => $jadwal->status,
@@ -377,17 +367,19 @@ class JadwalRuteController extends Controller
 
             // Terapkan filter yang sama seperti di index
             if ($search) {
-                $query->whereHas('armada', function ($q) use ($search) {
-                    $q->where('no_polisi', 'like', '%' . $search . '%')
-                        ->orWhere('merk_kendaraan', 'like', '%' . $search . '%')
-                        ->orWhere('jenis_kendaraan', 'like', '%' . $search . '%');
-                })
-                    ->orWhereHas('rute', function ($q) use ($search) {
-                        $q->where('nama_rute', 'like', '%' . $search . '%');
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('armada', function ($subQ) use ($search) {
+                        $subQ->where('no_polisi', 'like', '%' . $search . '%')
+                            ->orWhere('merk_kendaraan', 'like', '%' . $search . '%')
+                            ->orWhere('jenis_kendaraan', 'like', '%' . $search . '%');
                     })
-                    ->orWhereHas('jadwal', function ($q) use ($search) {
-                        $q->where('hari', 'like', '%' . $search . '%');
-                    });
+                        ->orWhereHas('rute', function ($subQ) use ($search) {
+                            $subQ->where('nama_rute', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('jadwal', function ($subQ) use ($search) {
+                            $subQ->where('hari', 'like', '%' . $search . '%');
+                        });
+                });
             }
 
             if ($statusFilter !== null && $statusFilter !== '') {
@@ -404,7 +396,7 @@ class JadwalRuteController extends Controller
             $exportData = [];
             foreach ($jadwalOperasional as $jadwal) {
                 $exportData[] = [
-                    'ID Jadwal' => $this->generateIdJadwal($jadwal->id, $jadwal->tanggal),
+                    'ID Jadwal' => $jadwal->id,
                     'Tanggal' => Carbon::parse($jadwal->tanggal)->format('d-m-Y'),
                     'Hari' => $this->formatHari($jadwal->jadwal->hari ?? 'N/A'),
                     'Armada' => $jadwal->armada->no_polisi ?? 'N/A',
@@ -432,12 +424,12 @@ class JadwalRuteController extends Controller
     /**
      * Helper function untuk generate ID Jadwal
      */
-    private function generateIdJadwal($id, $tanggal)
-    {
-        $year = Carbon::parse($tanggal)->format('y');
-        $month = Carbon::parse($tanggal)->format('m');
-        return $year . $month . 'G' . str_pad($id, 2, '0', STR_PAD_LEFT);
-    }
+    // private function generateIdJadwal($id, $tanggal)
+    // {
+    //     $year = Carbon::parse($tanggal)->format('y');
+    //     $month = Carbon::parse($tanggal)->format('m');
+    //     return $year . $month . 'G' . str_pad($id, 2, '0', STR_PAD_LEFT);
+    // }
 
     /**
      * Helper function untuk format hari
@@ -448,20 +440,12 @@ class JadwalRuteController extends Controller
     }
 
     /**
-     * Helper function untuk mendapatkan text status
+     * Helper function untuk mendapatkan text status - menggunakan model method
      */
     private function getStatusText($status)
     {
-        switch ($status) {
-            case 0:
-                return 'Belum Berjalan';
-            case 1:
-                return 'Sedang Berjalan';
-            case 2:
-                return 'Selesai';
-            default:
-                return 'Unknown';
-        }
+        $statusLabels = JadwalOperasional::getStatusLabels();
+        return $statusLabels[$status] ?? 'Unknown';
     }
 
     /**
@@ -480,4 +464,19 @@ class JadwalRuteController extends Controller
                 return 'badge-secondary';
         }
     }
+
+    /**
+     * Helper function untuk mendapatkan text tugas petugas
+     */
+    // private function getTugasText($tugas)
+    // {
+    //     switch ($tugas) {
+    //         case 1:
+    //             return 'Driver';
+    //         case 2:
+    //             return 'Picker';
+    //         default:
+    //             return 'Undefined';
+    //     }
+    // }
 }

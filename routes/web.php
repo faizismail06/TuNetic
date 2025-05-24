@@ -319,12 +319,25 @@ Route::middleware(['auth'])->prefix('petugas')->group(function () {
     })->name('jadwal.penjemputan');
 });
 // Route untuk Jadwal & Rute
-Route::prefix('tpst/jadwal-rute')->name('jadwal-rute.')->group(function () {
-    Route::get('/', [JadwalRuteController::class, 'index'])->name('index');
-    Route::get('/show/{id}', [JadwalRuteController::class, 'show'])->name('show');
-    Route::get('/export', [JadwalRuteController::class, 'export'])->name('export');
+// Route Group untuk Jadwal Rute (dengan middleware auth jika diperlukan)
+Route::group(['prefix' => 'tpst/jadwal-rute'], function () {
 
-    // API routes for AJAX calls
-    Route::get('/api/armada-detail/{id}', [JadwalRuteController::class, 'getArmadaDetail'])->name('api.armada-detail');
-    Route::get('/api/tracking/{id}', [JadwalRuteController::class, 'getTracking'])->name('api.tracking');
+    // Route utama untuk menampilkan halaman jadwal operasional dengan peta
+    Route::get('/', [JadwalRuteController::class, 'index'])->name('jadwal-rute.index');
+
+    // Route untuk menampilkan detail jadwal operasional
+    Route::get('/show/{id}', [JadwalRuteController::class, 'show'])->name('jadwal-rute.show');
+
+    // Route untuk export data jadwal operasional
+    Route::get('/export', [JadwalRuteController::class, 'export'])->name('jadwal-rute.export');
+
+    // API Routes untuk AJAX calls
+    Route::group(['prefix' => 'api'], function () {
+
+        // API untuk mendapatkan detail armada (digunakan di modal)
+        Route::get('/armada-detail/{id}', [JadwalRuteController::class, 'getArmadaDetail'])->name('jadwal-rute.api.armada-detail');
+
+        // API untuk mendapatkan tracking terbaru
+        Route::get('/tracking/{id}', [JadwalRuteController::class, 'getTracking'])->name('jadwal-rute.api.tracking');
+    });
 });
