@@ -105,7 +105,7 @@
                         <div class="card-header">
                             <h5 class="m-0">Daftar Lokasi TPS</h5>
                             <div class="card-tools">
-                                <a href="{{ route('lokasi-tps.create') }}" class="btn btn-sm btn-primary">
+                                <a href="{{ route('lokasi-tps.create') }}" class="btn btn-sm btn-success ml-auto">
                                     <i class="fas fa-plus-circle"></i> Tambah Lokasi TPS
                                 </a>
                             </div>

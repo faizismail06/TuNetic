@@ -47,7 +47,7 @@ Route::get('/', function () {
 
 Auth::routes(['verify' => true]);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 // ===================
 // DASHBOARD
@@ -72,7 +72,8 @@ Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petug
 Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
 Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
 Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
-// Route::post('petugas', [PetugasController::class, 'store'])->name('petugas.store');
+Route::post('petugas', [PetugasController::class, 'destroy'])->name('petugas.destroy');
+Route::post('petugas', [PetugasController::class, 'index'])->name('petugas.index');
 Route::get('/rute/{id}/detail', [RuteController::class, 'show'])->name('rute.detail');
 Route::get('/rute/{id_rute}/detail', [RuteController::class, 'detail'])->name('rute.detail');
 Route::get('/api/rute/{id}', [RuteController::class, 'getDetailJson'])->name('api.rute.detail');
@@ -108,7 +109,7 @@ Route::resource('jadwal-template', JadwalTemplateController::class)->except(['sh
 // Jadwal Routes
 Route::get('/daftar-jadwal/generate', [JadwalController::class, 'generateForm'])->name('daftar-jadwal.generate.form');
 Route::post('/daftar-jadwal/generate', [JadwalController::class, 'generateStore'])->name('daftar-jadwal.generate.store');
-Route::resource('daftar-jadwal', JadwalController::class);
+Route::resource('/daftar-jadwal', JadwalController::class);
 
 // ===================
 // JADWAL
