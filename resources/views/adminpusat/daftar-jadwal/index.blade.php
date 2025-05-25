@@ -67,7 +67,7 @@ $(document).ready(function () {
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($jadwals as $item)
+                                @foreach ($jadwal as $item)
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td>{{ $item->hari }}</td>

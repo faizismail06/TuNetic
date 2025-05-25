@@ -26,7 +26,7 @@ class DashboardController extends Controller
             ->join('rute', 'jadwal_operasional.id_rute', '=', 'rute.id')
             ->join('rute_tps', 'rute.id', '=', 'rute_tps.id_rute') // Links a route to potentially multiple TPS
             ->join('lokasi_tps', 'rute_tps.id_lokasi_tps', '=', 'lokasi_tps.id')
-            ->where('jadwal_operasional.status', 2) // Filter for 'Selesai' status
+            ->where('jadwal_operasional.status', 1) // Filter for 'Selesai' status
             // Filter for the last 7 days (today and the 6 previous days)
             // Assumes 'jadwal_operasional.tanggal' is a DATE or DATETIME column
             ->where('jadwal_operasional.tanggal', '>=', Carbon::now()->subDays(6)->startOfDay())
