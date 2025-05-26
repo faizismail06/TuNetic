@@ -39,7 +39,7 @@ use Illuminate\Http\Request;
 // Route::permanentRedirect('/', '/login');
 
 Route::get('/', function () {
-    return view('home-petugas');
+    return view('vendor/home-petugas');
 });
 
 
@@ -132,7 +132,9 @@ Route::get('/lacak', function () {
     return view('masyarakat.lacak');
 })->name('masyarakat.lacak');
 
-Route::get('/lapor', function () {return view('masyarakat.lapor');})->name('lapor');
+Route::get('/lapor', function () {
+    return view('masyarakat.lapor');
+})->name('lapor');
 
 Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
 Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');

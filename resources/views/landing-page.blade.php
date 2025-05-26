@@ -91,13 +91,8 @@
                     </div>
                 </div>
                 <div class="d-flex">
-<<<<<<< HEAD
                     <a href="#login" class="auth-btn sign-in me-2">Sign in</a>
                     <a href="#login" class="auth-btn sign-up">Sign up</a>
-=======
-                    <a href="login" class="auth-btn sign-in me-2">Sign in</a>
-                    <a href="login" class="auth-btn sign-up">Sign up</a>
->>>>>>> 82c7fce36379b374c0da5cc20a1dabdf956beb8b
                 </div>
             </div>
         </nav>
