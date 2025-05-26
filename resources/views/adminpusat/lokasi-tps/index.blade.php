@@ -243,32 +243,32 @@
                         // Pindahkan view peta ke lokasi pengguna
                         map.setView([userLat, userLng], 15);
 
-                        // Buat marker untuk lokasi pengguna
-                        const userIcon = L.divIcon({
-                            className: 'user-location-icon',
-                            html: `<div style="
-                                background-color: #007bff;
-                                width: 20px;
-                                height: 20px;
-                                border-radius: 50%;
-                                border: 3px solid #fff;
-                                box-shadow: 0 0 10px rgba(0,123,255,0.5);
-                                position: relative;
-                            ">
-                                <div style="
-                                    position: absolute;
-                                    top: 50%;
-                                    left: 50%;
-                                    transform: translate(-50%, -50%);
-                                    width: 8px;
-                                    height: 8px;
-                                    background-color: #fff;
-                                    border-radius: 50%;
-                                "></div>
-                            </div>`,
-                            iconSize: [20, 20],
-                            iconAnchor: [10, 10]
-                        });
+                        // // Buat marker untuk lokasi pengguna
+                        // const userIcon = L.divIcon({
+                        //     className: 'user-location-icon',
+                        //     html: `<div style="
+                    //         background-color: #007bff;
+                    //         width: 20px;
+                    //         height: 20px;
+                    //         border-radius: 50%;
+                    //         border: 3px solid #fff;
+                    //         box-shadow: 0 0 10px rgba(0,123,255,0.5);
+                    //         position: relative;
+                    //     ">
+                    //         <div style="
+                    //             position: absolute;
+                    //             top: 50%;
+                    //             left: 50%;
+                    //             transform: translate(-50%, -50%);
+                    //             width: 8px;
+                    //             height: 8px;
+                    //             background-color: #fff;
+                    //             border-radius: 50%;
+                    //         "></div>
+                    //     </div>`,
+                        //     iconSize: [20, 20],
+                        //     iconAnchor: [10, 10]
+                        // });
 
                         // // Hapus marker lokasi pengguna sebelumnya jika ada
                         // if (userLocationMarker) {
@@ -281,10 +281,10 @@
                         // }).addTo(map);
 
                         // userLocationMarker.bindPopup(`
-                        //     <b>📍 Lokasi Anda</b><br>
-                        //     Koordinat: ${userLat.toFixed(6)}, ${userLng.toFixed(6)}<br>
-                        //     Akurasi: ±${Math.round(accuracy)} meter
-                        // `);
+                    //     <b>📍 Lokasi Anda</b><br>
+                    //     Koordinat: ${userLat.toFixed(6)}, ${userLng.toFixed(6)}<br>
+                    //     Akurasi: ±${Math.round(accuracy)} meter
+                    // `);
 
                         // // Tambahkan circle untuk menunjukkan akurasi
                         // L.circle([userLat, userLng], {
@@ -318,7 +318,7 @@
                         // Tampilkan notifikasi error (opsional)
                         alert(
                             `Tidak dapat mendapatkan lokasi: ${errorMessage}\nMenggunakan lokasi default (Tembalang).`
-                            );
+                        );
                     }, {
                         enableHighAccuracy: true,
                         timeout: 10000,
