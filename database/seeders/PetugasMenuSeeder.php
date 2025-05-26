@@ -38,7 +38,7 @@ class PetugasMenuSeeder extends Seeder
         // Jadwal Pengambilan
         $jadwalPengambilan = Menu::create([
             'nama_menu' => 'Jadwal Pengambilan',
-            'url' => 'petugas/jadwal-pengambilan',
+            'url' => '/jadwal-pengambilan',
             'icon' => 'fas fa-calendar-alt',
             'parent_id' => $menuPetugas->id,
             'urutan' => 2
@@ -71,6 +71,16 @@ class PetugasMenuSeeder extends Seeder
         Permission::create(['name' => 'access_petugas_profile', 'menu_id' => $profilePetugas->id]);
         Permission::create(['name' => 'update_petugas_profile', 'menu_id' => $profilePetugas->id]);
 
+        $akun = Menu::create([
+            'nama_menu' => 'Akun',
+            'url' => 'petugas/profile/akun',
+            'icon' => 'fa-solid fa-key',
+            'parent_id' => $profilePetugas->id,
+            'urutan' => 1
+        ]);
+
+        Permission::create(['name' => 'access_petugas_profile_akun', 'menu_id' => $akun->id]);
+        Permission::create(['name' => 'update_petugas_profile_akun', 'menu_id' => $akun->id]);
         // Return the main menu id to be used by MasterSeeder
         return $menuPetugas->id;
     }

@@ -14,12 +14,23 @@ class Rute extends Model
     protected $fillable = [
         'nama_rute',
         'map',
-        'wilayah',
+        'wilayah'
+        // 'latitude',
+        // 'longitude'
     ];
 
-    protected $casts = [
-        'map' => 'array', // Karena kolom `map` menggunakan tipe JSON
-    ];
+    /**
+     * Relasi ke tabel rute_tps (ke primary key 'id')
+     */
+    public function ruteTps()
+    {
+        return $this->hasMany(RuteTps::class, 'id_rute');
+    }
+
+    public function tps()
+    {
+        return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps');
+    }
 
     /**
      * Relasi ke Lokasi.

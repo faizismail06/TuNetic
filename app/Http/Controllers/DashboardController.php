@@ -9,7 +9,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $countWarga = DB::table('users')->count();
+        $countWarga = DB::table('users')->where('level','4')->count();
         $countPetugas = DB::table('petugas')->count();
         $countArmada = DB::table('armada')->count();
         $countLaporan = DB::table('laporan_warga')->count();
@@ -22,7 +22,8 @@ class DashboardController extends Controller
         )
         ->join('jadwal_operasional', 'tracking_armada.id_jadwal_operasional', '=', 'jadwal_operasional.id')
         ->join('armada', 'jadwal_operasional.id_armada', '=', 'armada.id')
-        ->join('rute_tps', 'jadwal_operasional.id_rute_tps', '=', 'rute_tps.id')
+        ->join('rute', 'jadwal_operasional.id_rute', '=', 'rute.id')
+        ->join('rute_tps', 'rute.id', '=', 'rute_tps.id_rute')
         ->join('lokasi_tps', 'rute_tps.id_lokasi_tps', '=', 'lokasi_tps.id')
         ->where('tracking_armada.created_at', '>=', now()->subDays(7))
         ->groupBy('armada.no_polisi', 'lokasi_tps.id')
@@ -36,7 +37,7 @@ class DashboardController extends Controller
             $tpsData = [];
             foreach ($nomorKendaraan as $kendaraan) {
                 $jumlah = $pengangkutanData
-                    ->where('plat_nomor', $kendaraan)
+                    ->where('no_polisi', $kendaraan)
                     ->where('tps_id', $tps->id)
                     ->first();
                 $tpsData[] = $jumlah ? $jumlah->jumlah_pengangkutan : 0;

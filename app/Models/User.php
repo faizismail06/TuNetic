@@ -57,4 +57,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Village::class, 'village_id');
     }
 
+    public function petugas()
+    {
+        return $this->hasOne(Petugas::class, 'user_id');
+    }
+
+
 }
