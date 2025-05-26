@@ -10,18 +10,20 @@ class ArtikelController extends Controller
     // Menampilkan semua artikel
     public function index()
     {
-        $artikel = Artikel::all();
-        return response()->json($artikel);
+        $artikel = Artikel::orderBy('tanggal_publikasi', 'desc')->get(); // gunakan artikel (tunggal)
+        return view('adminpusat.artikel.index', compact('artikel')); // compact sesuai variabel
     }
+
 
     // Menampilkan satu artikel berdasarkan ID
     public function show($id)
     {
         $artikel = Artikel::find($id);
         if (!$artikel) {
-            return response()->json(['message' => 'Artikel tidak ditemukan'], 404);
+            abort(404); // akan munculkan halaman error Laravel
         }
-        return response()->json($artikel);
+
+        return view('adminpusat.artikel.show', compact('artikel'));
     }
 
     // Menambahkan artikel baru
@@ -31,47 +33,96 @@ class ArtikelController extends Controller
             'judul_artikel' => 'required|string|max:255',
             'tanggal_publikasi' => 'required|date',
             'deskripsi_singkat' => 'required|string|max:255',
-            'gambar' => 'required|string|max:255',
-            'link_artikel' => 'required|string|max:255',
-            'status' => 'integer|in:0,1',
+            'gambar' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'link_artikel' => 'required|url|max:255',
+            'status' => 'required|integer|in:0,1',
         ]);
 
-        $artikel = Artikel::create($request->all());
+        // Simpan gambar
+        $gambarPath = $request->file('gambar')->store('artikel', 'public');
 
-        return response()->json(['message' => 'Artikel berhasil ditambahkan', 'data' => $artikel], 201);
+        // Simpan data ke database
+        Artikel::create([
+            'judul_artikel' => $request->judul_artikel,
+            'tanggal_publikasi' => $request->tanggal_publikasi,
+            'deskripsi_singkat' => $request->deskripsi_singkat,
+            'gambar' => $gambarPath,
+            'link_artikel' => $request->link_artikel,
+            'status' => $request->status,
+        ]);
+
+        // Redirect kembali dengan pesan sukses
+        return redirect()->route('artikel.index')->with('success', 'Artikel berhasil ditambahkan.');
     }
+
 
     // Mengupdate artikel
     public function update(Request $request, $id)
     {
-        $artikel = Artikel::find($id);
-        if (!$artikel) {
-            return response()->json(['message' => 'Artikel tidak ditemukan'], 404);
-        }
-
         $request->validate([
-            'judul_artikel' => 'string|max:255',
-            'tanggal_publikasi' => 'date',
-            'deskripsi_singkat' => 'string|max:255',
-            'gambar' => 'string|max:255',
-            'link_artikel' => 'string|max:255',
-            'status' => 'integer|in:0,1',
+            'judul_artikel' => 'required|string|max:255',
+            'tanggal_publikasi' => 'required|date',
+            'deskripsi_singkat' => 'nullable|string|max:255',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'link_artikel' => 'required|url|max:255',
+            'status' => 'required|integer|in:0,1',
         ]);
 
-        $artikel->update($request->all());
+        $artikel = Artikel::findOrFail($id);
 
-        return response()->json(['message' => 'Artikel berhasil diperbarui', 'data' => $artikel]);
+        $artikel->judul_artikel = $request->judul_artikel;
+        $artikel->tanggal_publikasi = $request->tanggal_publikasi;
+        $artikel->deskripsi_singkat = $request->deskripsi_singkat;
+        $artikel->link_artikel = $request->link_artikel;
+        $artikel->status = $request->status;
+
+        // Jika user upload gambar baru
+        if ($request->hasFile('gambar')) {
+            $path = $request->file('gambar')->store('artikel', 'public');
+            $artikel->gambar = $path;
+        }
+
+        $artikel->save();
+
+        return redirect()->route('artikel.index')->with('success', 'Artikel berhasil diperbarui.');
     }
+    public function create()
+    {
+        return view('adminpusat.artikel.create'); // ganti path sesuai lokasi view form kamu
+    }
+
+    public function edit($id)
+    {
+        $artikel = Artikel::findOrFail($id);
+        return view('adminpusat.artikel.edit', compact('artikel'));
+    }
+
 
     // Menghapus artikel
     public function destroy($id)
     {
-        $artikel = Artikel::find($id);
-        if (!$artikel) {
-            return response()->json(['message' => 'Artikel tidak ditemukan'], 404);
+        $artikel = Artikel::findOrFail($id);
+
+        // Hapus gambar jika ada
+        if ($artikel->gambar && \Storage::exists('public/' . $artikel->gambar)) {
+            \Storage::delete('public/' . $artikel->gambar);
         }
 
         $artikel->delete();
-        return response()->json(['message' => 'Artikel berhasil dihapus']);
+
+        return redirect()->route('artikel.index')->with('success', 'Artikel berhasil dihapus');
     }
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:0,1',
+        ]);
+
+        $artikel = Artikel::findOrFail($id);
+        $artikel->status = $request->status;
+        $artikel->save();
+
+        return back()->with('success', 'Status artikel diperbarui.');
+    }
+
 }
