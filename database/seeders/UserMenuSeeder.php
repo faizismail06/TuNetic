@@ -73,9 +73,9 @@ class UserMenuSeeder extends Seeder
         // // Akun Menu (sekarang menu utama)
         $akun = Menu::create([
             'nama_menu' => 'Akun',
-            'url' => 'user/akun',
-            'icon' => '',
-            'parent_id' => $menuUser->id,
+            'url' => 'masyarakat/profile/akun',
+            'icon' => 'fa-solid fa-key',
+            'parent_id' => $profileUser->id,
             'urutan' => 1
         ]);
 
@@ -85,13 +85,9 @@ class UserMenuSeeder extends Seeder
         // adi Petugas Menu (sekarang menu utama)
         $jadiPetugas = Menu::create([
             'nama_menu' => 'Jadi Petugas',
-
-            'url' => 'user/jadipetugas',
-
-            'url' => 'user/jadi-petugas/form',
-
-            'icon' => '',
-            'parent_id' => $menuUser->id,
+            'url' => 'masyarakat/profile/akun',
+            'icon' => 'fa-solid fa-repeat',
+            'parent_id' => $profileUser->id,
             'urutan' => 2
         ]);
 
