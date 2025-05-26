@@ -28,7 +28,7 @@
                         <div class="card-header">
                             <h3 class="card-title">Data Armada</h3>
                             <div class="card-tools">
-                                <a href="{{ route('manage-rute.create') }}" class="btn btn-sm btn-success">
+                                <a href="{{ route('manage-armada.create') }}" class="btn btn-sm btn-success">
                                     <i class="fas fa-plus-circle mr-1"></i> Tambah Armada
                                 </a>
                             </div>
@@ -64,9 +64,9 @@
                                                         <i class="fas fa-cog"></i>
                                                     </button>
                                                     <div class="dropdown-menu dropdown-menu-right" role="menu">
-                                                        <a class="dropdown-item" href="{{ route('manage-rute.edit', $item->id) }}">Edit</a>
+                                                        <a class="dropdown-item" href="{{ route('manage-armada.edit', $item->id) }}">Edit</a>
                                                         <div class="dropdown-divider"></div>
-                                                        <form action="{{ route('manage-rute.destroy', $item->id) }}" class="form-delete" method="POST">
+                                                        <form action="{{ route('manage-armada.destroy', $item->id) }}" class="form-delete" method="POST">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="button" class="dropdown-item text-danger btn-delete">Hapus</button>
@@ -111,7 +111,7 @@
     <script src="{{ asset('plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
     <script src="{{ asset('plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
 
-    {{-- <script>
+    <script>
         @if (session('success'))
             Swal.fire({
                 icon: 'success',
@@ -172,31 +172,6 @@
                 }
             });
         });
-        document.querySelectorAll('.btn-detail-rute').forEach(button => {
-            button.addEventListener('click', async () => {
-                const id = button.getAttribute('data-id');
-                const overlay = document.getElementById('modalOverlay');
-                const content = document.getElementById('ruteContent');
-
-                overlay.style.display = 'flex'; // Agar bisa center via flex
-                content.innerHTML = 'Memuat...';
-
-                try {
-                    const response = await fetch(`/api/rute/${id}`);
-                    const data = await response.json();
-
-                    content.innerHTML = `
-                        <p><strong>TPS 1:</strong> ${data.TPS1}</p>
-                        <p><strong>TPS 2:</strong> ${data.TPS2}</p>
-                        <p><strong>TPS 3:</strong> ${data.TPS3}</p>
-                        <p><strong>TPST:</strong> ${data.TPST}</p>
-                        <p><strong>TPA:</strong> ${data.TPA}</p>
-                    `;
-                } catch (err) {
-                    content.innerHTML = '<p class="text-danger">Gagal memuat data.</p>';
-                }
-            });
-        });
 
         // Tutup jika klik tombol
         document.getElementById('closeModalBtn').addEventListener('click', function () {
@@ -209,5 +184,5 @@
                 this.style.display = 'none';
             }
         });
-    </script> --}}
+    </script>
 @endpush

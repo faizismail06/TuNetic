@@ -1300,5 +1300,268 @@
                 document.getElementById('tracking-status').textContent = 'Tracking aktif (offline mode)';
             }
         });
+
+
+        // Fungsi untuk pelacakan lokasi yang ditingkatkan dengan compass surrogate
+        function enhancedLocationTracking() {
+            // Variabel untuk menyimpan history lokasi
+            let locationHistory = [];
+            // Variabel untuk menyimpan arah (bearing)
+            let currentBearing = 0;
+            // Kecepatan minimum untuk menghitung arah yang valid (dalam m/s)
+            const MIN_SPEED_FOR_BEARING = 1.5;
+
+            // Fungsi untuk memulai tracking dengan dukungan arah (compass surrogate)
+            function startEnhancedTracking() {
+                if (trackingInterval) {
+                    clearInterval(trackingInterval);
+                }
+
+                if (watchId) {
+                    navigator.geolocation.clearWatch(watchId);
+                }
+
+                // Reset history lokasi
+                locationHistory = [];
+
+                // Mulai tracking dengan opsi yang ditingkatkan
+                if (navigator.geolocation) {
+                    // Dapatkan posisi awal
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            // Simpan posisi awal ke history
+                            const initialPosition = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                                timestamp: position.timestamp,
+                                accuracy: position.coords.accuracy,
+                                speed: position.coords.speed || 0
+                            };
+                            locationHistory.push(initialPosition);
+
+                            // Update lokasi dan kirim ke server
+                            updateLocationAndSendEnhanced(position);
+                        },
+                        handleLocationError, {
+                            enableHighAccuracy: true,
+                            maximumAge: 0,
+                            timeout: 10000
+                        }
+                    );
+
+                    // Lakukan polling lokasi dengan interval untuk mendapatkan data lebih sering
+                    trackingInterval = setInterval(function() {
+                        navigator.geolocation.getCurrentPosition(
+                            function(position) {
+                                updateLocationAndSendEnhanced(position);
+                            },
+                            handleLocationError, {
+                                enableHighAccuracy: true,
+                                maximumAge: 0,
+                                timeout: 10000
+                            }
+                        );
+                    }, 5000); // Polling setiap 5 detik
+                } else {
+                    alert('Browser Anda tidak mendukung Geolocation');
+                }
+            }
+
+            // Fungsi untuk menghitung bearing (arah) berdasarkan 2 titik koordinat
+            function calculateBearing(startLat, startLng, endLat, endLng) {
+                startLat = toRadians(startLat);
+                startLng = toRadians(startLng);
+                endLat = toRadians(endLat);
+                endLng = toRadians(endLng);
+
+                const y = Math.sin(endLng - startLng) * Math.cos(endLat);
+                const x = Math.cos(startLat) * Math.sin(endLat) -
+                    Math.sin(startLat) * Math.cos(endLat) * Math.cos(endLng - startLng);
+                let bearing = Math.atan2(y, x);
+
+                // Konversi dari radian ke derajat
+                bearing = toDegrees(bearing);
+
+                // Normalisasi bearing ke 0-360
+                return (bearing + 360) % 360;
+            }
+
+            // Konversi derajat ke radian
+            function toRadians(degrees) {
+                return degrees * (Math.PI / 180);
+            }
+
+            // Konversi radian ke derajat
+            function toDegrees(radians) {
+                return radians * (180 / Math.PI);
+            }
+
+            // Fungsi untuk menghaluskan data lokasi dan menghitung arah
+            function updateLocationAndSendEnhanced(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const accuracy = position.coords.accuracy;
+                const speed = position.coords.speed || 0; // m/s
+                const timestamp = position.timestamp;
+
+                // Filter lokasi berdasarkan akurasi
+                if (accuracy > 100) { // Jika akurasi lebih dari 50 meter, abaikan
+                    console.log(`Mengabaikan lokasi dengan akurasi rendah: ${accuracy}m`);
+                    document.getElementById('location-info').textContent =
+                        `Mencari sinyal GPS yang lebih akurat... (${accuracy.toFixed(1)}m)`;
+                    return;
+                }
+
+                // Tambahkan ke history lokasi
+                locationHistory.push({
+                    lat,
+                    lng,
+                    timestamp,
+                    accuracy,
+                    speed
+                });
+
+                // Batasi jumlah history yang disimpan
+                if (locationHistory.length > 5) {
+                    locationHistory.shift();
+                }
+
+                // Hitung bearing (arah) jika ada minimal 2 titik dan kecepatan cukup
+                if (locationHistory.length >= 2 && speed >= MIN_SPEED_FOR_BEARING) {
+                    const prevLocation = locationHistory[locationHistory.length - 2];
+
+                    // Hitung bearing saat ini
+                    const newBearing = calculateBearing(
+                        prevLocation.lat, prevLocation.lng,
+                        lat, lng
+                    );
+
+                    // Update bearing saat ini dengan smoothing
+                    if (Math.abs(newBearing - currentBearing) < 180) {
+                        // Smoothing sederhana untuk menghindari lompatan
+                        currentBearing = currentBearing * 0.7 + newBearing * 0.3;
+                    } else {
+                        // Jika ada lompatan besar (misalnya dari 359° ke 1°), gunakan nilai baru
+                        currentBearing = newBearing;
+                    }
+                }
+
+                // Update marker pada peta
+                if (marker && map) {
+                    marker.setLatLng([lat, lng]);
+
+                    // Update rotasi marker berdasarkan bearing jika kecepatan cukup
+                    if (speed >= MIN_SPEED_FOR_BEARING) {
+                        // Gunakan custom icon dengan rotasi
+                        const markerIcon = L.divIcon({
+                            className: 'tps-icon',
+                            html: `<div style="transform: rotate(${currentBearing}deg); line-height: 30px;"><i class="fas fa-truck"></i></div>`,
+                            iconSize: [30, 30]
+                        });
+                        marker.setIcon(markerIcon);
+                    }
+
+                    // Pastikan marker terlihat di dalam view
+                    if (!map.getBounds().contains(marker.getLatLng())) {
+                        map.panTo(marker.getLatLng());
+                    }
+
+                    // Update info lokasi dengan informasi tambahan
+                    document.getElementById('location-info').textContent =
+                        `Posisi: ${lat.toFixed(6)}, ${lng.toFixed(6)} | Akurasi: ${accuracy.toFixed(1)}m | Arah: ${currentBearing.toFixed(0)}° | Kecepatan: ${(speed * 3.6).toFixed(1)} km/h`;
+
+                    // Update rute jika rute sedang ditampilkan dan ada jadwal aktif
+                    if (isRouteVisible && activeJadwalId && tpsData[activeJadwalId]) {
+                        // Perbarui rute dengan posisi terbaru hanya jika lokasi cukup berubah
+                        if (locationHistory.length >= 2) {
+                            const prevLocation = locationHistory[locationHistory.length - 2];
+                            const distance = L.latLng(prevLocation.lat, prevLocation.lng).distanceTo(L.latLng(lat, lng));
+
+                            // Update rute hanya jika berpindah minimal 20 meter
+                            if (distance > 20) {
+                                drawRouteBetweenTps(tpsData[activeJadwalId]);
+                            }
+                        }
+                    }
+                }
+
+                // Kirim data ke server jika ada jadwal aktif
+                if (activeJadwalId) {
+                    // Tambahkan bearing dan kecepatan ke data yang dikirim
+                    sendEnhancedLocationToServer(lat, lng, accuracy, currentBearing, speed);
+
+                    // Update counter dan tampilkan
+                    trackingCounter++;
+                    if (trackingCounterElement) {
+                        trackingCounterElement.textContent = `Update ke-${trackingCounter}`;
+                    }
+
+                    // Perbarui status TPS jika dekat dengan lokasi saat ini
+                    updateTpsStatusBasedOnLocation(lat, lng);
+                }
+            }
+
+            // Fungsi untuk mengirim data lokasi yang ditingkatkan ke server
+            function sendEnhancedLocationToServer(lat, lng, accuracy, bearing, speed) {
+                // Data untuk dikirim dengan informasi tambahan
+                const locationData = {
+                    id_jadwal_operasional: activeJadwalId,
+                    latitude: lat,
+                    longitude: lng,
+                    accuracy: accuracy, // akurasi dalam meter
+                    bearing: bearing, // arah dalam derajat (0-360)
+                    speed: speed // kecepatan dalam m/s
+                };
+
+                // Kirim ke server
+                fetch('/petugas/jadwal-pengambilan/save-location', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(locationData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('Lokasi yang ditingkatkan berhasil disimpan:', data);
+                        } else {
+                            console.error('Gagal menyimpan lokasi:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error saat menyimpan lokasi:', error);
+
+                        // Jika offline, simpan data untuk dikirim nanti
+                        if (!navigator.onLine) {
+                            offlineQueue.push({
+                                type: 'location',
+                                data: locationData,
+                                timestamp: new Date().getTime()
+                            });
+
+                            // Simpan ke localStorage
+                            saveOfflineData();
+                        }
+                    });
+            }
+
+            // Return fungsi yang diekspos ke luar
+            return {
+                startEnhancedTracking: startEnhancedTracking,
+                // Fungsi tambahan lainnya yang mungkin perlu diekspos
+            };
+        }
+
+        // Inisialisasi dan ekspos fungsi ke global scope
+        const locationTracker = enhancedLocationTracking();
+
+        // Ganti fungsi startGpsTracking asli dengan versi yang ditingkatkan
+        function startGpsTracking() {
+            // Gunakan fungsi yang ditingkatkan
+            locationTracker.startEnhancedTracking();
+        }
     </script>
 @endpush

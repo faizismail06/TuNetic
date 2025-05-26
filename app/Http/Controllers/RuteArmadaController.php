@@ -58,8 +58,8 @@ class RuteArmadaController extends Controller
             $jadwalOperasional = JadwalOperasional::with([
                 'armada',
                 'jadwal',
-                'ruteTps.rute',
-                'ruteTps.lokasi_tps',
+                'rute',
+                'rute.ruteTps.lokasi_tps',
                 'penugasanPetugas.petugas.user'
             ])
                 ->whereHas('jadwal', function ($query) use ($selectedDay) {
@@ -74,7 +74,7 @@ class RuteArmadaController extends Controller
 
             foreach ($jadwalOperasional as $jadwal) {
                 // Dapatkan semua TPS dalam rute untuk jadwal ini
-                $ruteId = $jadwal->ruteTps->rute->id ?? null;
+                $ruteId = $jadwal->rute->id ?? null;
 
                 if ($ruteId) {
                     $tpsPoints = RuteTps::with('lokasi_tps')
@@ -122,7 +122,7 @@ class RuteArmadaController extends Controller
 
                     // Simpan data rute
                     $routeData[$jadwal->id] = [
-                        'nama_rute' => $jadwal->ruteTps->rute->nama_rute ?? 'Rute Tidak Tersedia',
+                        'nama_rute' => $jadwal->rute->nama_rute ?? 'Rute Tidak Tersedia',
                         'warna' => '#' . substr(md5($jadwal->id), 0, 6), // Generate warna unik per jadwal
                         'status' => $jadwal->status
                     ];
@@ -212,8 +212,8 @@ class RuteArmadaController extends Controller
             $jadwal = JadwalOperasional::with([
                 'armada',
                 'jadwal',
-                'ruteTps.rute',
-                'ruteTps.lokasi_tps',
+                'rute',
+                'rute.ruteTps.lokasi_tps',
                 'penugasanPetugas.petugas.user'
             ])->findOrFail($id);
 
@@ -235,7 +235,7 @@ class RuteArmadaController extends Controller
                     'kapasitas' => $jadwal->armada->kapasitas
                 ],
                 'rute' => [
-                    'nama_rute' => $jadwal->ruteTps->rute->nama_rute
+                    'nama_rute' => $jadwal->rute->nama_rute
                 ],
                 'petugas' => $jadwal->penugasanPetugas->map(function ($penugasan) {
                     return [
