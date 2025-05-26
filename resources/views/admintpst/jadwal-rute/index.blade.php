@@ -370,6 +370,68 @@
             border-color: #adb5bd;
         }
 
+        /* Tambahkan CSS ini di dalam <style> tag yang sudah ada */
+
+        /* Filter Dropdown Styles */
+        .dropdown-menu {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+        }
+
+        .dropdown-menu .form-label {
+            font-weight: 500;
+            color: #495057;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dropdown-menu .form-control,
+        .dropdown-menu .form-select {
+            font-size: 0.875rem;
+            border-radius: 0.25rem;
+        }
+
+        .dropdown-menu .btn {
+            font-size: 0.875rem;
+        }
+
+        /* Filter button active state */
+        .btn-group .dropdown-toggle:focus {
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        /* Show entries styling */
+        .form-select[style*="width: auto"] {
+            min-width: 70px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .d-flex.align-items-center.gap-3 {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 0.5rem;
+            }
+
+            .dropdown-menu {
+                position: static !important;
+                transform: none !important;
+                width: 100%;
+                margin-top: 0.5rem;
+                border: 1px solid #dee2e6;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        /* Remove old control panel styles since we're not using it anymore */
+
         /* Text utilities */
         .text-sm {
             font-size: 0.875rem !important;
@@ -423,6 +485,8 @@
     </style>
 @endpush
 
+<!-- Bagian yang perlu diubah di section content -->
+
 @section('content')
     <!-- Header - Match second code style -->
     <div class="content-header">
@@ -442,63 +506,9 @@
 
     <div class="content">
         <div class="container-fluid">
-            <!-- Control Panel -->
-            <div class="card card-success card-outline control-panel">
-                <div class="card-header">
-                    <h5 class="m-0">Filter & Pencarian</h5>
-                </div>
-                <div class="card-body">
-                    <form method="GET" action="{{ route('jadwal-rute.index') }}" class="filter-form">
-                        <div class="filter-group">
-                            <label for="search">Cari</label>
-                            <input type="text" class="form-control" id="search" name="search"
-                                value="{{ $currentSearch }}" placeholder="No. Polisi, Rute...">
-                        </div>
 
-                        <div class="filter-group">
-                            <label for="status">Status</label>
-                            <select class="form-select" id="status" name="status">
-                                @foreach ($statusOptions as $value => $label)
-                                    <option value="{{ $value }}" {{ $currentStatus == $value ? 'selected' : '' }}>
-                                        {{ $label }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="date">Tanggal</label>
-                            <input type="date" class="form-control" id="date" name="date"
-                                value="{{ $currentDate }}">
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="per_page">Show</label>
-                            <select class="form-select" id="per_page" name="per_page">
-                                <option value="5" {{ $currentPerPage == 5 ? 'selected' : '' }}>5</option>
-                                <option value="10" {{ $currentPerPage == 10 ? 'selected' : '' }}>10</option>
-                                <option value="25" {{ $currentPerPage == 25 ? 'selected' : '' }}>25</option>
-                                <option value="50" {{ $currentPerPage == 50 ? 'selected' : '' }}>50</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <button type="submit" class="btn btn-success btn-sm">
-                                <i class="fas fa-search me-2"></i>Filter
-                            </button>
-                        </div>
-
-                        <div class="filter-group">
-                            <button type="button" class="btn btn-success btn-sm" onclick="exportData()">
-                                <i class="fas fa-download me-2"></i>Export
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Map Container -->
-            <div class="card card-success card-outline map-container">
+            <!-- Map Container - Pindahkan ke atas -->
+            <div class="card map-container">
                 <div class="card-header">
                     <h5 class="m-0">
                         <i class="fas fa-map-marked-alt me-2"></i>
@@ -507,6 +517,77 @@
                 </div>
                 <div class="card-body">
                     <div id="map"></div>
+                </div>
+            </div>
+
+            <!-- Filter Section - Pindahkan ke bawah map dengan tampilan baru -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <!-- Filter Button -->
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-secondary dropdown-toggle"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-filter me-2"></i>Filter
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 300px;">
+                                <form method="GET" action="{{ route('jadwal-rute.index') }}" id="filterForm">
+                                    <div class="mb-3">
+                                        <label for="search" class="form-label">Cari</label>
+                                        <input type="text" class="form-control form-control-sm" id="search"
+                                            name="search" value="{{ $currentSearch }}" placeholder="No. Polisi, Rute...">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="status" class="form-label">Status</label>
+                                        <select class="form-select form-select-sm" id="status" name="status">
+                                            <option value="">Semua Status</option>
+                                            <option value="0" {{ $currentStatus == '0' ? 'selected' : '' }}>Belum
+                                                Berjalan</option>
+                                            <option value="1" {{ $currentStatus == '1' ? 'selected' : '' }}>Berjalan
+                                            </option>
+                                            <option value="2" {{ $currentStatus == '2' ? 'selected' : '' }}>Selesai
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="date" class="form-label">Tanggal</label>
+                                        <input type="date" class="form-control form-control-sm" id="date"
+                                            name="date" value="{{ $currentDate }}">
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                                            <i class="fas fa-search me-1"></i>Terapkan
+                                        </button>
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="resetFilter()">
+                                            <i class="fas fa-times me-1"></i>Reset
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Show entries dan Export -->
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="d-flex align-items-center">
+                                <label for="per_page" class="me-2 text-muted">Show</label>
+                                <select class="form-select form-select-sm" id="per_page" name="per_page"
+                                    onchange="changePerPage()" style="width: auto;">
+                                    <option value="5" {{ $currentPerPage == 5 ? 'selected' : '' }}>5</option>
+                                    <option value="10" {{ $currentPerPage == 10 ? 'selected' : '' }}>10</option>
+                                    <option value="25" {{ $currentPerPage == 25 ? 'selected' : '' }}>25</option>
+                                    <option value="50" {{ $currentPerPage == 50 ? 'selected' : '' }}>50</option>
+                                </select>
+                                <span class="ms-2 text-muted">entries</span>
+                            </div>
+
+                            <button type="button" class="btn btn-success btn-sm" onclick="exportData()">
+                                <i class="fas fa-download me-2"></i>Export
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -520,6 +601,7 @@
                         </button>
                     </div>
                 </div>
+                <!-- Sisa kode table tetap sama -->
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped text-sm">
@@ -561,9 +643,6 @@
                                                         onclick="showArmadaDetail({{ $data['id'] }})">
                                                         <i class="fas fa-eye me-1"></i>Detail
                                                     </a>
-                                                    {{-- <a class="dropdown-item" href="#">
-                                                        <i class="fas fa-edit me-1"></i>Edit
-                                                    </a> --}}
                                                 </div>
                                             </div>
                                         </td>
@@ -591,7 +670,7 @@
         </div>
     </div>
 
-    <!-- Modal Detail Armada -->
+    <!-- Modal Detail Armada tetap sama -->
     <div class="modal fade" id="armadaDetailModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -939,13 +1018,13 @@
                             </div>
 
                             ${detail.petugas && detail.petugas.length > 0 ? `
-                                            <div class="row mt-4">
-                                                <div class="col-12">
-                                                    <h6 class="text-info mb-3">
-                                                        <i class="fas fa-users me-2"></i>Tim Petugas
-                                                    </h6>
-                                                    <div class="row">
-                                                        ${detail.petugas.map(petugas => `
+                                                                                        <div class="row mt-4">
+                                                                                            <div class="col-12">
+                                                                                                <h6 class="text-info mb-3">
+                                                                                                    <i class="fas fa-users me-2"></i>Tim Petugas
+                                                                                                </h6>
+                                                                                                <div class="row">
+                                                                                                    ${detail.petugas.map(petugas => `
                                                 <div class="col-md-6 mb-2">
                                                     <div class="card border-0 bg-light">
                                                         <div class="card-body py-2">
@@ -955,47 +1034,47 @@
                                                     </div>
                                                 </div>
                                             `).join('')}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ` : ''}
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    ` : ''}
 
                             ${detail.last_tracking ? `
-                                            <div class="row mt-4">
-                                                <div class="col-12">
-                                                    <h6 class="text-warning mb-3">
-                                                        <i class="fas fa-map-marker-alt me-2"></i>Tracking Terakhir
-                                                    </h6>
-                                                    <div class="card border-0 bg-light">
-                                                        <div class="card-body">
-                                                            <div class="row">
-                                                                <div class="col-md-4">
-                                                                    <small class="text-muted">Latitude</small>
-                                                                    <div class="fw-bold">${detail.last_tracking.latitude}</div>
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <small class="text-muted">Longitude</small>
-                                                                    <div class="fw-bold">${detail.last_tracking.longitude}</div>
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <small class="text-muted">Waktu Update</small>
-                                                                    <div class="fw-bold">${detail.last_tracking.timestamp}</div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ` : `
-                                            <div class="row mt-4">
-                                                <div class="col-12">
-                                                    <div class="alert alert-info text-center">
-                                                        <i class="fas fa-info-circle me-2"></i>
-                                                        Belum ada data tracking untuk armada ini
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        `}
+                                                                                        <div class="row mt-4">
+                                                                                            <div class="col-12">
+                                                                                                <h6 class="text-warning mb-3">
+                                                                                                    <i class="fas fa-map-marker-alt me-2"></i>Tracking Terakhir
+                                                                                                </h6>
+                                                                                                <div class="card border-0 bg-light">
+                                                                                                    <div class="card-body">
+                                                                                                        <div class="row">
+                                                                                                            <div class="col-md-4">
+                                                                                                                <small class="text-muted">Latitude</small>
+                                                                                                                <div class="fw-bold">${detail.last_tracking.latitude}</div>
+                                                                                                            </div>
+                                                                                                            <div class="col-md-4">
+                                                                                                                <small class="text-muted">Longitude</small>
+                                                                                                                <div class="fw-bold">${detail.last_tracking.longitude}</div>
+                                                                                                            </div>
+                                                                                                            <div class="col-md-4">
+                                                                                                                <small class="text-muted">Waktu Update</small>
+                                                                                                                <div class="fw-bold">${detail.last_tracking.timestamp}</div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    ` : `
+                                                                                        <div class="row mt-4">
+                                                                                            <div class="col-12">
+                                                                                                <div class="alert alert-info text-center">
+                                                                                                    <i class="fas fa-info-circle me-2"></i>
+                                                                                                    Belum ada data tracking untuk armada ini
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    `}
                         `;
                     } else {
                         content.innerHTML = `
@@ -1318,6 +1397,32 @@
             });
         }
 
+        // Function untuk handle perubahan per page
+        function changePerPage() {
+            const perPage = document.getElementById('per_page').value;
+            const url = new URL(window.location);
+            url.searchParams.set('per_page', perPage);
+            url.searchParams.delete('page'); // Reset halaman ke 1
+            window.location.href = url.toString();
+        }
+
+        // Function untuk reset filter
+        function resetFilter() {
+            const url = new URL(window.location);
+            // Hapus semua parameter filter
+            url.searchParams.delete('search');
+            url.searchParams.delete('status');
+            url.searchParams.delete('date');
+            url.searchParams.delete('page');
+            // Tutup dropdown
+            const dropdown = bootstrap.Dropdown.getInstance(document.querySelector('[data-bs-toggle="dropdown"]'));
+            if (dropdown) {
+                dropdown.hide();
+            }
+            window.location.href = url.toString();
+        }
+
+
         // Update the original function to use enhanced version
         window.showRouteForArmada = showRouteForArmadaEnhanced;
         window.hideRouteForArmada = hideRouteForArmada;
@@ -1335,11 +1440,22 @@
             console.log('Peta jadwal operasional berhasil dimuat');
             console.log('Data armada:', mapData.length);
             console.log('Data TPS:', allTpsForMap.length);
+            // Handle dropdown events
+            const filterDropdown = document.querySelector('.dropdown-menu');
+            if (filterDropdown) {
+                // Prevent dropdown from closing when clicking inside
+                filterDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
         });
 
         // Global functions for window access
         window.exportData = exportData;
         window.showArmadaDetail = showArmadaDetail;
         window.updateArmadaPositions = updateArmadaPositions;
+        // Update existing window functions
+        window.changePerPage = changePerPage;
+        window.resetFilter = resetFilter;
     </script>
 @endpush
