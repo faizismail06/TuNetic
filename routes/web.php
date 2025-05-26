@@ -147,7 +147,9 @@ Route::resource('tracking-armada', TrackingArmadaController::class)->only(['inde
 // ===================
 // ARTIKEL
 // ===================
-Route::apiResource('artikel', ArtikelController::class);
+// Route::apiResource('artikel', ArtikelController::class);
+Route::resource('artikel', ArtikelController::class);
+Route::patch('/artikel/{id}/status', [ArtikelController::class, 'updateStatus'])->name('artikel.updateStatus');
 
 // ===================
 // BACKUP
