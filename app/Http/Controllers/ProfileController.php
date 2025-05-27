@@ -32,6 +32,21 @@ class ProfileController extends Controller
         return view('masyarakat.profile.index', compact('user', 'provinces'));
     }
 
+    // Tambahan untuk Admin TPST Profile Index
+    public function adminTpstIndex()
+    {
+        $user = Auth::user();
+        
+        // Pastikan user adalah admin TPST (level 2)
+        if ($user->level !== 2) {
+            return redirect()->back()->with('error', 'Akses ditolak. Anda bukan Admin TPST.');
+        }
+
+        $provinces = Province::all();
+
+        return view('admin_tpst.profile.index', compact('user', 'provinces'));
+    }
+
     public function petugasIndex()
     {
         Log::info('Mengakses petugasIndex');
@@ -124,6 +139,66 @@ public function updatePassword(Request $request)
         $user->save();
 
         return redirect()->route('masyarakat.profile.index')->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    // Tambahan method untuk Admin TPST Update
+    public function adminTpstUpdate(Request $request)
+    {
+        $user = Auth::user();
+
+        // Pastikan user adalah admin TPST (level 2)
+        if ($user->level !== 2) {
+            return redirect()->back()->with('error', 'Akses ditolak. Anda bukan Admin TPST.');
+        }
+
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'no_telepon' => 'required|string|max:15',
+            'province_id' => 'required|exists:reg_provinces,id',
+            'regency_id' => 'required|exists:reg_regencies,id',
+            'district_id' => 'required|exists:reg_districts,id',
+            'village_id' => 'required|exists:reg_villages,id',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $user->fill($request->only([
+            'name',
+            'email',
+            'no_telepon',
+            'province_id',
+            'regency_id',
+            'district_id',
+            'village_id',
+            'alamat'
+        ]));
+
+        if ($request->hasFile('gambar')) {
+            $uploadPath = 'public/profile';
+
+            if (!Storage::exists($uploadPath)) {
+                Storage::makeDirectory($uploadPath);
+            }
+
+            if ($user->gambar && Storage::exists("$uploadPath/{$user->gambar}")) {
+                Storage::delete("$uploadPath/{$user->gambar}");
+            }
+
+            $file = $request->file('gambar');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs($uploadPath, $filename);
+            $user->gambar = $filename;
+        }
+
+        $user->save();
+
+        return redirect()->route('admin_tpst.profile.index')->with('success', 'Profil berhasil diperbarui.');
     }
 
     public function petugasUpdate(Request $request)
@@ -228,7 +303,7 @@ public function updatePassword(Request $request)
         if ($user->level === 1) {
             return redirect()->route('admin.profile.index')->with('success', 'Profil berhasil diperbarui.');
         } elseif ($user->level === 2) {
-            return redirect()->route('admintpst.profile.index')->with('success', 'Profil berhasil diperbarui.');
+            return redirect()->route('admin_tpst.profile.index')->with('success', 'Profil berhasil diperbarui.');
         } elseif ($user->level === 3) {
             return redirect()->route('petugas.profile.index')->with('success', 'Profil berhasil diperbarui.');
         } elseif ($user->level === 4) {

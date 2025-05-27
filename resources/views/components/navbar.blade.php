@@ -468,7 +468,7 @@
             </div>
 
             @if  (Auth::check())
-                <div class="masyarakat.profilee-container">
+                <div class="masyarakat.profile-container">
                     <div class="profile" id="profileToggle">
                         <span>{{ Auth::user()->name }}</span>
                         <img src="{{ asset(Auth::user()->photo ?? 'assets/images/default-user.png') }}" alt="Profile">
@@ -479,7 +479,7 @@
                             <div class="user-name">{{ Auth::user()->name }}</div>
                             <div class="user-role">{{ $currentRole }}</div>
                         </div>
-                        <a href="{{ route('profil.index') }}" class="profile-dropdown-item">
+                        <a href="{{ route('profile.index') }}" class="profile-dropdown-item">
                             <i class="fas fa-user"></i>
                             Detail Profile
                         </a>

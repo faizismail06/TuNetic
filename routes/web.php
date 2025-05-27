@@ -221,7 +221,7 @@ Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
 
 //  Route Admin TPST
 Route::prefix('tpst')->name('admin_tpst.')->group(function () {
-    Route::get('/home', [DashboardController::class, 'indexTpst'])->name('admintpst.dashboard.index');
+    Route::get('/home', [DashboardController::class, 'indexTpst'])->name('admin_tpst.dashboard.index');
 });
 
 Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
@@ -232,6 +232,17 @@ Route::get('/get-regencies/{province}', [ProfileController::class, 'getRegencies
 Route::get('/get-districts/{regency}', [ProfileController::class, 'getDistricts'])->name('get.districts');
 Route::get('/get-villages/{district}', [ProfileController::class, 'getVillages'])->name('get.villages');
 
+// Halaman Profil untuk Admin TPST
+Route::prefix('tpst')->name('admin_tpst.')->middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'userIndex'])->name('admin_tpst.profile.index');
+    Route::put('/profile', [ProfileController::class, 'userUpdate'])->name('profile.update');
+    Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
+
+    // Dropdown wilayah dinamis
+    Route::get('/get-regencies/{province_id}', [ProfileController::class, 'getRegencies'])->name('get.regencies');
+    Route::get('/get-districts/{regency_id}', [ProfileController::class, 'getDistricts'])->name('get.districts');
+    Route::get('/get-villages/{district_id}', [ProfileController::class, 'getVillages'])->name('get.villages');
+});
 
 // Route::prefix('petugas')->name('petugas.')->middleware(['auth', 'level:3'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'petugasIndex'])->name('profile.index');
@@ -363,13 +374,13 @@ Route::middleware(['auth'])->prefix('masyarakat')->name('masyarakat.')->group(fu
     Route::get('/jadi-petugas/success', [JadiPetugasController::class, 'success'])->name('jadi-petugas.success');
 });
 
-// Routes untuk CRUD petugas (khusus admin)
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/petugas', [JadiPetugasController::class, 'index'])->name('jadi-petugas.index');
-    Route::get('/petugas/create', [JadiPetugasController::class, 'create'])->name('jadi-petugas.create');
-    Route::post('/petugas', [JadiPetugasController::class, 'store'])->name('jadi-petugas.store');
-    Route::get('/petugas/{id}', [JadiPetugasController::class, 'show'])->name('jadi-petugas.show');
-    Route::get('/petugas/{id}/edit', [JadiPetugasController::class, 'edit'])->name('jadi-petugas.edit');
-    Route::put('/petugas/{id}', [JadiPetugasController::class, 'update'])->name('jadi-petugas.update');
-    Route::delete('/petugas/{id}', [JadiPetugasController::class, 'destroy'])->name('jadi-petugas.destroy');
-});
+// // Routes untuk CRUD petugas (khusus admin)
+// Route::middleware(['auth', 'role:admin'])->group(function () {
+//     Route::get('/petugas', [JadiPetugasController::class, 'index'])->name('jadi-petugas.index');
+//     Route::get('/petugas/create', [JadiPetugasController::class, 'create'])->name('jadi-petugas.create');
+//     Route::post('/petugas', [JadiPetugasController::class, 'store'])->name('jadi-petugas.store');
+//     Route::get('/petugas/{id}', [JadiPetugasController::class, 'show'])->name('jadi-petugas.show');
+//     Route::get('/petugas/{id}/edit', [JadiPetugasController::class, 'edit'])->name('jadi-petugas.edit');
+//     Route::put('/petugas/{id}', [JadiPetugasController::class, 'update'])->name('jadi-petugas.update');
+//     Route::delete('/petugas/{id}', [JadiPetugasController::class, 'destroy'])->name('jadi-petugas.destroy');
+// });
