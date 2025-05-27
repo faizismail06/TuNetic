@@ -32,6 +32,6 @@ class DatabaseSeeder extends Seeder
         $this->call(VillagesTableSeeder::class);
         $this->call(LokasiTpsSeeder::class);
         $this->call(TambahanSeeder::class);
-        $this->call(UserSeeder::class);
+        // $this->call(UserSeeder::class);
     }
 }
