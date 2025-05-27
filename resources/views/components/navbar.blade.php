@@ -12,6 +12,12 @@
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Essential Meta Tags untuk Responsive -->
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, maximum-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
 
     <!-- Additional styles -->
     @yield('styles')
@@ -429,7 +435,7 @@
                             @if (count($submenu->submenus) == '0')
                                 {{-- Tautan Tunggal --}}
                                 <a href="{{ url($submenu->url) }}"
-                                class="nav-link {{ Request::is(ltrim($submenu->url, '/')) ? 'active' : '' }}">
+                                    class="nav-link {{ Request::is(ltrim($submenu->url, '/')) ? 'active' : '' }}">
                                     <i class="{{ $submenu->icon }}"></i>
                                     {{ ucwords($submenu->nama_menu) }}
                                 </a>
@@ -454,7 +460,7 @@
                                     <div class="dropdown-content">
                                         @foreach ($submenu->submenus as $endmenu)
                                             <a href="{{ url($endmenu->url) }}"
-                                            class="{{ Request::is(ltrim($endmenu->url, '/')) ? 'active' : '' }}">
+                                                class="{{ Request::is(ltrim($endmenu->url, '/')) ? 'active' : '' }}">
                                                 <i class="far fa-circle"></i>
                                                 {{ ucwords($endmenu->nama_menu) }}
                                             </a>
@@ -466,7 +472,7 @@
                     @endforeach
                 @endforeach
             </div>
-            
+
             @if (Auth::check())
                 <div class="profile-container">
                     <div class="profile" id="profileToggle">
@@ -505,7 +511,7 @@
 
             <!-- Logout Modal -->
             <div class="modal" id="modal-logout">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5>Konfirmasi Logout</h5>
