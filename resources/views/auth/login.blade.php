@@ -16,7 +16,6 @@
             $redirect = match ($level) {
                 4 => '/masyarakat',
                 1 => '/admin',
-                default => '/home'
             };
         @endphp
         <script>window.location.href = "{{ $redirect }}";</script>

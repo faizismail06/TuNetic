@@ -19,15 +19,13 @@ class LoginController extends Controller
 
         // Redirection berdasarkan role setelah verifikasi email
         if ($role === 'admin_pusat') {
-            return '/admin/home';
+            return '/pusat/home';
         } elseif ($role === 'admin_tpst') {
             return '/tpst/home';
         } elseif ($role === 'petugas') {
             return '/petugas';
         } elseif ($role === 'user') {
             return '/masyarakat';
-        } else {
-            return '/home'; // Default fallback jika role tidak dikenali
         }
     }
 
