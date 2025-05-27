@@ -103,6 +103,15 @@ class MasterSeeder extends Seeder
         ]);
         $petugas->assignRole('petugas');
 
+        $petugas = User::create([
+            'name' => 'Petugas Sampah 2',
+            'email' => 'petugas2@example.com',
+            'password' => Hash::make('petugaspetugas'),
+            'alamat' => 'Jl. Kebersihan No. 67',
+            'level' => 3,
+        ]);
+        $petugas->assignRole('petugas');
+
         $user = User::create([
             'name' => 'User Biasa',
             'email' => 'user@example.com',
