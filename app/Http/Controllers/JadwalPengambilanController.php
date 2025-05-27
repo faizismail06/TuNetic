@@ -69,7 +69,7 @@ class JadwalPengambilanController extends Controller
                     ->whereIn('status', [0, 1]) // Status 0=Belum Berjalan, 1=Sedang Berjalan
                     ->whereHas('penugasanPetugas', function ($query) use ($petugasId) {
                         $query->where('id_petugas', $petugasId);
-                    })
+                    })  
                     ->where('id', $jadwalId)
                     ->first();
 

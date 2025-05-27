@@ -12,7 +12,7 @@ class PetugasSeeder extends Seeder
     public function run(): void
     {
         // Ambil user berdasarkan email atau nama tertentu
-        $user = User::where('email', 'petugas1@resq.local')->first();
+        $user = User::where('email', 'petugas@example.com')->first();
 
         if (!$user) {
             $this->command->warn('User belum tersedia untuk penugasan petugas.');
@@ -23,7 +23,7 @@ class PetugasSeeder extends Seeder
             'user_id' => $user->id,
             'email' => $user->email,
             'name' => $user->name,
-            'username' => 'petugasresq',
+            'username' => 'petugastunetic',
             'password' => $user->password, // bisa pakai ulang password-nya
             'nomor' => '081234567890',
             'tanggal_lahir' => '1995-05-10',
@@ -34,7 +34,7 @@ class PetugasSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
         // Ambil user berdasarkan email atau nama tertentu
-        $user = User::where('email', 'petugas2@resq.local')->first();
+        $user = User::where('email', 'petugas2@example.com')->first();
 
         if (!$user) {
             $this->command->warn('User belum tersedia untuk penugasan petugas.');
@@ -45,7 +45,7 @@ class PetugasSeeder extends Seeder
             'user_id' => $user->id,
             'email' => $user->email,
             'name' => $user->name,
-            'username' => 'petugasresq',
+            'username' => 'petugastunetic2',
             'password' => $user->password, // bisa pakai ulang password-nya
             'nomor' => '081234567890',
             'tanggal_lahir' => '1995-05-10',
@@ -56,27 +56,27 @@ class PetugasSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        // Ambil user berdasarkan email atau nama tertentu
-        $user = User::where('email', 'petugas3@resq.local')->first();
+        // // Ambil user berdasarkan email atau nama tertentu
+        // $user = User::where('email', 'petugas3@resq.local')->first();
 
-        if (!$user) {
-            $this->command->warn('User belum tersedia untuk penugasan petugas.');
-            return;
-        }
+        // if (!$user) {
+        //     $this->command->warn('User belum tersedia untuk penugasan petugas.');
+        //     return;
+        // }
 
-        Petugas::create([
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'name' => $user->name,
-            'username' => 'petugasresq',
-            'password' => $user->password, // bisa pakai ulang password-nya
-            'nomor' => '081234567900',
-            'tanggal_lahir' => '1995-05-10',
-            'alamat' => $user->alamat,
-            'sim_image' => null,
-            'alasan_bergabung' => 'Bergabung untuk bantu lingkungan.',
-            'role' => 'Petugas',
-            'email_verified_at' => now(),
-        ]);
+        // Petugas::create([
+        //     'user_id' => $user->id,
+        //     'email' => $user->email,
+        //     'name' => $user->name,
+        //     'username' => 'petugasresq',
+        //     'password' => $user->password, // bisa pakai ulang password-nya
+        //     'nomor' => '081234567900',
+        //     'tanggal_lahir' => '1995-05-10',
+        //     'alamat' => $user->alamat,
+        //     'sim_image' => null,
+        //     'alasan_bergabung' => 'Bergabung untuk bantu lingkungan.',
+        //     'role' => 'Petugas',
+        //     'email_verified_at' => now(),
+        // ]);
     }
 }
