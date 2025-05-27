@@ -429,7 +429,7 @@
                             @if (count($submenu->submenus) == '0')
                                 {{-- Tautan Tunggal --}}
                                 <a href="{{ url($submenu->url) }}"
-                                class="nav-link {{ Request::is(ltrim($submenu->url, '/')) ? 'active' : '' }}">
+                                    class="nav-link {{ Request::is(ltrim($submenu->url, '/')) ? 'active' : '' }}">
                                     <i class="{{ $submenu->icon }}"></i>
                                     {{ ucwords($submenu->nama_menu) }}
                                 </a>
@@ -454,7 +454,7 @@
                                     <div class="dropdown-content">
                                         @foreach ($submenu->submenus as $endmenu)
                                             <a href="{{ url($endmenu->url) }}"
-                                            class="{{ Request::is(ltrim($endmenu->url, '/')) ? 'active' : '' }}">
+                                                class="{{ Request::is(ltrim($endmenu->url, '/')) ? 'active' : '' }}">
                                                 <i class="far fa-circle"></i>
                                                 {{ ucwords($endmenu->nama_menu) }}
                                             </a>
@@ -466,7 +466,7 @@
                     @endforeach
                 @endforeach
             </div>
-            
+
             @if (Auth::check())
                 <div class="profile-container">
                     <div class="profile" id="profileToggle">
@@ -505,7 +505,7 @@
 
             <!-- Logout Modal -->
             <div class="modal" id="modal-logout">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5>Konfirmasi Logout</h5>
