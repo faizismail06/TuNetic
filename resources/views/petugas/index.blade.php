@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @push('css')
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('') }}plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <link rel="stylesheet" href="{{ asset('') }}plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
@@ -67,11 +68,12 @@
                                                         <a class="dropdown-item"
                                                             href="{{ route('petugas.detail', $item->id) }}">Detail</a>
                                                         <div class="dropdown-divider"></div>
-                                                        <form action="{{ route('petugas.destroy', $item->id) }}" method="POST"
-                                                            style="display:inline;">
+                                                        <form action="{{ route('petugas.destroy', $item->id) }}"
+                                                            method="POST" style="display:inline;">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="dropdown-item text-danger">Hapus</button>
+                                                            <button type="submit"
+                                                                class="dropdown-item text-danger">Hapus</button>
                                                         </form>
                                                     </div>
                                                 </div>
