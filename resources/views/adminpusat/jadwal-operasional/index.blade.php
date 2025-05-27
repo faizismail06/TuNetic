@@ -46,6 +46,7 @@
                             <th>Jam</th>
                             <th>Petugas</th>
                             <th>Tugas</th>
+                            <th>Laporan</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -77,6 +78,15 @@
                                     @endif
                                 </td>
                                 <td>
+                                    @if ($item->laporan)
+                                        <a href="{{ route('laporan-warga.show', $item->laporan->id) }}">
+                                            {{ $item->laporan->judul }}
+                                        </a>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-outline-info dropdown-toggle" data-toggle="dropdown">
                                             <i class="fas fa-cog"></i>
@@ -99,11 +109,5 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-
 @endsection
 
