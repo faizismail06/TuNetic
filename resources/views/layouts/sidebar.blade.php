@@ -6,7 +6,7 @@
                 <li class="nav-item text-white">
                     <a href="{{ url($submenu->url) }}"
                         class="nav-link text-white {{ Request::segment(1) == $submenu->url ? 'active' : '' }}">
-                        <i class="nav-icon text-white {{ $submenu->icon }}"></i>
+                        <i class="nav-icon {{ $submenu->icon }}"></i>
                         <p>
                             {{ ucwords($submenu->nama_menu) }}
                         </p>
@@ -18,9 +18,9 @@
                         $urls[] = $url->url;
                     @endphp
                 @endforeach
-                <li class="nav-item text-white {{ in_array(Request::segment(1), $urls) ? 'menu-open' : '' }}">
+                <li class="nav-item text-white{{ in_array(Request::segment(1), $urls) ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link text-white {{ in_array(Request::segment(1), $urls) ? 'active' : '' }}">
-                        <i class="nav-icon text-white {{ $submenu->icon }}"></i>
+                        <i class="nav-icon {{ $submenu->icon }}"></i>
                         <p>
                             {{ ucwords($submenu->nama_menu) }}
                             <i class="fas fa-angle-left right"></i>
@@ -28,7 +28,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         @foreach ($submenu->submenus as $endmenu)
-                            <li class="nav-item">
+                            <li class="nav-item text-white">
                                 <a href="{{ url($endmenu->url) }}"
                                     class="nav-link {{ Request::segment(1) == $endmenu->url ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>

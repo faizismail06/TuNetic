@@ -81,7 +81,7 @@ class MasterSeeder extends Seeder
         // Create sample users for each role
         $adminPusat = User::create([
             'name' => 'Admin Pusat',
-            'email' => 'admin.pusat@example.com',
+            'email' => 'admin.pusat@tunetic.com',
             'password' => Hash::make('adminadmin'),
             'alamat' => 'Jl. Pusat No. 123',
             'level' => 1,
@@ -90,7 +90,7 @@ class MasterSeeder extends Seeder
 
         $adminTpst = User::create([
             'name' => 'Admin TPST',
-            'email' => 'admin.tpst@example.com',
+            'email' => 'admin.tpst@tunetic.com',
             'password' => Hash::make('admintpst'),
             'alamat' => 'Jl. TPST No. 45',
             'level' => 2,
@@ -99,7 +99,16 @@ class MasterSeeder extends Seeder
 
         $petugas = User::create([
             'name' => 'Petugas Sampah',
-            'email' => 'petugas@example.com',
+            'email' => 'petugas@tunetic.com',
+            'password' => Hash::make('petugaspetugas'),
+            'alamat' => 'Jl. Kebersihan No. 67',
+            'level' => 3,
+        ]);
+        $petugas->assignRole('petugas');
+
+        $petugas = User::create([
+            'name' => 'Petugas Sampah 2',
+            'email' => 'petugas2@tunetic.com',
             'password' => Hash::make('petugaspetugas'),
             'alamat' => 'Jl. Kebersihan No. 67',
             'level' => 3,
@@ -108,7 +117,7 @@ class MasterSeeder extends Seeder
 
         $user = User::create([
             'name' => 'User Biasa',
-            'email' => 'user@example.com',
+            'email' => 'user@tunetic.com',
             'password' => Hash::make('useruser'),
             'alamat' => 'Jl. Warga No. 89',
             'level' => 4,

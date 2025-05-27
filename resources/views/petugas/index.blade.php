@@ -67,7 +67,7 @@
                                                         <a class="dropdown-item"
                                                             href="{{ route('petugas.detail', $item->id) }}">Detail</a>
                                                         <div class="dropdown-divider"></div>
-                                                        <form action="{{ route('petugas.destroy', $item->id) }}" method="POST"
+                                                        <form action="{{ route('manage-petugas.destroy', $item->id) }}" method="POST"
                                                             style="display:inline;">
                                                             @csrf
                                                             @method('DELETE')

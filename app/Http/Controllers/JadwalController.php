@@ -8,8 +8,9 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use App\Models\JadwalOperasional;
 use App\Models\Armada;
-use App\Models\RuteTps;
+use App\Models\Rute;
 use App\Models\Petugas;
+use App\Models\JadwalTemplate;
 use App\Models\PenugasanPetugas;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -21,8 +22,8 @@ class JadwalController extends Controller
      */
     public function index()
     {
-        $jadwals = Jadwal::all();
-        return view('adminpusat.daftar-jadwal.index', compact('jadwals'));
+        $jadwal = Jadwal::all();
+        return view('adminpusat.daftar-jadwal.index', compact('jadwal'));
     }
 
     /**
@@ -103,24 +104,6 @@ class JadwalController extends Controller
         return view('adminpusat.daftar-jadwal.generate');
     }
 
-    /**
-     * Helper fungsi: dapatkan nama hari berdasarkan dayOfWeek Carbon
-     */
-    private function getNamaHari($dayOfWeek)
-    {
-        $hari = [
-            0 => 'Minggu',
-            1 => 'Senin',
-            2 => 'Selasa',
-            3 => 'Rabu',
-            4 => 'Kamis',
-            5 => 'Jumat',
-            6 => 'Sabtu',
-        ];
-
-        return $hari[$dayOfWeek] ?? 'Tidak diketahui';
-    }
-
     public function generateStore(Request $request)
     {
         $validated = $request->validate([
@@ -128,99 +111,60 @@ class JadwalController extends Controller
             'bulan_akhir' => 'required|date_format:Y-m|after_or_equal:bulan_mulai',
         ]);
 
-        $template = [
-            'Minggu' => [
-                'armada_id' => 4,
-                'rute_tps_id' => 4,
-                'petugas' => [1, 2],
-                // 'petugas' => [13, 14],
-            ],
-            'Senin' => [
-                'armada_id' => 1,
-                'rute_tps_id' => 1,
-                'petugas' => [1, 2],
-            ],
-            'Selasa' => [
-                'armada_id' => 1,
-                'rute_tps_id' => 1,
-                'petugas' => [1, 2],
-                // 'petugas' => [3, 4],
-            ],
-            'Rabu' => [
-                'armada_id' => 2,
-                'rute_tps_id' => 2,
-                'petugas' => [1, 2],
-                // 'petugas' => [5, 6],
-            ],
-            'Kamis' => [
-                'armada_id' => 2,
-                'rute_tps_id' => 2,
-                'petugas' => [1, 2],
-                // 'petugas' => [7, 8],
-            ],
-            'Jumat' => [
-                'armada_id' => 3,
-                'rute_tps_id' => 3,
-                'petugas' => [1, 2],
-                // 'petugas' => [9, 10],
-            ],
-            'Sabtu' => [
-                'armada_id' => 3,
-                'rute_tps_id' => 3,
-                'petugas' => [1, 2],
-                // 'petugas' => [11, 12],
-            ],
-        ];
-
-
         DB::beginTransaction();
 
         try {
             $startDate = Carbon::parse($validated['bulan_mulai'] . '-01')->startOfMonth();
             $endDate = Carbon::parse($validated['bulan_akhir'] . '-01')->endOfMonth();
-
-            // Ambil semua tanggal dari bulan mulai ke bulan akhir
             $period = CarbonPeriod::create($startDate, $endDate);
 
-            foreach ($period as $date) {
-                $hari = $this->getNamaHari($date->dayOfWeek);
+            foreach ($period as $tanggal) {
+                $namaHari = $this->getNamaHari($tanggal->dayOfWeek);
 
-                if (isset($template[$hari])) {
-                    // Ambil data dari template
-                    $dataTemplate = $template[$hari];
+                // Ambil semua template untuk hari itu
+                $templates = JadwalTemplate::with('petugasTemplate')->where('hari', $namaHari)->get();
 
-                    $jadwal = Jadwal::where('hari', $hari)->first();
-                    if (!$jadwal) {
-                        throw new \Exception("Jadwal untuk hari {$hari} tidak ditemukan.");
-                    }
-
-                    // Insert ke jadwal_operasional
+                foreach ($templates as $template) {
                     $jadwalOperasional = JadwalOperasional::create([
-                        'id_armada' => $dataTemplate['armada_id'],
-                        'id_jadwal' => $jadwal->id, // pastikan sudah ada jadwal hari itu
-                        'id_rute_tps' => $dataTemplate['rute_tps_id'],
-                        'tanggal' => $date->toDateString(), // INI DITAMBAHKAN!
-                        'jam_aktif' => '07:00:00', // misal default jam aktif
-                        'status' => 1, // aktif
+                        'id_jadwal' => Jadwal::where('hari', $namaHari)->first()->id,
+                        'id_armada' => $template->id_armada,
+                        'id_rute' => $template->id_rute, // rute_tps bisa diganti ke rute utama
+                        'tanggal' => $tanggal->format('Y-m-d'),
+                        'jam_aktif' => '07:00:00',
+                        'status' => 1,
                     ]);
 
-                    // Insert penugasan petugas
-                    foreach ($dataTemplate['petugas'] as $petugasId) {
+                    foreach ($template->petugasTemplate as $petugas) {
                         PenugasanPetugas::create([
-                            'id_petugas' => $petugasId,
                             'id_jadwal_operasional' => $jadwalOperasional->id,
-                            'tugas' => 2, // default tugas 1 (Driver) atau 2 (Pickup), bisa diatur nanti
+                            'id_petugas' => $petugas->id_petugas,
+                            'tugas' => $petugas->tugas,
                         ]);
                     }
                 }
             }
 
             DB::commit();
-
-            return redirect()->route('daftar-jadwal.index')->with('success', 'Jadwal berhasil digenerate!');
+            return redirect()->route('jadwal-operasional.index')->with('success', 'Jadwal berhasil digenerate!');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal generate jadwal: ' . $e->getMessage())->withInput();
         }
+    }
+
+    /**
+     * Helper fungsi: dapatkan nama hari berdasarkan dayOfWeek Carbon
+     */
+    private function getNamaHari($dayOfWeek)
+    {
+        return [
+            0 => 'Minggu',
+            1 => 'Senin',
+            2 => 'Selasa',
+            3 => 'Rabu',
+            4 => 'Kamis',
+            5 => 'Jumat',
+            6 => 'Sabtu',
+        ][$dayOfWeek] ?? 'Tidak diketahui';
     }
 }

@@ -10,25 +10,22 @@ class LoginController extends Controller
 {
     use AuthenticatesUsers;
 
-    /**
-     * Override method redirectTo untuk menentukan redirect berdasarkan role.
-     *
-     * @return string
-     */
+    // JANGAN TULIS PROPERTY INI
+    // protected $redirectTo = '/home';
+
     protected function redirectTo()
     {
-        $role = (Auth::user()->roles->first())->name;
+        $role = Auth::user()->roles->first()->name; // Ambil nama role user
 
+        // Redirection berdasarkan role setelah verifikasi email
         if ($role === 'admin_pusat') {
-            return '/admin/home';
+            return '/pusat/home';
         } elseif ($role === 'admin_tpst') {
-            return '/admin-tpst/home';
+            return '/tpst/home';
         } elseif ($role === 'petugas') {
-            return '/petugas/home';
-        } elseif ($role === 'warga') {
-            return '/warga/beranda';
-        } else {
-            return '/admin/home'; // default fallback
+            return '/petugas';
+        } elseif ($role === 'user') {
+            return '/masyarakat';
         }
     }
 

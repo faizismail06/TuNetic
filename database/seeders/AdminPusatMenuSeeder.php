@@ -27,7 +27,7 @@ class AdminPusatMenuSeeder extends Seeder
         // Dashboard Admin Pusat
         $dashboardAdmin = Menu::create([
             'nama_menu' => 'Dashboard',
-            'url' => 'admin/home',
+            'url' => 'pusat/home',
             'icon' => 'fas fa-home',
             'parent_id' => $menuAdminPusat->id,
             'urutan' => 1
@@ -47,7 +47,7 @@ class AdminPusatMenuSeeder extends Seeder
         // Kelola User
         $kelolaUser = Menu::create([
             'nama_menu' => 'Kelola User',
-            'url' => 'manage-user',
+            'url' => 'pusat/manage-user',
             'parent_id' => $manajemenData->id,
             'urutan' => 1
         ]);
@@ -60,7 +60,7 @@ class AdminPusatMenuSeeder extends Seeder
         // Kelola Petugas
         $kelolaPetugas = Menu::create([
             'nama_menu' => 'Kelola Petugas',
-            'url' => 'manage-petugas',
+            'url' => 'pusat/manage-petugas',
             'parent_id' => $manajemenData->id,
             'urutan' => 2
         ]);
@@ -73,7 +73,7 @@ class AdminPusatMenuSeeder extends Seeder
         // Kelola Armada
         $kelolaArmada = Menu::create([
             'nama_menu' => 'Kelola Armada',
-            'url' => 'manage-armada',
+            'url' => 'pusat/manage-armada',
             'parent_id' => $manajemenData->id,
             'urutan' => 3
         ]);
@@ -86,7 +86,7 @@ class AdminPusatMenuSeeder extends Seeder
         // Kelola Rute
         $kelolaRute = Menu::create([
             'nama_menu' => 'Kelola Rute',
-            'url' => 'manage-rute',
+            'url' => 'pusat/manage-rute',
             'parent_id' => $manajemenData->id,
             'urutan' => 4
         ]);
@@ -99,7 +99,7 @@ class AdminPusatMenuSeeder extends Seeder
         // Kelola TPS/TPST
         $kelolaTps = Menu::create([
             'nama_menu' => 'Kelola Tps/Tpst',
-            'url' => 'lokasi-tps',
+            'url' => 'pusat/lokasi-tps',
             'parent_id' => $manajemenData->id,
             'urutan' => 5
         ]);
@@ -112,7 +112,7 @@ class AdminPusatMenuSeeder extends Seeder
         // Laporan Pengaduan
         $laporanPengaduan = Menu::create([
             'nama_menu' => 'Laporan Pengaduan',
-            'url' => 'laporan-pengaduan',
+            'url' => 'pusat/laporan-pengaduan',
             'icon' => 'far fa-comment',
             'parent_id' => $menuAdminPusat->id,
             'urutan' => 3
@@ -125,7 +125,7 @@ class AdminPusatMenuSeeder extends Seeder
         // Artikel
         $artikel = Menu::create([
             'nama_menu' => 'Artikel',
-            'url' => 'artikel',
+            'url' => 'pusat/artikel',
             'icon' => 'fas fa-newspaper',
             'parent_id' => $menuAdminPusat->id,
             'urutan' => 4
@@ -148,7 +148,7 @@ class AdminPusatMenuSeeder extends Seeder
         // Daftar Jadwal
         $daftarJadwal = Menu::create([
             'nama_menu' => 'Daftar Jadwal',
-            'url' => 'daftar-jadwal',
+            'url' => 'pusat/daftar-jadwal',
             'parent_id' => $jadwalArmada->id,
             'urutan' => 1
         ]);
@@ -161,7 +161,7 @@ class AdminPusatMenuSeeder extends Seeder
         // Jadwal Operasional
         $jadwalOperasional = Menu::create([
             'nama_menu' => 'Jadwal Operasional',
-            'url' => 'jadwal-operasional',
+            'url' => 'pusat/jadwal-operasional',
             'parent_id' => $jadwalArmada->id,
             'urutan' => 2
         ]);
@@ -174,7 +174,7 @@ class AdminPusatMenuSeeder extends Seeder
         // Perhitungan Sampah
         $perhitunganSampah = Menu::create([
             'nama_menu' => 'Perhitungan Sampah',
-            'url' => 'perhitungan-sampah',
+            'url' => 'pusat/perhitungan-sampah',
             'icon' => 'fas fa-calculator',
             'parent_id' => $menuAdminPusat->id,
             'urutan' => 6
@@ -184,18 +184,6 @@ class AdminPusatMenuSeeder extends Seeder
         Permission::create(['name' => 'read_perhitungan', 'menu_id' => $perhitunganSampah->id]);
         Permission::create(['name' => 'update_perhitungan', 'menu_id' => $perhitunganSampah->id]);
         Permission::create(['name' => 'delete_perhitungan', 'menu_id' => $perhitunganSampah->id]);
-
-        // Profile
-        $profileAdmin = Menu::create([
-            'nama_menu' => 'Profile',
-            'url' => 'admin/profile',
-            'icon' => 'fas fa-user',
-            'parent_id' => $menuAdminPusat->id,
-            'urutan' => 7
-        ]);
-
-        Permission::create(['name' => 'access_profile', 'menu_id' => $profileAdmin->id]);
-        Permission::create(['name' => 'update_profile', 'menu_id' => $profileAdmin->id]);
 
         // Backup Server Menu (Admin Only)
         $backupServer = Menu::create([
@@ -208,7 +196,7 @@ class AdminPusatMenuSeeder extends Seeder
 
         $backupDatabase = Menu::create([
             'nama_menu' => 'Backup Database',
-            'url' => 'dbbackup',
+            'url' => 'pusat/dbbackup',
             'icon' => 'fas fa-database',
             'parent_id' => $backupServer->id,
             'urutan' => 1

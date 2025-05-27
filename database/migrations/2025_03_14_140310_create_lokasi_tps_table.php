@@ -13,13 +13,14 @@ return new class extends Migration {
         Schema::create('lokasi_tps', function (Blueprint $table) {
             $table->id();
             $table->string('nama_lokasi');
+
             $table->char('province_id', 2); // Sesuai dengan tipe data di reg_provinces
             $table->char('regency_id', 4); // Sesuai dengan tipe data di reg_regencies
             $table->char('district_id', 7); // Sesuai dengan tipe data di reg_districts
             $table->char('village_id', 10); // Sesuai dengan tipe data di reg_villages
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
-            // $table->string('wilayah_id'); //FK Wilayah
+            // $table->integer('level')->default(0);
             $table->timestamps();
 
             $table->foreign('province_id')->references('id')->on('reg_provinces')->onDelete('cascade');

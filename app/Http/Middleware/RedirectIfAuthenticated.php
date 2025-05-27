@@ -23,10 +23,15 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+                // Cek level user, jika level 4, arahkan ke halaman masyarakat
+                if (Auth::user()->level == 4) {
+                    return redirect('/masyarakat');  // Arahkan ke halaman masyarakat
+                }
+    
+                // Jika level tidak 4, arahkan ke halaman home
+                return redirect(RouteServiceProvider::HOME); // Arahkan ke halaman home
             }
         }
-
         return $next($request);
     }
 }
