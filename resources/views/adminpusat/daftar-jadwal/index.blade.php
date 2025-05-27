@@ -40,12 +40,25 @@ $(document).ready(function () {
 @endpush --}}
 
 @section('content')
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6 text-uppercase">
+                    <h4 class="m-0">Master Jadwal</h4>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
 <div class="content">
-    <div class="container-fluid mt-4">
+    <div class="container-fluid">
         <div class="card card-success card-outline">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="m-0">Daftar Jadwal</h5>
-                <div>
+            <div class="card-header">
+                <h3 class="card-title">Daftar Jadwal</h3>
+                <div class="card-tools">
                     {{-- <a href="{{ route('daftar-jadwal.generate.form') }}" class="btn btn-sm btn-success mr-2">
                         <i class="fas fa-sync-alt"></i> Generate Jadwal
                     </a> --}}
@@ -107,9 +120,9 @@ $(document).ready(function () {
 <div class="content">
     <div class="container-fluid mt-4">
         <div class="card card-success card-outline">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="m-0">Generate Jadwal Operasional</h5>
-                <div>
+            <div class="card-header">
+                <h3 class="card-title">Generate Jadwal Operasional</h3>
+                <div class="card-tools">
                     <a href="/jadwal-template" class="btn btn-success">Kelola Template</a>
                 </div>
             </div>
