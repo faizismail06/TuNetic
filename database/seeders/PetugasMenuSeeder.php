@@ -62,7 +62,7 @@ class PetugasMenuSeeder extends Seeder
         // Profile Petugas
         $profilePetugas = Menu::create([
             'nama_menu' => 'Profile',
-            'url' => '/profile',
+            'url' => 'petugas/profile',
             'icon' => 'fas fa-user',
             'parent_id' => $menuPetugas->id,
             'urutan' => 4

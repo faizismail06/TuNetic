@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.navbar')
 
 @section('content')
     <div class="container">
@@ -19,35 +19,14 @@
 
                         {{-- Form action is dynamic based on user level --}}
                         @php
-                            $formRoute = '';
-                            $ajaxPhotoRoute = '';
-                            $regenciesRoute = '';
-                            $districtsRoute = '';
-                            $villagesRoute = '';
-
-                            if ($user->level === 1) {
-                                $formRoute = route('admin.profile.update');
-                                $ajaxPhotoRoute = route('admin.profile.upload-photo');
-                                $regenciesRoute = 'admin.get.regencies';
-                                $districtsRoute = 'admin.get.districts';
-                                $villagesRoute = 'admin.get.villages';
-                            } elseif ($user->level === 4) {
-                                $formRoute = route('petugas.profile.update');
-                                $ajaxPhotoRoute = route('petugas.profile.upload-photo');
-                                $regenciesRoute = 'petugas.get.regencies';
-                                $districtsRoute = 'petugas.get.districts';
-                                $villagesRoute = 'petugas.get.villages';
-                            } else {
-                                // Fallback for other user types
-                                $formRoute = route('profile.update');
-                                $ajaxPhotoRoute = route('profile.upload-photo');
-                                $regenciesRoute = 'get.regencies';
-                                $districtsRoute = 'get.districts';
-                                $villagesRoute = 'get.villages';
-                            }
+                            $formRoute = route('petugas.profile.update');
+                            $ajaxPhotoRoute = route('petugas.profile.upload-photo');
+                            $regenciesRoute = 'petugas.get.regencies';
+                            $districtsRoute = 'petugas.get.districts';
+                            $villagesRoute = 'petugas.get.villages';
                         @endphp
 
-                        <form method="POST" action="{{ $formRoute }}" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('petugas.profile.update') }}" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
 
@@ -60,10 +39,9 @@
                                         <div class="profile-image-wrapper rounded-circle mx-auto d-flex align-items-center justify-content-center"
                                             style="width: 150px; height: 150px; overflow: hidden; background-color: #f8f9fa; cursor: pointer;"
                                             id="profile-image-clickable">
-                                            @if($user && $user->foto)
-                                                <img id="profile-preview" src="{{ asset('storage/profil/'.$user->foto) }}" 
-                                                    class="img-fluid w-100 h-100" 
-                                                    style="object-fit: cover;" 
+                                            @if ($user && $user->foto)
+                                                <img id="profile-preview" src="{{ asset('storage/profil/' . $user->foto) }}"
+                                                    class="img-fluid w-100 h-100" style="object-fit: cover;"
                                                     alt="Foto Profil">
                                             @else
                                                 <div id="profile-preview"
@@ -81,7 +59,8 @@
                                 <div class="col-md-9">
                                     <div class="d-flex flex-column h-100 justify-content-center">
                                         <div class="d-flex align-items-center mb-2">
-                                            <button type="button" id="btn-choose-photo" class="btn btn-success px-4" style="background-color: #299E63; border-color: #299E63;">
+                                            <button type="button" id="btn-choose-photo" class="btn btn-success px-4"
+                                                style="background-color: #299E63; border-color: #299E63;">
                                                 <i class="fas fa-camera me-2"></i> Pilih Photo
                                             </button>
                                             <input type="file" name="gambar" id="input-gambar" class="d-none"
@@ -188,14 +167,20 @@
                                             class="text-danger">*</span></label>
                                 </div>
                                 <div class="col-md-9">
+                                    <!-- Kecamatan -->
                                     <select name="district_id" id="district"
                                         class="form-control @error('district_id') is-invalid @enderror">
                                         <option value="">Pilih Kecamatan</option>
-                                        @if ($user && $user->district_id)
-                                            <option value="{{ $user->district_id }}" selected>
-                                                {{ $user->district->name ?? '' }}</option>
+                                        @if ($districts ?? false)
+                                            @foreach ($districts as $district)
+                                                <option value="{{ $district->id }}"
+                                                    {{ old('district_id', $user->district_id ?? '') == $district->id ? 'selected' : '' }}>
+                                                    {{ $district->name }}
+                                                </option>
+                                            @endforeach
                                         @endif
                                     </select>
+
                                     @error('district_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -208,14 +193,20 @@
                                             class="text-danger">*</span></label>
                                 </div>
                                 <div class="col-md-9">
+                                    <!-- Desa -->
                                     <select name="village_id" id="village"
                                         class="form-control @error('village_id') is-invalid @enderror">
                                         <option value="">Pilih Desa/Kelurahan</option>
-                                        @if ($user && $user->village_id)
-                                            <option value="{{ $user->village_id }}" selected>
-                                                {{ $user->village->name ?? '' }}</option>
+                                        @if ($villages ?? false)
+                                            @foreach ($villages as $village)
+                                                <option value="{{ $village->id }}"
+                                                    {{ old('village_id', $user->village_id ?? '') == $village->id ? 'selected' : '' }}>
+                                                    {{ $village->name }}
+                                                </option>
+                                            @endforeach
                                         @endif
                                     </select>
+
                                     @error('village_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -235,10 +226,11 @@
                                     <small class="text-muted">Contoh: Jl. Merdeka No. 10, RT 05/RW 02</small>
                                 </div>
                             </div>
-                            
+
                             <div class="row mt-4">
                                 <div class="col-12 text-end">
-                                    <button type="submit" class="btn btn-success px-4" style="background-color: #299E63; border-color: #299E63;">
+                                    <button type="submit" class="btn btn-success px-4"
+                                        style="background-color: #299E63; border-color: #299E63;">
                                         <i class="fas fa-save me-2"></i> Simpan Perubahan
                                     </button>
                                 </div>
@@ -251,7 +243,8 @@
     </div>
 @endsection
 
-@push('styles')
+@push('css')
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .profile-image-wrapper {
             border: 3px solid #e9ecef;
@@ -539,7 +532,7 @@
                                         } else {
                                             console.log(
                                                 'Village option not found in dropdown after fallback'
-                                                );
+                                            );
                                         }
                                     }, 1000);
                                 }

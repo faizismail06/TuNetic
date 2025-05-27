@@ -87,12 +87,12 @@ Route::resource('manage-menu', MenuController::class);
 Route::resource('manage-petugas', PetugasController::class);
 Route::resource('manage-rute', RuteController::class);
 Route::resource('manage-permission', PermissionController::class)->only('store', 'destroy');
-Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
-Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
-Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
-Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
-Route::post('petugas', [PetugasController::class, 'destroy'])->name('petugas.destroy');
-Route::post('petugas', [PetugasController::class, 'index'])->name('petugas.index');
+// Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
+// Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
+// Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
+// Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
+// Route::post('petugas', [PetugasController::class, 'destroy'])->name('petugas.destroy');
+// Route::post('petugas', [PetugasController::class, 'index'])->name('petugas.index');
 Route::get('/rute/{id}/detail', [RuteController::class, 'show'])->name('rute.detail');
 Route::get('/rute/{id_rute}/detail', [RuteController::class, 'detail'])->name('rute.detail');
 Route::get('/api/rute/{id}', [RuteController::class, 'getDetailJson'])->name('api.rute.detail');
@@ -232,8 +232,7 @@ Route::get('/get-regencies/{province}', [ProfileController::class, 'getRegencies
 Route::get('/get-districts/{regency}', [ProfileController::class, 'getDistricts'])->name('get.districts');
 Route::get('/get-villages/{district}', [ProfileController::class, 'getVillages'])->name('get.villages');
 
-
-// Route::prefix('petugas')->name('petugas.')->middleware(['auth', 'level:3'])->group(function () {
+Route::prefix('petugas')->name('petugas.')->middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'petugasIndex'])->name('profile.index');
     Route::put('/profile', [ProfileController::class, 'petugasUpdate'])->name('profile.update');
     Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
@@ -242,7 +241,7 @@ Route::get('/get-villages/{district}', [ProfileController::class, 'getVillages']
     Route::get('/get-regencies/{province_id}', [ProfileController::class, 'getRegencies'])->name('get.regencies');
     Route::get('/get-districts/{regency_id}', [ProfileController::class, 'getDistricts'])->name('get.districts');
     Route::get('/get-villages/{district_id}', [ProfileController::class, 'getVillages'])->name('get.villages');
-// });
+});
 
 Route::get('/armada', function () {
     return view('armada');
@@ -363,13 +362,14 @@ Route::middleware(['auth'])->prefix('masyarakat')->name('masyarakat.')->group(fu
     Route::get('/jadi-petugas/success', [JadiPetugasController::class, 'success'])->name('jadi-petugas.success');
 });
 
-// Routes untuk CRUD petugas (khusus admin)
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/petugas', [JadiPetugasController::class, 'index'])->name('jadi-petugas.index');
-    Route::get('/petugas/create', [JadiPetugasController::class, 'create'])->name('jadi-petugas.create');
-    Route::post('/petugas', [JadiPetugasController::class, 'store'])->name('jadi-petugas.store');
-    Route::get('/petugas/{id}', [JadiPetugasController::class, 'show'])->name('jadi-petugas.show');
-    Route::get('/petugas/{id}/edit', [JadiPetugasController::class, 'edit'])->name('jadi-petugas.edit');
-    Route::put('/petugas/{id}', [JadiPetugasController::class, 'update'])->name('jadi-petugas.update');
-    Route::delete('/petugas/{id}', [JadiPetugasController::class, 'destroy'])->name('jadi-petugas.destroy');
-});
+// Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+// // Routes untuk CRUD petugas (khusus admin)
+// Route::middleware(['auth', 'role:admin'])->group(function () {
+//     Route::get('/petugas', [JadiPetugasController::class, 'index'])->name('jadi-petugas.index');
+//     Route::get('/petugas/create', [JadiPetugasController::class, 'create'])->name('jadi-petugas.create');
+//     Route::post('/petugas', [JadiPetugasController::class, 'store'])->name('jadi-petugas.store');
+//     Route::get('/petugas/{id}', [JadiPetugasController::class, 'show'])->name('jadi-petugas.show');
+//     Route::get('/petugas/{id}/edit', [JadiPetugasController::class, 'edit'])->name('jadi-petugas.edit');
+//     Route::put('/petugas/{id}', [JadiPetugasController::class, 'update'])->name('jadi-petugas.update');
+//     Route::delete('/petugas/{id}', [JadiPetugasController::class, 'destroy'])->name('jadi-petugas.destroy');
+// });
