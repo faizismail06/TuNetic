@@ -29,8 +29,19 @@ class ProfileController extends Controller
         $user = Auth::user();
         $provinces = Province::all();
 
-        return view('masyarakat.profile.index', compact('user', 'provinces'));
+        $regencies = $user->province_id ? Regency::where('province_id', $user->province_id)->get() : collect();
+        $districts = $user->regency_id ? District::where('regency_id', $user->regency_id)->get() : collect();
+        $villages = $user->district_id ? Village::where('district_id', $user->district_id)->get() : collect();
+
+        return view('masyarakat.profile.index', compact(
+            'user',
+            'provinces',
+            'regencies',
+            'districts',
+            'villages'
+        ));
     }
+
 
     // Tambahan untuk Admin TPST Profile Index
     public function adminTpstIndex()
@@ -52,38 +63,48 @@ class ProfileController extends Controller
         Log::info('Mengakses petugasIndex');
         $user = Auth::user();
         Log::info('User:', $user->toArray());
+
         if ($user->level !== 3) {
             return redirect()->back()->with('error', 'Akses ditolak');
         }
 
+        $petugas = $user->petugas;
         $provinces = Province::all();
 
-        return view('petugas.profile.index', [
-            'user' => $user,
-            'provinces' => $provinces,
-            'petugas' => $user->petugas
+        $regencies = $petugas->province_id ? Regency::where('province_id', $petugas->province_id)->get() : collect();
+        $districts = $petugas->regency_id ? District::where('regency_id', $petugas->regency_id)->get() : collect();
+        $villages = $petugas->district_id ? Village::where('district_id', $petugas->district_id)->get() : collect();
+
+        return view('petugas.profile.index', compact(
+            'user',
+            'petugas',
+            'provinces',
+            'regencies',
+            'districts',
+            'villages'
+        ));
+    }
+
+
+    public function akun()
+    {
+        return view('masyarakat.akun.index', [
+            'user' => auth()->user()
         ]);
     }
 
-    public function akun()
-{
-    return view('masyarakat.akun.index', [
-        'user' => auth()->user()
-    ]);
-}
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
 
-public function updatePassword(Request $request)
-{
-    $request->validate([
-        'new_password' => 'required|string|min:8|confirmed',
-    ]);
-    
-    $user = Auth::user();
-    $user->password = Hash::make($request->new_password);
-    $user->save();
-    
-    return redirect()->route('masyarakat.akun.index')->with('success', 'Password berhasil diubah!');
-}
+        $user = Auth::user();
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return redirect()->route('masyarakat.akun.index')->with('success', 'Password berhasil diubah!');
+    }
 
     // Menambahkan method userUpdate yang hilang
     public function userUpdate(Request $request)
@@ -204,26 +225,71 @@ public function updatePassword(Request $request)
     public function petugasUpdate(Request $request)
     {
         $user = Auth::user();
-        Log::info($user);
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email',
-            'no_telepon' => 'required',
-        ]);
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'no_telepon' => 'required|string|max:15',
+            'province_id' => 'required|exists:reg_provinces,id',
+            'regency_id' => 'required|exists:reg_regencies,id',
+            'district_id' => 'required|exists:reg_districts,id',
+            'village_id' => 'required|exists:reg_villages,id',
+            'alamat' => 'required|string|max:255',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $user->update($request->only(['name', 'email', 'no_telepon']));
+        $user->fill($request->only([
+            'name',
+            'email',
+            'no_telepon',
+            'province_id',
+            'regency_id',
+            'district_id',
+            'village_id',
+            'alamat'
+        ]));
 
-        if ($user->petugas) {
-            $user->petugas->update($request->except(['name', 'email', '_token']));
+
+        // Proses gambar jika ada
+        if ($request->hasFile('gambar')) {
+            $uploadPath = 'public/profile';
+
+            if (!Storage::exists($uploadPath)) {
+                Storage::makeDirectory($uploadPath);
+            }
+
+            if ($user->gambar && Storage::exists("$uploadPath/{$user->gambar}")) {
+                Storage::delete("$uploadPath/{$user->gambar}");
+            }
+
+            $file = $request->file('gambar');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs($uploadPath, $filename);
+            $user->gambar = $filename;
         }
 
-        return redirect()->route('profile.index')->with('success', 'Profil berhasil diperbarui');
+        $user->save();
+
+        // // Update data petugas (relasi)
+        // if ($user->petugas) {
+        //     $user->petugas->update($request->only([
+        //         'province_id',
+        //         'regency_id',
+        //         'district_id',
+        //         'village_id',
+        //         'alamat'
+        //     ]));
+        // }
+
+        return redirect()->route('petugas.profile.index')->with('success', 'Profil berhasil diperbarui.');
     }
+
 
     public function getRegencies($province_id)
     {

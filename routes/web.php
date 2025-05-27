@@ -74,11 +74,11 @@ Route::prefix('masyarakat/akun')->name('masyarakat.akun.')->middleware('auth')->
     Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
 });
 
-// Route untuk pengajuan jadi petugas
-Route::prefix('masyarakat/jadipetugas')->name('masyarakat.jadipetugas.')->middleware('auth')->group(function () {
-    Route::get('/', [jadipetugasController::class, 'JadiPetugasForm'])->name('form');
-    Route::post('/', [jadipetugasController::class, 'submitPetugasRequest'])->name('submit');
-});
+// // Route untuk pengajuan jadi petugas
+// Route::prefix('masyarakat/jadipetugas')->name('masyarakat.jadipetugas.')->middleware('auth')->group(function () {
+//     Route::get('/', [jadipetugasController::class, 'JadiPetugasForm'])->name('form');
+//     Route::post('/', [jadipetugasController::class, 'submitPetugasRequest'])->name('submit');
+// });
 
 // Route::resource('profile', ProfileController::class)->except('destroy');
 Route::resource('manage-user', UserController::class);
@@ -87,12 +87,12 @@ Route::resource('manage-menu', MenuController::class);
 Route::resource('manage-petugas', PetugasController::class);
 Route::resource('manage-rute', RuteController::class);
 Route::resource('manage-permission', PermissionController::class)->only('store', 'destroy');
-Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
-Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
-Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
-Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
-Route::post('petugas', [PetugasController::class, 'destroy'])->name('petugas.destroy');
-Route::post('petugas', [PetugasController::class, 'index'])->name('petugas.index');
+// Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
+// Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
+// Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
+// Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
+// Route::post('petugas', [PetugasController::class, 'destroy'])->name('petugas.destroy');
+// Route::post('petugas', [PetugasController::class, 'index'])->name('petugas.index');
 Route::get('/rute/{id}/detail', [RuteController::class, 'show'])->name('rute.detail');
 Route::get('/rute/{id_rute}/detail', [RuteController::class, 'detail'])->name('rute.detail');
 Route::get('/api/rute/{id}', [RuteController::class, 'getDetailJson'])->name('api.rute.detail');
@@ -248,12 +248,11 @@ Route::prefix('tpst')->name('admin_tpst.')->middleware('auth')->group(function (
     Route::get('/profile', [ProfileController::class, 'petugasIndex'])->name('profile.index');
     Route::put('/profile', [ProfileController::class, 'petugasUpdate'])->name('profile.update');
     Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
-    
+
     // Add these routes if they don't exist
     Route::get('/get-regencies/{province_id}', [ProfileController::class, 'getRegencies'])->name('get.regencies');
     Route::get('/get-districts/{regency_id}', [ProfileController::class, 'getDistricts'])->name('get.districts');
     Route::get('/get-villages/{district_id}', [ProfileController::class, 'getVillages'])->name('get.villages');
-// });
 
 Route::get('/armada', function () {
     return view('armada');
@@ -374,6 +373,7 @@ Route::middleware(['auth'])->prefix('masyarakat')->name('masyarakat.')->group(fu
     Route::get('/jadi-petugas/success', [JadiPetugasController::class, 'success'])->name('jadi-petugas.success');
 });
 
+// Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
 // // Routes untuk CRUD petugas (khusus admin)
 // Route::middleware(['auth', 'role:admin'])->group(function () {
 //     Route::get('/petugas', [JadiPetugasController::class, 'index'])->name('jadi-petugas.index');

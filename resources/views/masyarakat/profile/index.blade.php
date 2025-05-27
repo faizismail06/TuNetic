@@ -19,32 +19,12 @@
 
                         {{-- Form action is dynamic based on user level --}}
                         @php
-                            $formRoute = '';
-                            $ajaxPhotoRoute = '';
-                            $regenciesRoute = '';
-                            $districtsRoute = '';
-                            $villagesRoute = '';
+                            $formRoute = route('masyarakat.profile.update');
+                            $ajaxPhotoRoute = route('masyarakat.profile.upload-photo');
+                            $regenciesRoute = 'masyarakat.get.regencies';
+                            $districtsRoute = 'masyarakat.get.districts';
+                            $villagesRoute = 'masyarakat.get.villages';
 
-                            if ($user->level === 1) {
-                                $formRoute = route('admin.profile.update');
-                                $ajaxPhotoRoute = route('admin.profile.upload-photo');
-                                $regenciesRoute = 'admin.get.regencies';
-                                $districtsRoute = 'admin.get.districts';
-                                $villagesRoute = 'admin.get.villages';
-                            } elseif ($user->level === 4) {
-                                $formRoute = route('masyarakat.profile.update');
-                                $ajaxPhotoRoute = route('masyarakat.profile.upload-photo');
-                                $regenciesRoute = 'masyarakat.get.regencies';
-                                $districtsRoute = 'masyarakat.get.districts';
-                                $villagesRoute = 'masyarakat.get.villages';
-                            } else {
-                                // Fallback for other user types
-                                $formRoute = route('profile.update');
-                                $ajaxPhotoRoute = route('profile.upload-photo');
-                                $regenciesRoute = 'get.regencies';
-                                $districtsRoute = 'get.districts';
-                                $villagesRoute = 'get.villages';
-                            }
                         @endphp
 
                         <form method="POST" action="{{ $formRoute }}" enctype="multipart/form-data">

@@ -39,87 +39,100 @@ $(document).ready(function () {
 </script>
 @endpush --}}
 
-    @section('content')
-    <div class="content">
-        <div class="container-fluid mt-4">
-            <div class="card card-success card-outline">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="m-0">Daftar Jadwal</h5>
-                    <div>
-                        {{-- <a href="{{ route('daftar-jadwal.generate.form') }}" class="btn btn-sm btn-success mr-2">
-                            <i class="fas fa-sync-alt"></i> Generate Jadwal
-                        </a> --}}
-                        <a href="{{ route('daftar-jadwal.create') }}" class="btn btn-sm btn-success">
-                            <i class="fas fa-plus-circle"></i> Tambah Jadwal
-                        </a>
-                    </div>
+@section('content')
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6 text-uppercase">
+                    <h4 class="m-0">Master Jadwal</h4>
                 </div>
-
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="datatable-main" class="table table-bordered table-striped text-sm">
-                            <thead class="text-center">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Hari</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($jadwal as $item)
-                                <tr>
-                                    <td class="text-center">{{ $loop->iteration }}</td>
-                                    <td>{{ $item->hari }}</td>
-                                    <td class="text-center">
-                                        <span class="badge {{ $item->status == 1 ? 'badge-success' : 'badge-secondary' }}">
-                                            {{ $item->status == 1 ? 'Aktif' : 'Tidak Aktif' }}
-                                        </span>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-toggle="dropdown">
-                                                <i class="fas fa-cogs"></i> Aksi
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a class="dropdown-item" href="{{ route('daftar-jadwal.edit', $item->id) }}">
-                                                    <i class="fas fa-edit"></i> Edit
-                                                </a>
-                                                <form action="{{ route('daftar-jadwal.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="dropdown-item text-danger">
-                                                        <i class="fas fa-trash-alt"></i> Hapus
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div> <!-- table responsive -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                    </ol>
                 </div>
             </div>
         </div>
     </div>
-    <div class="content">
-        <div class="container-fluid mt-4">
-            <div class="card card-success card-outline">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="m-0">Generate Jadwal Operasional</h5>
-                    <div>
-                        <a href="/jadwal-template" class="btn btn-success">Kelola Template</a>
-                    </div>
+<div class="content">
+    <div class="container-fluid">
+        <div class="card card-success card-outline">
+            <div class="card-header">
+                <h3 class="card-title">Daftar Jadwal</h3>
+                <div class="card-tools">
+                    {{-- <a href="{{ route('daftar-jadwal.generate.form') }}" class="btn btn-sm btn-success mr-2">
+                        <i class="fas fa-sync-alt"></i> Generate Jadwal
+                    </a> --}}
+                    <a href="{{ route('daftar-jadwal.create') }}" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus-circle"></i> Tambah Jadwal
+                    </a>
                 </div>
-                <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
-                    @if(session('error'))
-                        <div class="alert alert-danger">{{ session('error') }}</div>
-                    @endif
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="datatable-main" class="table table-bordered table-striped text-sm">
+                        <thead class="text-center">
+                            <tr>
+                                <th>No</th>
+                                <th>Hari</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($jadwal as $item)
+                            <tr>
+                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td>{{ $item->hari }}</td>
+                                <td class="text-center">
+                                    <span class="badge {{ $item->status == 1 ? 'badge-success' : 'badge-secondary' }}">
+                                        {{ $item->status == 1 ? 'Aktif' : 'Tidak Aktif' }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-toggle="dropdown">
+                                            <i class="fas fa-cogs"></i> Aksi
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            <a class="dropdown-item" href="{{ route('daftar-jadwal.edit', $item->id) }}">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            <form action="{{ route('daftar-jadwal.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="fas fa-trash-alt"></i> Hapus
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div> <!-- table responsive -->
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content">
+    <div class="container-fluid mt-4">
+        <div class="card card-success card-outline">
+            <div class="card-header">
+                <h3 class="card-title">Generate Jadwal Operasional</h3>
+                <div class="card-tools">
+                    <a href="/jadwal-template" class="btn btn-success">Kelola Template</a>
+                </div>
+            </div>
+            <div class="card-body">
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+                @if(session('error'))
+                    <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
 
                     <form action="{{ route('daftar-jadwal.generate.store') }}" method="POST">
                         @csrf
