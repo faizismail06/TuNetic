@@ -32,11 +32,11 @@
                                 $districtsRoute = 'admin.get.districts';
                                 $villagesRoute = 'admin.get.villages';
                             } elseif ($user->level === 4) {
-                                $formRoute = route('user.profile.update');
-                                $ajaxPhotoRoute = route('user.profile.upload-photo');
-                                $regenciesRoute = 'user.get.regencies';
-                                $districtsRoute = 'user.get.districts';
-                                $villagesRoute = 'user.get.villages';
+                                $formRoute = route('masyarakat.profile.update');
+                                $ajaxPhotoRoute = route('masyarakat.profile.upload-photo');
+                                $regenciesRoute = 'masyarakat.get.regencies';
+                                $districtsRoute = 'masyarakat.get.districts';
+                                $villagesRoute = 'masyarakat.get.villages';
                             } else {
                                 // Fallback for other user types
                                 $formRoute = route('profile.update');

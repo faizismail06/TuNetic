@@ -83,7 +83,7 @@ class JadiPetugasController extends Controller
             // Commit transaksi
             DB::commit();
 
-            return redirect()->route('user.jadipetugas.form')
+            return redirect()->route('masyarakat.jadipetugas.form')
                 ->with('success', 'Permohonan Anda berhasil dikirim. Tunggu verifikasi dari admin.');
 
         } catch (\Exception $e) {

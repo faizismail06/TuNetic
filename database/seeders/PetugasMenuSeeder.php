@@ -49,7 +49,7 @@ class PetugasMenuSeeder extends Seeder
         // Lapor Sampah
         $laporSampah = Menu::create([
             'nama_menu' => 'Lapor Sampah',
-            'url' => 'petugas/lapor',
+            'url' => '/lapor',
             'icon' => 'fas fa-clipboard-list',
             'parent_id' => $menuPetugas->id,
             'urutan' => 3
@@ -62,7 +62,7 @@ class PetugasMenuSeeder extends Seeder
         // Profile Petugas
         $profilePetugas = Menu::create([
             'nama_menu' => 'Profile',
-            'url' => 'petugas/profile',
+            'url' => '/profile',
             'icon' => 'fas fa-user',
             'parent_id' => $menuPetugas->id,
             'urutan' => 4

@@ -54,7 +54,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::resource('admin/home', DashboardController::class);
 
 // Halaman Profil untuk User Biasa
-Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
+Route::prefix('masyarakat')->name('masyarakat.')->middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'userIndex'])->name('profile.index');
     Route::put('/profile', [ProfileController::class, 'userUpdate'])->name('profile.update');
     Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
@@ -66,14 +66,14 @@ Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
 });
 
 // Route untuk pengaturan akun user
-Route::prefix('user/akun')->name('user.akun.')->middleware('auth')->group(function () {
+Route::prefix('masyarakat/akun')->name('masyarakat.akun.')->middleware('auth')->group(function () {
     Route::get('/', [ProfileController::class, 'akun'])->name('index');
     Route::put('/update', [ProfileController::class, 'updateAkun'])->name('update');
     Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
 });
 
 // Route untuk pengajuan jadi petugas
-Route::prefix('user/jadipetugas')->name('user.jadipetugas.')->middleware('auth')->group(function () {
+Route::prefix('masyarakat/jadipetugas')->name('masyarakat.jadipetugas.')->middleware('auth')->group(function () {
     Route::get('/', [jadipetugasController::class, 'JadiPetugasForm'])->name('form');
     Route::post('/', [jadipetugasController::class, 'submitPetugasRequest'])->name('submit');
 });
@@ -210,11 +210,16 @@ Route::get('/get-districts/{regency}', [ProfileController::class, 'getDistricts'
 Route::get('/get-villages/{district}', [ProfileController::class, 'getVillages'])->name('get.villages');
 
 
-Route::prefix('petugas')->name('petugas.')->middleware('auth')->group(function () {
+// Route::prefix('petugas')->name('petugas.')->middleware(['auth', 'level:3'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'petugasIndex'])->name('profile.index');
-    Route::put('/profile/update', [ProfileController::class, 'petugasUpdate'])->name('profile.update');
+    Route::put('/profile', [ProfileController::class, 'petugasUpdate'])->name('profile.update');
     Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
-});
+    
+    // Add these routes if they don't exist
+    Route::get('/get-regencies/{province_id}', [ProfileController::class, 'getRegencies'])->name('get.regencies');
+    Route::get('/get-districts/{regency_id}', [ProfileController::class, 'getDistricts'])->name('get.districts');
+    Route::get('/get-villages/{district_id}', [ProfileController::class, 'getVillages'])->name('get.villages');
+// });
 
 Route::get('/armada', function () {
     return view('armada');
@@ -242,12 +247,11 @@ Route::middleware('auth')->group(function () {
 });
 
 
-// Route publik untuk masyarakat (tidak perlu login)
 Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
-    // Route untuk lapor sampah (publik)
     Route::get('/lapor', function () {
         return view('masyarakat.lapor');
     })->name('lapor');
+});
 
 
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
@@ -304,7 +308,7 @@ Route::get('/jadwal-pengambilan/detail', function () {
 
 
 // Routes untuk pengguna biasa yang ingin menjadi petugas
-Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
+Route::middleware(['auth'])->prefix('masyarakat')->name('masyarakat.')->group(function () {
     Route::get('/jadi-petugas/form', [JadiPetugasController::class, 'JadipetugasForm'])->name('jadi-petugas.form');
     Route::post('/jadi-petugas/submit', [JadiPetugasController::class, 'submit'])->name('jadi-petugas.submit');
     Route::get('/jadi-petugas/success', [JadiPetugasController::class, 'success'])->name('jadi-petugas.success');

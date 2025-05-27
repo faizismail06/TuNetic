@@ -77,7 +77,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                <a href="{{ route('user.jadipetugas.form') }}" class="btn text-white" style="background-color: #299E63">
+                <a href="{{ route('masyarakat.jadipetugas.form') }}" class="btn text-white" style="background-color: #299E63">
                     Lanjutkan
                 </a>
             </div>

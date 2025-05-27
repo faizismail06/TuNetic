@@ -31,7 +31,7 @@
                 @endif
 
 
-                    <form method="POST" action="{{ route('user.akun.password.update') }}">
+                    <form method="POST" action="{{ route('masyarakat.akun.password.update') }}">
                         @csrf
                         @method('PUT')
 

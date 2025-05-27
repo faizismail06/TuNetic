@@ -34,7 +34,9 @@ class ProfileController extends Controller
 
     public function petugasIndex()
     {
+        Log::info('Mengakses petugasIndex');
         $user = Auth::user();
+        Log::info('User:', $user->toArray());
         if ($user->level !== 3) {
             return redirect()->back()->with('error', 'Akses ditolak');
         }
@@ -65,7 +67,7 @@ public function updatePassword(Request $request)
     $user->password = Hash::make($request->new_password);
     $user->save();
     
-    return redirect()->route('user.akun.index')->with('success', 'Password berhasil diubah!');
+    return redirect()->route('masyarakat.akun.index')->with('success', 'Password berhasil diubah!');
 }
 
     // Menambahkan method userUpdate yang hilang
@@ -121,7 +123,7 @@ public function updatePassword(Request $request)
 
         $user->save();
 
-        return redirect()->route('user.profile.index')->with('success', 'Profil berhasil diperbarui.');
+        return redirect()->route('masyarakat.profile.index')->with('success', 'Profil berhasil diperbarui.');
     }
 
     public function petugasUpdate(Request $request)
@@ -145,7 +147,7 @@ public function updatePassword(Request $request)
             $user->petugas->update($request->except(['name', 'email', '_token']));
         }
 
-        return redirect()->route('petugas.profile.index')->with('success', 'Profil berhasil diperbarui');
+        return redirect()->route('profile.index')->with('success', 'Profil berhasil diperbarui');
     }
 
     public function getRegencies($province_id)
@@ -230,7 +232,7 @@ public function updatePassword(Request $request)
         } elseif ($user->level === 3) {
             return redirect()->route('petugas.profile.index')->with('success', 'Profil berhasil diperbarui.');
         } elseif ($user->level === 4) {
-            return redirect()->route('user.profile.index')->with('success', 'Profil berhasil diperbarui.');
+            return redirect()->route('masyarakat.profile.index')->with('success', 'Profil berhasil diperbarui.');
         } else {
             return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
         }
@@ -309,7 +311,7 @@ public function updatePassword(Request $request)
         } elseif ($user->level === 3) {
             return redirect()->route('petugas.profile.index')->with('success', 'Profil berhasil diperbarui.');
         } elseif ($user->level === 4) {
-            return redirect()->route('user.profile.index')->with('success', 'Profil berhasil diperbarui.');
+            return redirect()->route('masyarakat.profile.index')->with('success', 'Profil berhasil diperbarui.');
         } else {
             return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
         }

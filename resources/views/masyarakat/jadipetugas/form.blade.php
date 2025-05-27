@@ -12,7 +12,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('user.jadipetugas.submit') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('masyarakat.jadipetugas.submit') }}" enctype="multipart/form-data">
                         @csrf
 
                         <!-- Foto Diri Section -->

@@ -286,7 +286,7 @@
             @endphp
 
             @if (Auth::check())
-                <a href="{{ route('user.profile.index') }}" class="profile">
+                <a href="{{ route('masyarakat.profile.index') }}" class="profile">
                     {{ Auth::user()->name }}
                     <img src="{{ asset(Auth::user()->photo ?? 'assets/images/default-user.png') }}" alt="Profile">
                 </a>
