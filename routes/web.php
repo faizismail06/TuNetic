@@ -74,11 +74,11 @@ Route::prefix('masyarakat/akun')->name('masyarakat.akun.')->middleware('auth')->
     Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
 });
 
-// Route untuk pengajuan jadi petugas
-Route::prefix('masyarakat/jadipetugas')->name('masyarakat.jadipetugas.')->middleware('auth')->group(function () {
-    Route::get('/', [jadipetugasController::class, 'JadiPetugasForm'])->name('form');
-    Route::post('/', [jadipetugasController::class, 'submitPetugasRequest'])->name('submit');
-});
+// // Route untuk pengajuan jadi petugas
+// Route::prefix('masyarakat/jadipetugas')->name('masyarakat.jadipetugas.')->middleware('auth')->group(function () {
+//     Route::get('/', [jadipetugasController::class, 'JadiPetugasForm'])->name('form');
+//     Route::post('/', [jadipetugasController::class, 'submitPetugasRequest'])->name('submit');
+// });
 
 // Route::resource('profile', ProfileController::class)->except('destroy');
 Route::resource('manage-user', UserController::class);
