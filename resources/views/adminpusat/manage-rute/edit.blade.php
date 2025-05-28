@@ -50,41 +50,53 @@
                                 <input type="text" class="form-control" id="wilayah" name="wilayah" value="{{ $rute->wilayah }}" required>
                             </div>
 
-                            <div id="tps-input-wrapper">
-                                <label for="tps">TPS</label>
-                                @foreach ($rute->tps->where('tipe', 'TPS') as $tps)
-                                    <div class="tps-row input-group mb-2">
-                                        <select name="tps[]" class="form-control" required>
-                                            <option value="">Pilih TPS</option>
-                                            @foreach($lokasiTps as $lokasi)
-                                                @if($lokasi->tipe == 'TPS')
-                                                    <option value="{{ $lokasi->id }}" {{ $lokasi->id == $tps->id ? 'selected' : '' }}>{{ $lokasi->nama_lokasi }}</option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                @endforeach
-                                @if($rute->tps->where('tipe', 'TPS')->isEmpty())
-                                    <div class="tps-row input-group mb-2">
-                                        <select name="tps[]" class="form-control" required>
-                                            <option value="">Pilih TPS</option>
-                                            @foreach($lokasiTps as $lokasi)
-                                                @if($lokasi->tipe == 'TPS')
-                                                    <option value="{{ $lokasi->id }}">{{ $lokasi->nama_lokasi }}</option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                @endif
-                            </div>
+                            <div class="form-group mt-4">
+                                <!-- Label dan tombol tambah sejajar -->
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label for="tps" class="mb-0">TPS</label>
+                                    <button type="button" class="btn btn-success" id="add-tps-btn">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
 
-                            <div class="mb-3">
-                                <button type="button" class="btn btn-success" id="add-tps-btn">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger" id="remove-tps-btn">
-                                    <i class="fas fa-minus"></i>
-                                </button>
+                                <!-- Wrapper baris TPS -->
+                                <div id="tps-input-wrapper">
+                                    @forelse ($rute->tps->where('tipe', 'TPS') as $tps)
+                                        <div class="tps-row input-group mb-2">
+                                            <select name="tps[]" class="form-control" required>
+                                                <option value="">Pilih TPS</option>
+                                                @foreach($lokasiTps as $lokasi)
+                                                    @if($lokasi->tipe === 'TPS')
+                                                        <option value="{{ $lokasi->id }}" {{ $tps->id == $lokasi->id ? 'selected' : '' }}>
+                                                            {{ $lokasi->nama_lokasi }}
+                                                        </option>
+                                                    @endif
+                                                @endforeach
+                                            </select>
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-danger remove-tps-btn">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="tps-row input-group mb-2">
+                                            <select name="tps[]" class="form-control" required>
+                                                <option value="">Pilih TPS</option>
+                                                @foreach($lokasiTps as $lokasi)
+                                                    @if($lokasi->tipe === 'TPS')
+                                                        <option value="{{ $lokasi->id }}">{{ $lokasi->nama_lokasi }}</option>
+                                                    @endif
+                                                @endforeach
+                                            </select>
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-danger remove-tps-btn">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endforelse
+                                </div>
                             </div>
 
                             <div class="form-group">
@@ -132,25 +144,44 @@
 @push('js')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const addBtn = document.getElementById('add-tps-btn');
-        const removeBtn = document.getElementById('remove-tps-btn');
+     document.addEventListener('DOMContentLoaded', function () {
         const wrapper = document.getElementById('tps-input-wrapper');
+        const addBtn = document.getElementById('add-tps-btn');
 
-        addBtn.addEventListener('click', function () {
-            const rows = wrapper.querySelectorAll('.tps-row');
-            const lastRow = rows[rows.length -1];
-            const newRow = lastRow.cloneNode(true);
-            const select = newRow.querySelector('select');
+        function createTpsRow() {
+            const div = document.createElement('div');
+            div.className = 'tps-row input-group mb-2';
+            div.innerHTML = `
+                <select name="tps[]" class="form-control" required>
+                    <option value="">Pilih TPS</option>
+                    @foreach($lokasiTps as $lokasi)
+                        @if($lokasi->tipe === 'TPS')
+                            <option value="{{ $lokasi->id }}">{{ $lokasi->nama_lokasi }}</option>
+                        @endif
+                    @endforeach
+                </select>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-danger remove-tps-btn">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            `;
+            return div;
+        }
 
-            select.value = "";
+        // Tambah TPS
+        addBtn.addEventListener('click', () => {
+            const newRow = createTpsRow();
             wrapper.appendChild(newRow);
         });
 
-        removeBtn.addEventListener('click', function () {
-            const rows = wrapper.querySelectorAll('.tps-row');
-            if (rows.length > 1) {
-                wrapper.removeChild(rows[rows.length - 1]);
+        // Hapus TPS tertentu
+        wrapper.addEventListener('click', function (e) {
+            if (e.target.closest('.remove-tps-btn')) {
+                const row = e.target.closest('.tps-row');
+                if (wrapper.querySelectorAll('.tps-row').length > 1) {
+                    row.remove();
+                }
             }
         });
 
