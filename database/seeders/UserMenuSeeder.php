@@ -58,6 +58,18 @@ class UserMenuSeeder extends Seeder
 
         Permission::create(['name' => 'view_rute_armada', 'menu_id' => $ruteArmadaUser->id]);
 
+        // Rute Jadipetugas
+        $ruteArmadaUser = Menu::create([
+            'nama_menu' => 'Jadi Petugas',
+            'url' => 'masyarakat/jadi-petugas',
+            'icon' => '',
+            'parent_id' => $menuUser->id,
+            'urutan' => 4
+        ]);
+
+       Permission::create(['name' => 'masyarakat.jadipetugas']);
+
+
         // Profile User
         $profileUser = Menu::create([
             'nama_menu' => 'Profile',
