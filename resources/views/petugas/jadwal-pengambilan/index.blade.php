@@ -705,6 +705,8 @@
         let tpsMarkers = {};
         let routeControl = null;
         let isRouteVisible = false;
+        let isGpsLocationReady = false;
+        let pendingRouteDrawing = null;
 
         // ===== DEBOUNCE FUNCTION =====
         function debounce(func, wait) {
@@ -796,54 +798,54 @@
                                 map.removeLayer(userLocationMarker);
                             }
 
-                    //         // Buat custom icon untuk lokasi user
-                    //         const userIcon = L.divIcon({
-                    //             className: 'user-location-marker',
-                    //             html: `
-                    //         <div style="
-                    //             width: 20px;
-                    //             height: 20px;
-                    //             background: #4285f4;
-                    //             border: 3px solid white;
-                    //             border-radius: 50%;
-                    //             box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-                    //             position: relative;
-                    //         ">
-                    //             <div style="
-                    //                 width: 40px;
-                    //                 height: 40px;
-                    //                 background: rgba(66, 133, 244, 0.2);
-                    //                 border-radius: 50%;
-                    //                 position: absolute;
-                    //                 top: -13px;
-                    //                 left: -13px;
-                    //                 animation: pulse 2s infinite;
-                    //             "></div>
-                    //         </div>
-                    //         <style>
-                    //             @keyframes pulse {
-                    //                 0% { transform: scale(0.5); opacity: 1; }
-                    //                 100% { transform: scale(2); opacity: 0; }
-                    //             }
-                    //         </style>
-                    //     `,
-                    //             iconSize: [20, 20],
-                    //             iconAnchor: [10, 10]
-                    //         });
+                            //         // Buat custom icon untuk lokasi user
+                            //         const userIcon = L.divIcon({
+                            //             className: 'user-location-marker',
+                            //             html: `
+                        //         <div style="
+                        //             width: 20px;
+                        //             height: 20px;
+                        //             background: #4285f4;
+                        //             border: 3px solid white;
+                        //             border-radius: 50%;
+                        //             box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                        //             position: relative;
+                        //         ">
+                        //             <div style="
+                        //                 width: 40px;
+                        //                 height: 40px;
+                        //                 background: rgba(66, 133, 244, 0.2);
+                        //                 border-radius: 50%;
+                        //                 position: absolute;
+                        //                 top: -13px;
+                        //                 left: -13px;
+                        //                 animation: pulse 2s infinite;
+                        //             "></div>
+                        //         </div>
+                        //         <style>
+                        //             @keyframes pulse {
+                        //                 0% { transform: scale(0.5); opacity: 1; }
+                        //                 100% { transform: scale(2); opacity: 0; }
+                        //             }
+                        //         </style>
+                        //     `,
+                            //             iconSize: [20, 20],
+                            //             iconAnchor: [10, 10]
+                            //         });
 
-                    //         // Tambahkan marker lokasi user
-                    //         userLocationMarker = L.marker([userLat, userLng], {
-                    //             icon: userIcon,
-                    //             title: 'Lokasi Anda'
-                    //         }).addTo(map);
+                            //         // Tambahkan marker lokasi user
+                            //         userLocationMarker = L.marker([userLat, userLng], {
+                            //             icon: userIcon,
+                            //             title: 'Lokasi Anda'
+                            //         }).addTo(map);
 
-                    //         // Tambahkan popup dengan informasi lokasi
-                    //         userLocationMarker.bindPopup(`
-                    //     <div style="text-align: center;">
-                    //         <strong>📍 Lokasi Anda</strong><br>
-                    //         <small>Akurasi: ±${Math.round(accuracy)} meter</small>
-                    //     </div>
-                    // `);
+                            //         // Tambahkan popup dengan informasi lokasi
+                            //         userLocationMarker.bindPopup(`
+                        //     <div style="text-align: center;">
+                        //         <strong>📍 Lokasi Anda</strong><br>
+                        //         <small>Akurasi: ±${Math.round(accuracy)} meter</small>
+                        //     </div>
+                        // `);
 
                             // Tambahkan circle untuk menunjukkan akurasi (opsional)
                             if (accuracy < 1000) { // Hanya tampilkan jika akurasi < 1km
@@ -1044,7 +1046,6 @@
             }
         }
 
-        // Fungsi untuk menampilkan TPS di peta (dengan responsif marker)
         function showTpsOnMap(jadwalId) {
             if (tpsMarkers[jadwalId]) {
                 tpsMarkers[jadwalId].forEach(marker => map.removeLayer(marker));
@@ -1083,11 +1084,21 @@
                 padding: [50, 50]
             });
 
+            // Perbaikan: Jangan langsung gambar rute, tunggu GPS ready
+            console.log('Meminta pembuatan rute, GPS ready:', isGpsLocationReady);
             drawResponsiveRoute(tpsPoints);
         }
 
         // ===== RESPONSIVE ROUTE DRAWING =====
+        // Perbaiki fungsi drawResponsiveRoute
         function drawResponsiveRoute(tpsPoints) {
+            // Cek apakah GPS sudah siap
+            // if (!isGpsLocationReady || !marker) {
+            //     console.log('GPS belum siap, menunda pembuatan rute...');
+            //     pendingRouteDrawing = tpsPoints;
+            //     return;
+            // }
+
             if (routeControl) {
                 map.removeControl(routeControl);
                 routeControl = null;
@@ -1098,6 +1109,40 @@
             }
 
             const currentPosition = marker.getLatLng();
+
+            // Pastikan posisi marker bukan posisi default
+            const defaultLat = -7.056325;
+            const defaultLng = 110.454250;
+
+            if (Math.abs(currentPosition.lat - defaultLat) < 0.001 &&
+                Math.abs(currentPosition.lng - defaultLng) < 0.001) {
+                console.log('Masih menggunakan posisi default, menunda pembuatan rute...');
+                pendingRouteDrawing = tpsPoints;
+
+                // Coba dapatkan lokasi GPS dulu
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            marker.setLatLng([lat, lng]);
+                            isGpsLocationReady = true;
+
+                            // Panggil ulang setelah lokasi ready
+                            if (pendingRouteDrawing) {
+                                drawResponsiveRoute(pendingRouteDrawing);
+                                pendingRouteDrawing = null;
+                            }
+                        },
+                        function(error) {
+                            console.error('Error mendapatkan lokasi untuk rute:', error);
+                        },
+                        getResponsiveGeolocationOptions()
+                    );
+                }
+                return;
+            }
+
             const waypoints = [L.latLng(currentPosition.lat, currentPosition.lng)];
 
             tpsPoints.forEach(tps => {
@@ -1148,9 +1193,7 @@
 
             routeControl.on('routesfound', function(e) {
                 const routes = e.routes;
-                const summary = routes[0].summary;
-
-                console.log('Rute ditemukan:', routes);
+                console.log('Rute dari armada ke TPS ditemukan:', routes);
                 isRouteVisible = true;
                 updateRouteButtonText();
             });
@@ -1608,10 +1651,25 @@
             }
         }
 
-        // Fungsi untuk mengupdate lokasi dan mengirim ke server
+        // Perbaiki fungsi updateLocationAndSend untuk menandai GPS ready
         function updateLocationAndSend(position) {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
+
+            // Tandai GPS sudah ready
+            if (!isGpsLocationReady) {
+                isGpsLocationReady = true;
+                console.log('GPS location ready, posisi:', lat, lng);
+
+                // Jika ada rute yang pending, gambar sekarang
+                if (pendingRouteDrawing) {
+                    console.log('Menggambar rute yang tertunda...');
+                    setTimeout(() => {
+                        drawResponsiveRoute(pendingRouteDrawing);
+                        pendingRouteDrawing = null;
+                    }, 1000);
+                }
+            }
 
             if (marker && map) {
                 marker.setLatLng([lat, lng]);
@@ -1623,7 +1681,8 @@
                 document.getElementById('location-info').textContent =
                     `Posisi saat ini: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 
-                if (isRouteVisible && activeJadwalId && tpsData[activeJadwalId]) {
+                // Perbarui rute jika sedang aktif dan GPS sudah ready
+                if (isRouteVisible && activeJadwalId && tpsData[activeJadwalId] && isGpsLocationReady) {
                     drawResponsiveRoute(tpsData[activeJadwalId]);
                 }
             }
@@ -1809,7 +1868,7 @@
             }
         }
 
-        // Cek jadwal yang sudah aktif
+        // Perbaiki checkActiveTracking untuk menangani rute yang benar
         function checkActiveTracking() {
             document.querySelectorAll('.btn-group').forEach(container => {
                 const jadwalStatus = container.dataset.status;
@@ -1826,6 +1885,8 @@
                     document.getElementById('tracking-status').textContent = 'Tracking aktif';
 
                     trackingCounterElement = container.querySelector('.tracking-counter');
+
+                    // Tampilkan TPS tapi tunggu GPS ready untuk rute
                     showTpsOnMap(jadwalId);
                 }
             });
