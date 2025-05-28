@@ -16,12 +16,11 @@
 
     <style>
         body {
-            background-color: #e6f5f3; /* Light green background similar to the image */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(90deg, #e2e2e2, #299e63);
         }
 
         .wrapper {

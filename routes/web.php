@@ -84,12 +84,12 @@ Route::prefix('masyarakat/akun')->name('masyarakat.akun.')->middleware('auth')->
 // });
 
 // Route::resource('profile', ProfileController::class)->except('destroy');
-Route::resource('manage-user', UserController::class);
-Route::resource('manage-role', RoleController::class);
-Route::resource('manage-menu', MenuController::class);
-Route::resource('manage-petugas', PetugasController::class);
-Route::resource('manage-rute', RuteController::class);
-Route::resource('manage-permission', PermissionController::class)->only('store', 'destroy');
+Route::resource('pusat/manage-user', UserController::class);
+Route::resource('pusat/manage-role', RoleController::class);
+Route::resource('pusat/manage-menu', MenuController::class);
+Route::resource('pusat/manage-petugas', PetugasController::class);
+Route::resource('pusat/manage-rute', RuteController::class);
+Route::resource('pusat/manage-permission', PermissionController::class)->only('store', 'destroy');
 // Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
 // Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
 // Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
@@ -99,9 +99,9 @@ Route::resource('manage-permission', PermissionController::class)->only('store',
 Route::get('/rute/{id}/detail', [RuteController::class, 'show'])->name('rute.detail');
 Route::get('/rute/{id_rute}/detail', [RuteController::class, 'detail'])->name('rute.detail');
 Route::get('/api/rute/{id}', [RuteController::class, 'getDetailJson'])->name('api.rute.detail');
-Route::get('manage-rute/{id}/edit', [RuteController::class, 'edit'])->name('manage-rute.edit');
-Route::get('manage-rute/create', [RuteController::class, 'create'])->name('manage-rute.create');
-Route::delete('/manage-rute/{id}', [RuteController::class, 'destroy'])->name('manage-rute.destroy');
+Route::get('pusat/manage-rute/{id}/edit', [RuteController::class, 'edit'])->name('manage-rute.edit');
+Route::get('pusat/manage-rute/create', [RuteController::class, 'create'])->name('manage-rute.create');
+Route::delete('pusat/manage-rute/{id}', [RuteController::class, 'destroy'])->name('manage-rute.destroy');
 // ===================
 // ARMADA
 // ===================

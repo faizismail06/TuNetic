@@ -10,13 +10,11 @@
             box-sizing: border-box;
         }
         body {
-            margin: 0;
-            font-family: 'Nunito', sans-serif;
-            background: linear-gradient(to right, #cde8d4, #b4e0c0);
             display: flex;
-            align-items: center;
             justify-content: center;
-            height: 100vh;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(90deg, #e2e2e2, #299e63);
         }
         .container {
             width: 900px;
