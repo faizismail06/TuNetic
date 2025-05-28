@@ -12,6 +12,7 @@ use App\Http\Controllers\JadwalOperasionalController;
 use App\Http\Controllers\JadwalPengambilanController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\JadwalTemplateController;
+use App\Http\Controllers\KelolaArmadaController;
 use App\Http\Controllers\LokasiTpsController;
 use App\Http\Controllers\PenugasanPetugasController;
 use App\Http\Controllers\RuteController;
@@ -23,12 +24,17 @@ use App\Http\Controllers\TrackingArmadaController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RuteArmadaController;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LaporanWargaAdminController;
+
+use App\Http\Controllers\JadwalRuteController;
+
 use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,15 +45,18 @@ use Illuminate\Http\Request;
 // ===================
 // AUTH & LANDING PAGE
 // ===================
-Route::permanentRedirect('/', '/login');
+Route::get('/', function () {
+    return view('landing-page');
+});
+
 Auth::routes(['verify' => true]);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 // ===================
 // DASHBOARD
 // ===================
-Route::resource('admin/home', DashboardController::class);
+Route::resource('pusat/home', DashboardController::class);
 
 // ===================
 // PROFILE
@@ -57,34 +66,41 @@ Route::resource('profil', ProfilController::class)->except('destroy');
 // ===================
 // USER, ROLE, MENU, PERMISSION MANAGEMENT
 // ===================
-Route::resource('manage-user', UserController::class);
-Route::resource('manage-role', RoleController::class);
-Route::resource('manage-menu', MenuController::class);
-Route::resource('manage-petugas', PetugasController::class);
-Route::resource('manage-rute', RuteController::class);
-Route::resource('manage-permission', PermissionController::class)->only('store', 'destroy');
+Route::resource('pusat/manage-user', UserController::class);
+Route::resource('pusat/manage-role', RoleController::class);
+Route::resource('pusat/manage-menu', MenuController::class);
+Route::resource('pusat/manage-petugas', PetugasController::class);
+Route::resource('pusat/manage-rute', RuteController::class);
+Route::resource('pusat/manage-armada', KelolaArmadaController::class);
+Route::resource('pusat/manage-permission', PermissionController::class)->only('store', 'destroy');
 Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
 Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
 Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
 Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
-Route::post('petugas', [PetugasController::class, 'store'])->name('petugas.store');
+Route::post('petugas', [PetugasController::class, 'destroy'])->name('petugas.destroy');
+Route::post('petugas', [PetugasController::class, 'index'])->name('petugas.index');
 Route::get('/rute/{id}/detail', [RuteController::class, 'show'])->name('rute.detail');
-Route::get('manage-rute/{id}/detail', [RuteController::class, 'show'])->name('manage-rute.detail');
+Route::get('/rute/{id_rute}/detail', [RuteController::class, 'detail'])->name('rute.detail');
+Route::get('/api/rute/{id}', [RuteController::class, 'getDetailJson'])->name('api.rute.detail');
 Route::get('manage-rute/{id}/edit', [RuteController::class, 'edit'])->name('manage-rute.edit');
-
+Route::get('manage-rute/create', [RuteController::class, 'create'])->name('manage-rute.create');
+Route::delete('/manage-rute/{id}', [RuteController::class, 'destroy'])->name('manage-rute.destroy');
 // ===================
 // ARMADA
 // ===================
 Route::resource('armada', ArmadaController::class);
 
+
 // ===================
 // PETUGAS
 // ===================
-Route::resource('petugas', PetugasController::class);
+// Route::resource('petugas', PetugasController::class);
+
+Route::get('/petugas', [LaporanWargaController::class, 'index']);
 Route::get('/petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
 
 Route::prefix('jadwal-template')->group(function () {
-    Route::get('/', [JadwalTemplateController::class, 'index'])->name('jadwal-template.index');
+    // Route::get('/', [JadwalTemplateController::class, 'index'])->name('jadwal-template.index');
     Route::get('/{hari}', [JadwalTemplateController::class, 'filterByDay'])->name('jadwal-template.filter');
     Route::post('/store', [JadwalTemplateController::class, 'store'])->name('jadwal-template.store');
     Route::get('/{id}/edit', [JadwalTemplateController::class, 'edit'])->name('jadwal-template.edit');
@@ -96,16 +112,16 @@ Route::resource('jadwal-template', JadwalTemplateController::class)->except(['sh
 
 
 // Jadwal Routes
-Route::get('/daftar-jadwal/generate', [JadwalController::class, 'generateForm'])->name('daftar-jadwal.generate.form');
-Route::post('/daftar-jadwal/generate', [JadwalController::class, 'generateStore'])->name('daftar-jadwal.generate.store');
-Route::resource('daftar-jadwal', JadwalController::class);
+Route::get('pusat/daftar-jadwal/generate', [JadwalController::class, 'generateForm'])->name('daftar-jadwal.generate.form');
+Route::post('pusat/daftar-jadwal/generate', [JadwalController::class, 'generateStore'])->name('daftar-jadwal.generate.store');
+Route::resource('pusat/daftar-jadwal', JadwalController::class);
 
 // ===================
 // JADWAL
 // ===================
 Route::resource('jadwal', JadwalController::class);
 
-Route::resource('jadwal-operasional', JadwalOperasionalController::class);
+Route::resource('pusat/jadwal-operasional', JadwalOperasionalController::class);
 
 // ===================
 // PENUGASAN
@@ -126,17 +142,30 @@ Route::resource('sampah', SampahController::class);
 // ===================
 // LOKASI TPS
 // ===================
-Route::get('/lokasi-tps', [LokasiTpsController::class, 'index'])->name('lokasi-tps.index');
-Route::get('/lokasi-tps/create', [LokasiTpsController::class, 'create'])->name('lokasi-tps.create');
-Route::post('/lokasi-tps', [LokasiTpsController::class, 'store'])->name('lokasi-tps.store');
-Route::get('/lokasi-tps/{lokasiTps}/edit', [LokasiTpsController::class, 'edit'])->name('lokasi-tps.edit');
-Route::put('/lokasi-tps/{lokasiTps}', [LokasiTpsController::class, 'update'])->name('lokasi-tps.update');
-Route::delete('/lokasi-tps/{lokasiTps}', [LokasiTpsController::class, 'destroy'])->name('lokasi-tps.destroy');
-Route::get('lokasi-tps/get-regencies', [LokasiTpsController::class, 'getRegencies'])->name('lokasi-tps.getRegencies');
-Route::get('lokasi-tps/get-districts', [LokasiTpsController::class, 'getDistricts'])->name('lokasi-tps.getDistricts');
-Route::get('lokasi-tps/get-villages', [LokasiTpsController::class, 'getVillages'])->name('lokasi-tps.getVillages');
+// 1. Route dengan pola tetap (pastikan diletakkan sebelum route dinamis)
+Route::get('pusat/lokasi-tps', [LokasiTpsController::class, 'index'])->name('lokasi-tps.index');
+Route::get('pusat/lokasi-tps/create', [LokasiTpsController::class, 'create'])->name('lokasi-tps.create');
+Route::post('pusat/lokasi-tps', [LokasiTpsController::class, 'store'])->name('lokasi-tps.store');
 
-// ===================
+Route::get('pusat/lokasi-tps/get-regencies', [LokasiTpsController::class, 'getRegencies'])->name('lokasi-tps.getRegencies');
+Route::get('pusat/lokasi-tps/get-districts', [LokasiTpsController::class, 'getDistricts'])->name('lokasi-tps.getDistricts');
+Route::get('pusat/lokasi-tps/get-villages', [LokasiTpsController::class, 'getVillages'])->name('lokasi-tps.getVillages');
+
+// ✅ Filter berdasarkan 'tipe' bertipe string (TPS, TPST, TPA)
+Route::get('pusat/lokasi-tps/filter/{tipe}', [LokasiTpsController::class, 'filterByTipe'])
+    ->where('tipe', 'TPS|TPST|TPA') // ← optional: batasi hanya string valid
+    ->name('lokasi-tps.filterByTipe');
+
+Route::post('pusat/lokasi-tps/find-nearest', [LokasiTpsController::class, 'findNearestTps'])->name('lokasi-tps.findNearest');
+Route::get('pusat/lokasi-tps-view', [LokasiTpsController::class, 'indexView'])->name('lokasi-tps.indexView');
+Route::get('pusat/rute-armada', [LokasiTpsController::class, 'ruteArmada'])->name('rute-armada.index');
+
+// 2. Route dengan parameter dinamis
+Route::get('pusat/lokasi-tps/{lokasiTps}/edit', [LokasiTpsController::class, 'edit'])->name('lokasi-tps.edit');
+Route::put('pusat/lokasi-tps/{lokasiTps}', [LokasiTpsController::class, 'update'])->name('lokasi-tps.update');
+Route::delete('pusat/lokasi-tps/{lokasiTps}', [LokasiTpsController::class, 'destroy'])->name('lokasi-tps.destroy');
+Route::get('pusat/lokasi-tps/{id}', [LokasiTpsController::class, 'show'])->name('lokasi-tps.show');
+
 // TRACKING ARMADA
 // ===================
 Route::resource('tracking-armada', TrackingArmadaController::class)->only(['index', 'store', 'destroy']);
@@ -144,12 +173,14 @@ Route::resource('tracking-armada', TrackingArmadaController::class)->only(['inde
 // ===================
 // ARTIKEL
 // ===================
-Route::apiResource('artikel', ArtikelController::class);
+// Route::apiResource('artikel', ArtikelController::class);
+Route::resource('pusat/artikel', ArtikelController::class);
+Route::patch('pusat/artikel/{id}/status', [ArtikelController::class, 'updateStatus'])->name('artikel.updateStatus');
 
 // ===================
 // BACKUP
 // ===================
-Route::get('dbbackup', [DBBackupController::class, 'DBDataBackup']);
+Route::get('pusat/dbbackup', [DBBackupController::class, 'DBDataBackup']);
 
 
 Route::middleware('auth')->group(function () {
@@ -174,6 +205,11 @@ Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
     Route::get('/rute-armada/all-tps', [RuteArmadaController::class, 'showAllTps'])->name('rute-armada.all-tps');
     Route::get('/rute-armada/jadwal/{id}', [RuteArmadaController::class, 'getJadwalDetail'])->name('rute-armada.jadwal-detail');
     Route::get('/rute-armada/tracking/{id}', [RuteArmadaController::class, 'getRealtimeTracking'])->name('rute-armada.realtime-tracking');
+});
+
+//  Route Admin TPST
+Route::prefix('tpst')->name('admin_tpst.')->group(function () {
+    Route::get('/home', [DashboardController::class, 'indexTpst'])->name('admintpst.dashboard.index');
 });
 
 Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
@@ -258,7 +294,6 @@ Route::get('/email/verify', function () {
 
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
-    return redirect('/home');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 Route::post('/email/verification-notification', function (Request $request) {
@@ -269,21 +304,47 @@ Route::post('/email/verification-notification', function (Request $request) {
 // ===================
 // JADWAL PENGAMBILAN - TRACKING PETUGAS
 // ===================
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->prefix('petugas')->group(function () {
     Route::get('/jadwal-pengambilan', [JadwalPengambilanController::class, 'index'])
         ->name('petugas.jadwal-pengambilan.index');
 
     // Put the specific route FIRST
     Route::get('/jadwal-pengambilan/auto-tracking', [JadwalPengambilanController::class, 'showAutoTrackingPage'])
         ->name('jadwal-pengambilan.auto-tracking');
-    Route::post('/petugas/jadwal-pengambilan/start-tracking/{id}', [JadwalPengambilanController::class, 'startTracking'])
-        ->name('jadwal-pengambilan.start-tracking');
-    Route::post('/petugas/jadwal-pengambilan/finish-tracking/{id}', [JadwalPengambilanController::class, 'finishTracking'])
-        ->name('jadwal-pengambilan.finish-tracking');
-    Route::post('/petugas/jadwal-pengambilan/save-location', [JadwalPengambilanController::class, 'saveLocation'])
-        ->name('jadwal-pengambilan.save-location');
-});
 
-Route::get('/jadwal-pengambilan/detail', function () {
-    return view('petugas.jadwal-pengambilan.details');
-})->name('jadwal.penjemputan');
+    Route::post('/jadwal-pengambilan/start-tracking/{id}', [JadwalPengambilanController::class, 'startTracking'])
+        ->name('jadwal-pengambilan.start-tracking');
+
+    Route::post('/jadwal-pengambilan/finish-tracking/{id}', [JadwalPengambilanController::class, 'finishTracking'])
+        ->name('jadwal-pengambilan.finish-tracking');
+
+    Route::post('/jadwal-pengambilan/save-location', [JadwalPengambilanController::class, 'saveLocation'])
+        ->name('jadwal-pengambilan.save-location');
+
+    Route::get('/jadwal-pengambilan/detail', function () {
+        return view('petugas.jadwal-pengambilan.details');
+    })->name('jadwal.penjemputan');
+});
+// Route untuk Jadwal & Rute
+// Route Group untuk Jadwal Rute (dengan middleware auth jika diperlukan)
+Route::group(['prefix' => 'tpst/jadwal-rute'], function () {
+
+    // Route utama untuk menampilkan halaman jadwal operasional dengan peta
+    Route::get('/', [JadwalRuteController::class, 'index'])->name('jadwal-rute.index');
+
+    // Route untuk menampilkan detail jadwal operasional
+    Route::get('/show/{id}', [JadwalRuteController::class, 'show'])->name('jadwal-rute.show');
+
+    // Route untuk export data jadwal operasional
+    Route::get('/export', [JadwalRuteController::class, 'export'])->name('jadwal-rute.export');
+
+    // API Routes untuk AJAX calls
+    Route::group(['prefix' => 'api'], function () {
+
+        // API untuk mendapatkan detail armada (digunakan di modal)
+        Route::get('/armada-detail/{id}', [JadwalRuteController::class, 'getArmadaDetail'])->name('jadwal-rute.api.armada-detail');
+
+        // API untuk mendapatkan tracking terbaru
+        Route::get('/tracking/{id}', [JadwalRuteController::class, 'getTracking'])->name('jadwal-rute.api.tracking');
+    });
+});

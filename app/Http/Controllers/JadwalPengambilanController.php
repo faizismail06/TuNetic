@@ -63,13 +63,13 @@ class JadwalPengambilanController extends Controller
                 $jadwalOperasional = JadwalOperasional::with([
                     'armada',
                     'jadwal',
-                    'ruteTps.rute',
-                    'ruteTps.lokasi_tps' // Memuat lokasi TPS
+                    'rute',
+                    'rute.ruteTps.lokasi_tps' // Memuat lokasi TPS
                 ])
                     ->whereIn('status', [0, 1]) // Status 0=Belum Berjalan, 1=Sedang Berjalan
                     ->whereHas('penugasanPetugas', function ($query) use ($petugasId) {
                         $query->where('id_petugas', $petugasId);
-                    })
+                    })  
                     ->where('id', $jadwalId)
                     ->first();
 
@@ -116,8 +116,8 @@ class JadwalPengambilanController extends Controller
                 $jadwalOperasionalQuery = JadwalOperasional::with([
                     'armada',
                     'jadwal',
-                    'ruteTps.rute',
-                    'ruteTps.lokasi_tps'
+                    'rute',
+                    'rute.ruteTps.lokasi_tps'
                 ])
                     ->whereIn('status', [0, 1]) // Status 0=Belum Berjalan, 1=Sedang Berjalan
                     ->whereHas('penugasanPetugas', function ($query) use ($petugasId) {
@@ -150,7 +150,7 @@ class JadwalPengambilanController extends Controller
                 if ($firstJadwal) {
                     foreach ($jadwalOperasional as $jadwal) {
                         // Dapatkan semua TPS dalam rute untuk jadwal ini
-                        $ruteId = $jadwal->ruteTps->rute->id;
+                        $ruteId = $jadwal->rute->id;
 
                         $tpsPoints = \App\Models\RuteTps::with('lokasi_tps')
                             ->where('id_rute', $ruteId)
@@ -199,7 +199,7 @@ class JadwalPengambilanController extends Controller
             } else {
                 // Single jadwal operasional
                 if ($jadwalOperasional) {
-                    $ruteId = $jadwalOperasional->ruteTps->rute->id;
+                    $ruteId = $jadwalOperasional->rute->id;
 
                     $tpsPoints = \App\Models\RuteTps::with('lokasi_tps')
                         ->where('id_rute', $ruteId)
@@ -308,6 +308,8 @@ class JadwalPengambilanController extends Controller
             ], 500);
         }
     }
+
+
 
     /**
      * Selesaikan tracking untuk jadwal operasional tertentu
@@ -530,8 +532,8 @@ class JadwalPengambilanController extends Controller
             $jadwalOperasional = JadwalOperasional::with([
                 'armada',
                 'jadwal',
-                'ruteTps.lokasi_tps',
-                'ruteTps.rute'
+                'rute.ruteTps.lokasi_tps',
+                'rute'
             ])
                 ->whereHas('jadwal', function ($query) use ($day) {
                     $query->where('hari', strtolower($day));
@@ -547,8 +549,8 @@ class JadwalPengambilanController extends Controller
             }
 
             // Ambil semua TPS di rute
-            $ruteTps = $jadwalOperasional->ruteTps;
-            $rute = $ruteTps->rute;
+            $ruteTps = $jadwalOperasional->rute->ruteTps;
+            $rute = $jadwalOperasional->rute;
 
             // Ambil semua TPS dalam rute
             $tpsLocations = RuteTps::with('lokasi_tps')
