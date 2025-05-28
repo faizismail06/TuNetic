@@ -14,8 +14,10 @@
         @php
             $level = auth()->user()->level;
             $redirect = match ($level) {
-                4 => '/masyarakat',
-                1 => '/admin',
+                1 => '/pusat/home',
+                2 => '/tpst/home',
+                3 => '/petugas',
+                4 => '/masyarakat'
             };
         @endphp
         <script>window.location.href = "{{ $redirect }}";</script>

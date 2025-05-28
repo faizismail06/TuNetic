@@ -2,6 +2,10 @@
 
 namespace App\Models;
 
+// Import Notifikasi Kustom
+use App\Notifications\CustomVerifyEmail;
+use App\Notifications\CustomResetPassword;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -23,7 +27,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'district_id',
         'village_id',
         'alamat',
-        'level'
+        'level',
     ];
 
     protected $hidden = [
@@ -36,7 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
-    // Relasi ke wilayah
+    // ... (Relasi Anda: province, regency, district, village, petugas) ...
     public function province()
     {
         return $this->belongsTo(Province::class, 'province_id');
@@ -72,9 +76,33 @@ class User extends Authenticatable implements MustVerifyEmail
         return asset('assets/img/default-profile.jpg');
     }
 
-    // Cek apakah user adalah petugas
-    public function isPetugas()
+    /**
+     * Send the email verification notification.
+     * Override default Laravel notification.
+     *
+     * @return void
+     */
+    public function sendEmailVerificationNotification()
     {
-        return $this->hasRole('petugas') || $this->petugas !== null;
+        $this->notify(new CustomVerifyEmail); // Menggunakan Notifikasi Verifikasi Kustom
+    }
+
+    /**
+     * Send the password reset notification.
+     * Override default Laravel notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        // Membuat URL reset password
+        $url = url(route('password.reset', [
+            'token' => $token,
+            'email' => $this->getEmailForPasswordReset(),
+        ], false));
+
+        // Mengirim notifikasi menggunakan kelas kustom Anda
+        $this->notify(new CustomResetPassword($url));
     }
 }
