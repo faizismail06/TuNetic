@@ -20,7 +20,7 @@ return new class extends Migration {
             $table->char('village_id', 10); // Sesuai dengan tipe data di reg_villages
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
-            $table->integer('level')->default(0);
+            // $table->integer('level')->default(0);
             $table->timestamps();
 
             $table->foreign('province_id')->references('id')->on('reg_provinces')->onDelete('cascade');
