@@ -23,9 +23,10 @@ use App\Http\Controllers\TrackingArmadaController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RuteArmadaController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LaporanWargaAdminController;
 use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
