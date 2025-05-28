@@ -56,8 +56,6 @@ class RuteController extends Controller
         try {
             $validatedData = $request->validate([
                 'nama_rute' => 'required|string|max:255',
-                // 'latitude' => 'required|numeric|between:-90,90',
-                // 'longitude' => 'required|numeric|between:-180,180',
                 'wilayah' => 'required|string',
                 'tps' => 'required|array|min:1',
                 'tps.*' => 'nullable|exists:lokasi_tps,id', // validasi dropdown TPS
@@ -71,13 +69,6 @@ class RuteController extends Controller
                 'tpst_id' => $request->tpst_id,
                 'tpa_id' => $request->tpa_id,
             ]);
-
-            // foreach ($request->tps as $id_lokasi_tps) {
-            //     RuteTps::create([
-            //         'id_rute' => $rute->id,
-            //         'id_lokasi_tps' => $id_lokasi_tps,
-            //     ]);
-            // }
 
             $rute->tps()->attach(array_filter($request->tps));
             // return response()->json($rute, 201);
@@ -145,8 +136,6 @@ class RuteController extends Controller
                 'wilayah' => 'required|string',
                 'tps' => 'required|array|min:1',
                 'tps.*' => 'nullable|exists:lokasi_tps,id',
-                'tpst_id' => ['nullable', Rule::exists('lokasi_tps', 'id')->where('tipe', 'TPST')],
-                'tpa_id' => ['nullable', Rule::exists('lokasi_tps', 'id')->where('tipe', 'TPA')],
             ]);
 
             $rute = Rute::findOrFail($id);
@@ -155,8 +144,6 @@ class RuteController extends Controller
             $rute->update([
                 'nama_rute' => $request->nama_rute,
                 'wilayah' => $request->wilayah,
-                'tpst_id' => $request->tpst_id,
-                'tpa_id' => $request->tpa_id,
             ]);
 
             // Update relasi TPS
@@ -170,31 +157,6 @@ class RuteController extends Controller
             ], 400);
         }
     }
-    // public function update(Request $request, $id)
-    // {
-    //     try {
-    //         $rute = Rute::findOrFail($id);
-
-    //         $validatedData = $request->validate([
-    //             'nama_rute' => 'sometimes|string|max:255',
-    //             // 'latitude' => 'sometimes|numeric|between:-90,90',
-    //             // 'longitude' => 'sometimes|numeric|between:-180,180',
-    //             'wilayah' => 'sometimes|string',
-    //         ]);
-
-    //         $rute->update($validatedData);
-
-    //         return response()->json([
-    //             'message' => 'Rute berhasil diperbarui',
-    //             'data' => $rute
-    //         ], 200);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'error' => 'Gagal mengupdate rute',
-    //             'message' => $e->getMessage(),
-    //         ], 400);
-    //     }
-    // }
 
     /**
      * Menghapus rute berdasarkan ID.
