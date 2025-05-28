@@ -56,7 +56,7 @@
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link text-white" data-widget="pushmenu" href="#" role="button"><i
-                           
+
                             class="fas fa-bars"></i></a>
                 </li>
             </ul>
@@ -86,7 +86,7 @@
                             </p>
                         </li>
                         <li class="user-footer">
-                            <a href="{{ route('masyarakat.profile.index') }}" class="btn btn-default btn-flat">Profil</a>
+                            {{-- <a href="{{ route('masyarakat.profile.index') }}" class="btn btn-default btn-flat">Profil</a> --}}
                             <a href="#" class="btn btn-success btn-flat float-right" data-toggle="modal"
                                 data-target="#modal-logout"><i class="fas fa-sign-out-alt"></i> <span>Keluar</span></a>
                         </li>

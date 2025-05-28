@@ -761,7 +761,7 @@
             </div>
 
             @if (Auth::check())
-                <div class="profile-container">
+                <div class="profile-container" style="margin-right: 20px;">
                     <div class="profile" id="profileToggle">
                         <span>{{ Auth::user()->name }}</span>
                         <img src="{{ asset(Auth::user()->photo ?? 'assets/images/default-user.png') }}" alt="Profile">
@@ -943,7 +943,7 @@
     </footer>
 
 
-{{--
+    {{--
     <!-- Pastikan urutan script benar -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script> --}}
