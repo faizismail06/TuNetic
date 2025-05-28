@@ -12,7 +12,7 @@ class PetugasSeeder extends Seeder
     public function run(): void
     {
         // Ambil user berdasarkan email atau nama tertentu
-        $user = User::where('email', 'petugas@example.com')->first();
+        $user = User::where('email', 'petugas@tunetic.com')->first();
 
         if (!$user) {
             $this->command->warn('User belum tersedia untuk penugasan petugas.');
@@ -27,14 +27,13 @@ class PetugasSeeder extends Seeder
             'password' => $user->password, // bisa pakai ulang password-nya
             'nomor' => '081234567890',
             'tanggal_lahir' => '1995-05-10',
-            'alamat' => $user->alamat,
             'sim_image' => null,
             'alasan_bergabung' => 'Bergabung untuk bantu lingkungan.',
             'role' => 'Petugas',
             'email_verified_at' => now(),
         ]);
         // Ambil user berdasarkan email atau nama tertentu
-        $user = User::where('email', 'petugas2@example.com')->first();
+        $user = User::where('email', 'petugas2@tunetic.com')->first();
 
         if (!$user) {
             $this->command->warn('User belum tersedia untuk penugasan petugas.');

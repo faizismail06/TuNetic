@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.navbar')
 
 @section('content')
     <div class="container">
@@ -6,7 +6,7 @@
             <div class="col-md-11">
                 <div class="card">
                     <div class="card-header bg-white border-bottom">
-                        <h5 class="mb-0">Profil Admin</h5>
+                        <h5 class="mb-0">Profil Pengguna</h5>
                     </div>
 
                     <div class="card-body">
@@ -17,7 +17,17 @@
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ route('admin.profile.update') }}" enctype="multipart/form-data">
+                        {{-- Form action is dynamic based on user level --}}
+                        @php
+                            $formRoute = route('masyarakat.profile.update');
+                            $ajaxPhotoRoute = route('masyarakat.profile.upload-photo');
+                            $regenciesRoute = 'masyarakat.get.regencies';
+                            $districtsRoute = 'masyarakat.get.districts';
+                            $villagesRoute = 'masyarakat.get.villages';
+
+                        @endphp
+
+                        <form method="POST" action="{{ $formRoute }}" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
 
@@ -31,13 +41,18 @@
                                             style="width: 150px; height: 150px; overflow: hidden; background-color: #f8f9fa; cursor: pointer;"
                                             id="profile-image-clickable">
                                             @if ($user && $user->foto)
-                                                <img id="profile-preview"
-                                                    src="{{ asset('storage/profile/' . $user->foto) }}"
+                                                <img id="profile-preview" src="{{ asset('storage/profil/' . $user->foto) }}"
                                                     class="img-fluid w-100 h-100" style="object-fit: cover;"
                                                     alt="Foto Profil">
                                             @else
-                                                <i class="fas fa-user text-secondary" style="font-size: 4rem;"></i>
+                                                <div id="profile-preview"
+                                                    class="w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-light">
+                                                    <i class="fas fa-user text-secondary" style="font-size: 4rem;"></i>
+                                                </div>
                                             @endif
+                                        </div>
+                                        <div class="position-absolute bottom-0 end-0 bg-white rounded-circle p-2"
+                                            style="transform: translate(-10px, -10px);">
                                         </div>
                                     </div>
                                 </div>
@@ -45,10 +60,11 @@
                                 <div class="col-md-9">
                                     <div class="d-flex flex-column h-100 justify-content-center">
                                         <div class="d-flex align-items-center mb-2">
-                                            <button type="button" id="btn-choose-photo" class="btn btn-success px-4">
+                                            <button type="button" id="btn-choose-photo" class="btn btn-success px-4"
+                                                style="background-color: #299E63; border-color: #299E63;">
                                                 <i class="fas fa-camera me-2"></i> Pilih Photo
                                             </button>
-                                            <input type="file" name="foto" id="input-foto" class="d-none"
+                                            <input type="file" name="gambar" id="input-gambar" class="d-none"
                                                 accept="image/jpeg,image/png,image/jpg">
                                         </div>
                                         <div class="text-muted small">
@@ -79,7 +95,8 @@
                                     <label for="email" class="form-label">Email</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                    <input type="email"
+                                        class="form-control @error('email') is-invalid @enderror colored-input"
                                         id="email" name="email" value="{{ old('email', $user->email ?? '') }}">
                                     @error('email')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -184,10 +201,25 @@
                                     @enderror
                                 </div>
                             </div>
+                            <!-- Setelah bagian Desa/Kelurahan -->
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="alamat" class="form-label">Detail Alamat <span
+                                            class="text-danger">*</span></label>
+                                </div>
+                                <div class="col-md-9">
+                                    <textarea class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" rows="2">{{ old('alamat', $user->alamat ?? '') }}</textarea>
+                                    @error('alamat')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">Contoh: Jl. Merdeka No. 10, RT 05/RW 02</small>
+                                </div>
+                            </div>
 
                             <div class="row mt-4">
                                 <div class="col-12 text-end">
-                                    <button type="submit" class="btn btn-success px-4">
+                                    <button type="submit" class="btn btn-success px-4"
+                                        style="background-color: #299E63; border-color: #299E63;">
                                         <i class="fas fa-save me-2"></i> Simpan Perubahan
                                     </button>
                                 </div>
@@ -200,7 +232,8 @@
     </div>
 @endsection
 
-@push('styles')
+@push('css')
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .profile-image-wrapper {
             border: 3px solid #e9ecef;
@@ -240,6 +273,26 @@
         select.form-select {
             width: 100%;
         }
+
+        .colored-input {
+            background-color: #d4edda;
+            /* Warna hijau muda seperti contoh */
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            border-radius: 0.25rem;
+            /* Sesuaikan radius sesuai keinginan */
+            padding: 0.375rem 0.75rem;
+            /* Sesuaikan padding sesuai keinginan */
+        }
+
+        .colored-input:focus {
+            background-color: #d4edda;
+            /* Pertahankan warna saat fokus */
+            border-color: #c3e6cb;
+            box-shadow: 0 0 0 0.2rem rgba(207, 233, 210, 0.5);
+            /* Efek fokus yang lebih halus */
+            color: #155724;
+        }
     </style>
 @endpush
 
@@ -249,11 +302,11 @@
         $(document).ready(function() {
             // Auto trigger file input when button clicked
             $('#btn-choose-photo').click(function() {
-                $('#input-foto').trigger('click');
+                $('#input-gambar').trigger('click');
             });
 
             // Preview and auto-upload when file selected
-            $('#input-foto').change(function() {
+            $('#input-gambar').change(function() {
                 if (this.files && this.files[0]) {
                     // Validate file size
                     if (this.files[0].size > 2 * 1024 * 1024) {
@@ -276,11 +329,11 @@
             // Upload function
             function uploadPhoto(file) {
                 let formData = new FormData();
-                formData.append('foto', file);
+                formData.append('gambar', file);
                 formData.append('_token', '{{ csrf_token() }}');
 
                 $.ajax({
-                    url: '{{ route('admin.profile.upload-photo') }}',
+                    url: '{{ $ajaxPhotoRoute }}',
                     type: 'POST',
                     data: formData,
                     processData: false,
@@ -306,7 +359,7 @@
                     error: function(xhr) {
                         let error = xhr.responseJSON?.error || 'Gagal mengupload foto';
                         toastr.error(error);
-                        $('#input-foto').val('');
+                        $('#input-gambar').val('');
                     }
                 });
             }
@@ -320,21 +373,29 @@
                     return;
                 }
 
-                $.get('/admin/get-regencies/' + provinceId, function(data) {
-                    var options = '<option value="">Pilih Kabupaten/Kota</option>';
-                    $.each(data, function(key, value) {
-                        var selected = (selectedId && value.id == selectedId) ? 'selected' : '';
-                        options += '<option value="' + value.id + '" ' + selected + '>' + value
-                            .name + '</option>';
-                    });
-                    $('#regency').html(options);
+                $.ajax({
+                    url: '{{ route($regenciesRoute, ['province_id' => ':province_id']) }}'.replace(
+                        ':province_id', provinceId),
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        var options = '<option value="">Pilih Kabupaten/Kota</option>';
+                        $.each(data, function(key, value) {
+                            var selected = (selectedId && value.id == selectedId) ? 'selected' :
+                                '';
+                            options += '<option value="' + value.id + '" ' + selected + '>' +
+                                value.name + '</option>';
+                        });
+                        $('#regency').html(options);
 
-                    if (selectedId) {
-                        $('#regency').trigger('change');
+                        if (selectedId) {
+                            $('#regency').trigger('change');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Gagal memuat data kabupaten/kota', xhr);
+                        $('#regency').html('<option value="">Error: Gagal memuat data</option>');
                     }
-                }).fail(function() {
-                    console.error('Gagal memuat data kabupaten/kota');
-                    $('#regency').html('<option value="">Pilih Kabupaten/Kota</option>');
                 });
             }
 
@@ -345,21 +406,29 @@
                     return;
                 }
 
-                $.get('/admin/get-districts/' + regencyId, function(data) {
-                    var options = '<option value="">Pilih Kecamatan</option>';
-                    $.each(data, function(key, value) {
-                        var selected = (selectedId && value.id == selectedId) ? 'selected' : '';
-                        options += '<option value="' + value.id + '" ' + selected + '>' + value
-                            .name + '</option>';
-                    });
-                    $('#district').html(options);
+                $.ajax({
+                    url: '{{ route($districtsRoute, ['regency_id' => ':regency_id']) }}'.replace(
+                        ':regency_id', regencyId),
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        var options = '<option value="">Pilih Kecamatan</option>';
+                        $.each(data, function(key, value) {
+                            var selected = (selectedId && value.id == selectedId) ? 'selected' :
+                                '';
+                            options += '<option value="' + value.id + '" ' + selected + '>' +
+                                value.name + '</option>';
+                        });
+                        $('#district').html(options);
 
-                    if (selectedId) {
-                        $('#district').trigger('change');
+                        if (selectedId) {
+                            $('#district').trigger('change');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Gagal memuat data kecamatan', xhr);
+                        $('#district').html('<option value="">Error: Gagal memuat data</option>');
                     }
-                }).fail(function() {
-                    console.error('Gagal memuat data kecamatan');
-                    $('#district').html('<option value="">Pilih Kecamatan</option>');
                 });
             }
 
@@ -369,17 +438,35 @@
                     return;
                 }
 
-                $.get('/admin/get-villages/' + districtId, function(data) {
-                    var options = '<option value="">Pilih Desa/Kelurahan</option>';
-                    $.each(data, function(key, value) {
-                        var selected = (selectedId && value.id == selectedId) ? 'selected' : '';
-                        options += '<option value="' + value.id + '" ' + selected + '>' + value
-                            .name + '</option>';
-                    });
-                    $('#village').html(options);
-                }).fail(function() {
-                    console.error('Gagal memuat data desa/kelurahan');
-                    $('#village').html('<option value="">Pilih Desa/Kelurahan</option>');
+                $.ajax({
+                    url: '{{ route($villagesRoute, ['district_id' => ':district_id']) }}'.replace(
+                        ':district_id', districtId),
+                    type: 'GET',
+                    dataType: 'json',
+                    cache: false,
+                    success: function(data) {
+                        console.log('Village data received:', data);
+                        console.log('Selected village ID:', selectedId);
+
+                        var options = '<option value="">Pilih Desa/Kelurahan</option>';
+                        $.each(data, function(key, value) {
+                            var selected = (selectedId && value.id == selectedId) ? 'selected' :
+                                '';
+                            options += '<option value="' + value.id + '" ' + selected + '>' +
+                                value.name + '</option>';
+                        });
+                        $('#village').html(options);
+
+                        // Tambahan: Force select jika ada selectedId
+                        if (selectedId) {
+                            $('#village').val(selectedId);
+                            console.log('Forcing select village ID:', selectedId);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Gagal memuat data desa/kelurahan', xhr);
+                        $('#village').html('<option value="">Error: Gagal memuat data</option>');
+                    }
                 });
             }
 
@@ -406,22 +493,42 @@
                 var districtId = '{{ $user->district_id }}';
                 var villageId = '{{ $user->village_id }}';
 
-                // Load regencies first
-                loadRegencies(provinceId, regencyId);
+                console.log('Init data - provinceId:', provinceId);
+                console.log('Init data - regencyId:', regencyId);
+                console.log('Init data - districtId:', districtId);
+                console.log('Init data - villageId:', villageId);
 
-                // Then load districts after a short delay
-                setTimeout(function() {
-                    if (regencyId) {
-                        loadDistricts(regencyId, districtId);
-                    }
+                // Load semua data secara berurutan dengan penanganan yang lebih baik
+                if (provinceId) {
+                    loadRegencies(provinceId, regencyId);
 
-                    // Finally load villages after another delay
+                    // Tunggu untuk regencies dimuat
                     setTimeout(function() {
-                        if (districtId) {
-                            loadVillages(districtId, villageId);
+                        if (regencyId) {
+                            loadDistricts(regencyId, districtId);
+
+                            // Tunggu untuk districts dimuat
+                            setTimeout(function() {
+                                if (districtId && villageId) {
+                                    loadVillages(districtId, villageId);
+
+                                    // Sebagai fallback, coba set village value lagi setelah 1 detik
+                                    setTimeout(function() {
+                                        if ($('#village option[value="' + villageId + '"]')
+                                            .length) {
+                                            $('#village').val(villageId);
+                                            console.log('Village value set via fallback');
+                                        } else {
+                                            console.log(
+                                                'Village option not found in dropdown after fallback'
+                                            );
+                                        }
+                                    }, 1000);
+                                }
+                            }, 500);
                         }
-                    }, 300);
-                }, 300);
+                    }, 500);
+                }
             @endif
         });
     </script>

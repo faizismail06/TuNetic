@@ -13,4 +13,14 @@ class Regency extends Model
     protected $fillable = [
         'name', // Kolom untuk nama provinsi
     ];
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+    
+    public function districts()
+    {
+        return $this->hasMany(District::class);
+    }
 }
