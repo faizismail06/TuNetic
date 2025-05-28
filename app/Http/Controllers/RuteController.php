@@ -59,15 +59,11 @@ class RuteController extends Controller
                 'wilayah' => 'required|string',
                 'tps' => 'required|array|min:1',
                 'tps.*' => 'nullable|exists:lokasi_tps,id', // validasi dropdown TPS
-                'tpst_id' => ['nullable', Rule::exists('lokasi_tps', 'id')->where('tipe', 'TPST')],
-                'tpa_id' => ['nullable', Rule::exists('lokasi_tps', 'id')->where('tipe', 'TPA')],
             ]);
 
             $rute = Rute::create([
                 'nama_rute' => $request->nama_rute,
                 'wilayah' => $request->wilayah,
-                'tpst_id' => $request->tpst_id,
-                'tpa_id' => $request->tpa_id,
             ]);
 
             $rute->tps()->attach(array_filter($request->tps));
