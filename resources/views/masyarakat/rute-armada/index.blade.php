@@ -359,30 +359,102 @@
             showAllRoutes();
         });
 
-        // Fungsi inisialisasi peta yang lebih sederhana, mengadopsi dari kode 2
-        function initializeMap() {
-            console.log('Initializing map');
+        try {
+            // Variabel global untuk menyimpan referensi peta
+            let map = null;
 
-            try {
-                // Inisialisasi peta dengan lokasi default Jawa Tengah
-                map = L.map('map').setView([-7.056325, 110.454250], 12);
+            // Fungsi untuk inisialisasi peta dengan koordinat tertentu
+            function initializeMap(lat, lng, zoom = 15) {
+                // Validasi koordinat
+                if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+                    console.error('Koordinat tidak valid:', lat, lng);
+                    return;
+                }
+
+                // Hapus peta yang sudah ada jika ada
+                if (map) {
+                    map.remove();
+                    map = null;
+                }
+
+                // Inisialisasi peta baru
+                map = L.map('map').setView([lat, lng], zoom);
 
                 // Tambahkan tile layer
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; OpenStreetMap contributors'
                 }).addTo(map);
 
-                // Tambahkan layer groups
-                markersLayer.addTo(map);
-                routesLayer.addTo(map);
-
-                // Tambahkan legenda
-                addMapLegend();
-
-                console.log('Map initialized successfully');
-            } catch (e) {
-                console.error('Error initializing map:', e);
+                // Tambahkan marker pada lokasi pengguna
+                // L.marker([lat, lng])
+                //     .addTo(map)
+                //     .bindPopup('Lokasi Anda')
+                //     .openPopup();
             }
+
+            // Cek apakah browser mendukung Geolocation
+            if (navigator.geolocation) {
+                // Tampilkan loading atau pesan sementara
+                console.log("Mengambil lokasi Anda...");
+
+                // Opsi untuk geolocation
+                const options = {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                };
+
+                // Ambil lokasi pengguna
+                navigator.geolocation.getCurrentPosition(
+                    // Success callback
+                    function(position) {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+
+                        console.log(`Lokasi ditemukan: ${userLat}, ${userLng}`);
+
+                        // Validasi koordinat sebelum inisialisasi
+                        if (userLat && userLng && !isNaN(userLat) && !isNaN(userLng)) {
+                            initializeMap(userLat, userLng, 15);
+                        } else {
+                            console.error('Koordinat tidak valid dari geolocation');
+                            initializeMap(-7.056325, 110.454250, 12);
+                        }
+                    },
+                    // Error callback
+                    function(error) {
+                        console.warn('Error mendapatkan lokasi:', error.message);
+
+                        // Fallback ke lokasi default Jawa Tengah jika gagal
+                        console.log('Menggunakan lokasi default: Jawa Tengah');
+                        initializeMap(-7.056325, 110.454250, 12);
+
+                        // Tampilkan pesan error kepada pengguna (opsional)
+                        alert('Tidak dapat mengakses lokasi Anda. Menggunakan lokasi default.');
+                    },
+                    options
+                );
+            } else {
+                // Browser tidak mendukung Geolocation
+                console.warn('Browser tidak mendukung Geolocation');
+
+                // Gunakan lokasi default
+                initializeMap(-7.056325, 110.454250, 12);
+                alert('Browser Anda tidak mendukung deteksi lokasi. Menggunakan lokasi default.');
+            }
+
+        } catch (error) {
+            console.error('Error inisialisasi peta:', error);
+
+            // Fallback terakhir - pastikan tidak ada peta yang sudah diinisialisasi
+            if (map) {
+                map.remove();
+            }
+
+            map = L.map('map').setView([-7.056325, 110.454250], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
         }
 
         // Tambahkan legenda ke peta

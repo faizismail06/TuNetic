@@ -13,6 +13,7 @@ class LokasiTps extends Model
 
     protected $fillable = [
         'nama_lokasi',
+        'tipe',
         'province_id',
         'regency_id',
         'district_id',
@@ -30,7 +31,7 @@ class LokasiTps extends Model
     {
         return $this->belongsToMany(Rute::class, 'rute_tps');
     }
-    
+
     public function province()
     {
         return $this->belongsTo(Province::class, 'province_id');
@@ -40,13 +41,14 @@ class LokasiTps extends Model
     {
         return $this->belongsTo(Regency::class, 'regency_id');
     }
+
     public function district()
     {
         return $this->belongsTo(District::class, 'district_id');
     }
+
     public function village()
     {
         return $this->belongsTo(Village::class, 'village_id');
     }
-
 }

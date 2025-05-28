@@ -8,6 +8,7 @@ use App\Models\Jadwal;
 use App\Models\Rute;
 use App\Models\Petugas;
 use App\Models\PenugasanPetugas;
+use App\Models\LaporanWarga;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Exception;
@@ -27,7 +28,8 @@ class JadwalOperasionalController extends Controller
             'armada',
             'jadwal',
             'rute',
-            'penugasanPetugas.petugas'
+            'penugasanPetugas.petugas',
+            'laporan',
         ])->get();
         return view('adminpusat/jadwal-operasional.index', compact('jadwals'));
     }
@@ -46,6 +48,7 @@ class JadwalOperasionalController extends Controller
                 'id_armada' => 'required|exists:armada,id',
                 'id_jadwal' => 'required|exists:jadwal,id',
                 'id_rute' => 'required|exists:rute,id',
+                'id_laporan' => 'nullable|exists:laporan_warga,id',
                 'tanggal' => 'required|date',
                 'jam_aktif' => [
                     'required',
@@ -59,9 +62,18 @@ class JadwalOperasionalController extends Controller
                 'status' => 'required|integer|in:0,1,2',
             ]));
 
+            // Jika ada laporan warga yang di-assign, update statusnya
+            if ($request->filled('id_laporan')) {
+                $laporan = LaporanWarga::find($request->id_laporan);
+                $laporan->status = 'diterima';
+                $laporan->waktu_diterima = now();
+                $laporan->save();
+            }
+
+
             // Simpan penugasan petugas
             foreach ($request->input('petugas', []) as $p) {
-                \App\Models\PenugasanPetugas::create([
+                PenugasanPetugas::create([
                     'id_jadwal_operasional' => $jadwal->id,
                     'id_petugas' => $p['id_petugas'],
                     'tugas' => $p['tugas'],
@@ -86,28 +98,11 @@ class JadwalOperasionalController extends Controller
             'jadwals' => Jadwal::all(),
             'rutes' => Rute::all(),
             'petugas' => Petugas::all(), // ✅ ini penting
+            'laporan' => LaporanWarga::all(),
         ]);
     }
 
-    /**
-     * Menampilkan jadwal operasional berdasarkan ID.
-     */
-    public function show($id)
-    {
-        // $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->findOrFail($id);
-        // return response()->json($jadwal, 200);
-        try {
-            $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->findOrFail($id);
-            return response()->json($jadwal, 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Data tidak ditemukan!',
-                'error' => $e->getMessage()
-            ], 404);
-        }
-    }
-
-    /**
+        /**
      * Memperbarui jadwal operasional.
      */
     public function edit($id)
@@ -116,7 +111,8 @@ class JadwalOperasionalController extends Controller
             'jadwal',
             'armada',
             'rute',
-            'penugasanPetugas.petugas'
+            'penugasanPetugas.petugas',
+            'laporan',
         ])->findOrFail($id);
 
         return view('adminpusat/jadwal-operasional.edit', [
@@ -125,6 +121,7 @@ class JadwalOperasionalController extends Controller
             'jadwals' => Jadwal::all(),
             'rutes' => Rute::all(),
             'petugas' => Petugas::all(),
+            'laporan' => LaporanWarga::all(),
         ]);
     }
 
@@ -140,6 +137,7 @@ class JadwalOperasionalController extends Controller
                 'id_armada' => 'required|exists:armada,id',
                 'id_jadwal' => 'required|exists:jadwal,id',
                 'id_rute' => 'required|exists:rute,id',
+                'id_laporan' => 'nullable|exists:laporan_warga,id',
                 'tanggal' => 'required|date',
                 'jam_aktif' => [
                     'required',
@@ -156,12 +154,18 @@ class JadwalOperasionalController extends Controller
             // Update jadwal operasional
             $jadwal->update($validatedData);
 
+            if ($request->filled('id_laporan')) {
+                $laporan = LaporanWarga::find($request->id_laporan);
+                $laporan->status = 'diterima';
+                $laporan->waktu_diterima = now();
+                $laporan->save();
+            }
             // Hapus semua penugasan lama
             $jadwal->penugasanPetugas()->delete();
 
             // Tambahkan ulang penugasan yang baru dari form
             foreach ($request->input('petugas', []) as $p) {
-                \App\Models\PenugasanPetugas::create([
+                PenugasanPetugas::create([
                     'id_jadwal_operasional' => $jadwal->id,
                     'id_petugas' => $p['id_petugas'],
                     'tugas' => $p['tugas'],
@@ -184,6 +188,14 @@ class JadwalOperasionalController extends Controller
     {
         try {
             $jadwal = JadwalOperasional::findOrFail($id);
+
+            if ($jadwal->id_laporan) {
+                $laporan = LaporanWarga::find($jadwal->id_laporan);
+                $laporan->status = 'menunggu';
+                $laporan->waktu_diterima = null;
+                $laporan->save();
+            }
+
             $jadwal->delete();
 
 
@@ -197,6 +209,24 @@ class JadwalOperasionalController extends Controller
                 'message' => 'Terjadi kesalahan saat menghapus!',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Menampilkan jadwal operasional berdasarkan ID.
+     */
+    public function show($id)
+    {
+        // $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->findOrFail($id);
+        // return response()->json($jadwal, 200);
+        try {
+            $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->findOrFail($id);
+            return response()->json($jadwal, 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Data tidak ditemukan!',
+                'error' => $e->getMessage()
+            ], 404);
         }
     }
 }

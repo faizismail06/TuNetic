@@ -24,13 +24,13 @@
 </div>
 
 <div class="content">
-    <div class="container-fluid mt-4">
+    <div class="container-fluid">
         <div class="card card-success card-outline">
-            <div class="card-header">
-                <h5 class="m-0">Data Jadwal Operasional</h5>
-                <div class="card-tools">
+            <div class="card-header d-flex justify-content-between">
+                <h5 class="m-0 p-1">Data Jadwal Operasional</h5>
+                <div class="ml-auto">
                     <a href="{{ route('jadwal-operasional.create') }}" class="btn btn-sm btn-success">
-                        <i class="fas fa-plus-circle"></i>
+                        <i class="fas fa-plus-circle"></i> Tambah Jadwal
                     </a>
                 </div>
             </div>
@@ -46,6 +46,7 @@
                             <th>Jam</th>
                             <th>Petugas</th>
                             <th>Tugas</th>
+                            <th>Laporan</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -77,6 +78,15 @@
                                     @endif
                                 </td>
                                 <td>
+                                    @if ($item->laporan)
+                                        <a href="{{ route('laporan-warga.show', $item->laporan->id) }}">
+                                            {{ $item->laporan->judul }}
+                                        </a>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-outline-info dropdown-toggle" data-toggle="dropdown">
                                             <i class="fas fa-cog"></i>
@@ -99,11 +109,5 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-
 @endsection
 

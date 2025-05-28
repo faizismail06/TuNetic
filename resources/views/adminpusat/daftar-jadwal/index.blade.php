@@ -40,12 +40,25 @@ $(document).ready(function () {
 @endpush --}}
 
 @section('content')
-<div class="content">
-    <div class="container-fluid mt-4">
+    <div class="content-header mx-5">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6 text-uppercase">
+                    <h4 class="m-0">Master Jadwal</h4>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="content mx-5">
+    <div class="container-fluid">
         <div class="card card-success card-outline">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="m-0">Daftar Jadwal</h5>
-                <div>
+            <div class="card-header d-flex justify-content-between">
+                <h5 class="m-0 p-1">Daftar Jadwal</h5>
+                <div class="ml-auto">
                     {{-- <a href="{{ route('daftar-jadwal.generate.form') }}" class="btn btn-sm btn-success mr-2">
                         <i class="fas fa-sync-alt"></i> Generate Jadwal
                     </a> --}}
@@ -67,7 +80,7 @@ $(document).ready(function () {
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($jadwals as $item)
+                            @foreach ($jadwal as $item)
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td>{{ $item->hari }}</td>
@@ -104,13 +117,13 @@ $(document).ready(function () {
         </div>
     </div>
 </div>
-<div class="content">
+<div class="content mx-5">
     <div class="container-fluid mt-4">
         <div class="card card-success card-outline">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="m-0">Generate Jadwal Operasional</h5>
-                <div>
-                    <a href="/jadwal-template" class="btn btn-success">Kelola Template</a>
+            <div class="card-header d-flex justify-content-between">
+                <h5 class="m-0 p-1">Generate Jadwal Operasional</h5>
+                <div class="ml-auto">
+                    <a href="/jadwal-template" class="btn btn-sm btn-success">Kelola Template</a>
                 </div>
             </div>
             <div class="card-body">
@@ -121,25 +134,25 @@ $(document).ready(function () {
                     <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif
 
-                <form action="{{ route('daftar-jadwal.generate.store') }}" method="POST">
-                    @csrf
-                    <div class="row">
-                        <div class="col-md-6 form-group">
-                            <label for="bulan_mulai">Bulan Mulai</label>
-                            <input type="month" name="bulan_mulai" class="form-control" required>
-                        </div>
+                    <form action="{{ route('daftar-jadwal.generate.store') }}" method="POST">
+                        @csrf
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label for="bulan_mulai">Bulan Mulai</label>
+                                <input type="month" name="bulan_mulai" class="form-control" required>
+                            </div>
 
-                        <div class="col-md-6 form-group">
-                            <label for="bulan_akhir">Bulan Akhir</label>
-                            <input type="month" name="bulan_akhir" class="form-control" required>
+                            <div class="col-md-6 form-group">
+                                <label for="bulan_akhir">Bulan Akhir</label>
+                                <input type="month" name="bulan_akhir" class="form-control" required>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-success">Generate</button>
-                    </div>
-                </form>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">Generate</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
-@endsection
+    @endsection

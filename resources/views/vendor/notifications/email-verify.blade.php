@@ -16,7 +16,7 @@
                     <!-- Logo Section -->
                     <tr>
                         <td style="padding: 30px 30px 20px 30px; background-color: #299e63;">
-                            <img src="https://i.postimg.cc/hPZh2FJk/logoputih.png" alt="TuNetic" width="120" style="display: block;">
+                            <img src="https://i.imgur.com/SCU5T7B.png" alt="TuNetic" width="120" style="display: block;">
                         </td>
                     </tr>
 
@@ -34,7 +34,7 @@
 
                                     <!-- Right Column: Worker Image -->
                                     <td width="50%" align="right" valign="top" style="padding-right: 20px;">
-                                        <img src="https://i.postimg.cc/L566Vvm4/karakter-petugas.png" alt="Petugas Verifikasi" width="230" style="display: block;">
+                                        <img src="https://i.imgur.com/PfKUY3C.png" alt="Petugas Verifikasi" width="230" style="display: block;">
                                     </td>
                                 </tr>
                             </table>

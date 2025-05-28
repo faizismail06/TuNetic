@@ -10,14 +10,16 @@
 @section('content')
     <div class="container-fluid mt-4">
         <div class="card card-success card-outline">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="m-0">Template Jadwal</h5>
-
-                <select id="hariSelector" class="form-control w-25">
+            <div class="card-header d-flex justify-content-between">
+                <h5 class="m-0 p-2">Template Jadwal</h5>
+                <select id="hariSelector" class="ml-auto align-self-center form-control w-25 mr-2">
                     @foreach ($hariList as $hari)
-                        <option value="{{ $hari }}">{{ $hari }}</option>
+                    <option value="{{ $hari }}">{{ $hari }}</option>
                     @endforeach
                 </select>
+                <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#tambahTemplateModal">
+                    <i class="fas fa-plus-circle"></i> Tambah Template
+                </button>
             </div>
 
 
@@ -28,10 +30,7 @@
                 </div>
             </div>
         </div>
-        <!-- Tombol Tambah Template -->
-        <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#tambahTemplateModal">
-            Tambah Template
-        </button>
+
 
         <!-- Modal Tambah Template -->
         <div class="modal fade" id="tambahTemplateModal" tabindex="-1" aria-labelledby="tambahTemplateModalLabel"
