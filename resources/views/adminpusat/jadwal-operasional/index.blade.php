@@ -26,9 +26,9 @@
 <div class="content">
     <div class="container-fluid">
         <div class="card card-success card-outline">
-            <div class="card-header">
-                <h5 class="card-title">Data Jadwal Operasional</h5>
-                <div class="card-tools">
+            <div class="card-header d-flex justify-content-between">
+                <h5 class="m-0 p-1">Data Jadwal Operasional</h5>
+                <div class="ml-auto">
                     <a href="{{ route('jadwal-operasional.create') }}" class="btn btn-sm btn-success">
                         <i class="fas fa-plus-circle"></i> Tambah Jadwal
                     </a>
