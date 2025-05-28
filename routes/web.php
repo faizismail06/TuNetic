@@ -24,14 +24,17 @@ use App\Http\Controllers\LaporanTpsController;
 use App\Http\Controllers\TrackingArmadaController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\RuteArmadaController;
 use App\Http\Controllers\JadwalRuteController;
 use App\Models\Role;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -304,6 +307,9 @@ Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
     return back()->with('resent', true);
 })->middleware(['auth', 'throttle:6,1'])->name('verification.resend');
+
+Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
 
 // ===================
 // JADWAL PENGAMBILAN - TRACKING PETUGAS
