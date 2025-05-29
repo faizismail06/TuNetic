@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.navbar')
 
 @section('content')
 <div class="container py-5">
@@ -12,16 +12,26 @@
                 </div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('masyarakat.jadipetugas.submit') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('masyarakat.jadi-petugas.submit') }}" enctype="multipart/form-data">
                         @csrf
+
+                        <!-- Persyaratan Section -->
+                        <div class="alert alert-light border mb-4">
+                            <h5 class="mb-3"><strong>Syarat Pendaftaran:</strong></h5>
+                            <ul class="mb-0">
+                                <li>Usia minimal 18 tahun</li>
+                                <li>Berdomisili di area layanan TuNetic</li>
+                                <li>Siap bekerja sesuai jadwal yang ditentukan</li>
+                            </ul>
+                        </div>
 
                         <!-- Foto Diri Section -->
                         <div class="mb-4">
-                            <h5><i class="fas fa-camera me-2"></i> Foto Diri</h5>
-                            <div class="alert alert-info">
+                            <h5 class="mb-3">Foto Diri</h5>
+                            <div class="alert alert-light border">
                                 <small>
                                     <i class="fas fa-info-circle me-2"></i> 
-                                    Upload foto diri dengan latar belakang polos, ukuran maksimal 2MB
+                                    Upload foto profile dengan latar belakang polos, ukuran maksimal 2MB
                                 </small>
                             </div>
                             <input type="file" class="form-control @error('foto_diri') is-invalid @enderror" 
@@ -33,10 +43,9 @@
 
                         <!-- Personal Data Section -->
                         <div class="mb-4">
-                            <h5><i class="fas fa-user-circle me-2"></i> Data Pribadi</h5>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nama Lengkap *</label>
+                                    <label class="form-label fw-bold">Nama Lengkap *</label>
                                     <input type="text" class="form-control @error('nama_lengkap') is-invalid @enderror" 
                                            name="nama_lengkap" value="{{ old('nama_lengkap') }}" required>
                                     @error('nama_lengkap')
@@ -44,7 +53,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Username *</label>
+                                    <label class="form-label fw-bold">Username *</label>
                                     <input type="text" class="form-control @error('username') is-invalid @enderror" 
                                            name="username" value="{{ old('username') }}" required>
                                     @error('username')
@@ -55,7 +64,7 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">No Telepon *</label>
+                                    <label class="form-label fw-bold">No Telepon *</label>
                                     <input type="tel" class="form-control @error('no_telepon') is-invalid @enderror" 
                                            name="no_telepon" value="{{ old('no_telepon') }}" required>
                                     @error('no_telepon')
@@ -87,18 +96,17 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Provinsi</label>
                                     <select class="form-control @error('provinsi') is-invalid @enderror" name="provinsi" id="provinsi">
                                         <option value="">Pilih Provinsi</option>
                                         <option value="Jawa Tengah" {{ old('provinsi') == 'Jawa Tengah' ? 'selected' : '' }}>Jawa Tengah</option>
-                                        <!-- Add more provinces as needed -->
                                     </select>
                                     @error('provinsi')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Kabupaten/Kota</label>
                                     <select class="form-control @error('kabupaten') is-invalid @enderror" name="kabupaten" id="kabupaten">
                                         <option value="">Pilih Kabupaten/Kota</option>
@@ -108,10 +116,7 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Kecamatan</label>
                                     <select class="form-control @error('kecamatan') is-invalid @enderror" name="kecamatan" id="kecamatan">
                                         <option value="">Pilih Kecamatan</option>
@@ -121,6 +126,9 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+                            </div>
+
+                            <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Desa/Kelurahan</label>
                                     <select class="form-control @error('desa') is-invalid @enderror" name="desa" id="desa">
@@ -136,8 +144,8 @@
 
                         <!-- SIM Upload Section -->
                         <div class="mb-4">
-                            <h5><i class="fas fa-id-card me-2"></i> Upload SIM</h5>
-                            <div class="alert alert-info">
+                            <h5 class="mb-3">Upload SIM</h5>
+                            <div class="alert alert-light border">
                                 <small>
                                     <i class="fas fa-info-circle me-2"></i> 
                                     Upload foto SIM dalam format JPG/JPEG/PNG (maksimal 2MB)
@@ -152,9 +160,9 @@
 
                         <!-- Reason Section -->
                         <div class="mb-4">
-                            <h5><i class="fas fa-comment me-2"></i> Alasan Bergabung</h5>
+                            <h5 class="mb-3">Alasan Bergabung</h5>
                             <textarea class="form-control @error('alasan_bergabung') is-invalid @enderror" 
-                                      name="alasan_bergabung" rows="4" required>{{ old('alasan_bergabung') }}</textarea>
+                                      name="alasan_bergabung" rows="4" placeholder="Berikan alasan terbaik Anda" required>{{ old('alasan_bergabung') }}</textarea>
                             @error('alasan_bergabung')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -163,7 +171,7 @@
                         <!-- Submit Button -->
                         <div class="d-grid">
                             <button type="submit" class="btn btn-lg text-white" style="background-color: #299E63">
-                                <i class="fas fa-paper-plane me-2"></i> Kirim Pendaftaran
+                                Kirim Pendaftaran
                             </button>
                         </div>
                     </form>
@@ -172,34 +180,61 @@
         </div>
     </div>
 </div>
+@endsection
 
 @section('styles')
 <style>
     .card {
-        border-radius: 15px;
+        border-radius: 10px;
     }
     .card-header {
-        border-radius: 15px 15px 0 0 !important;
+        border-radius: 10px 10px 0 0 !important;
+        font-size: 1.2rem;
     }
     textarea {
         resize: none;
+        min-height: 120px;
     }
     .form-control:focus {
         border-color: #299E63;
         box-shadow: 0 0 0 0.25rem rgba(41, 158, 99, 0.25);
+    }
+    .alert-light {
+        background-color: #f8f9fa;
+    }
+    h5 {
+        color: #299E63;
+        font-weight: 600;
     }
 </style>
 @endsection
 
 @section('scripts')
 <script>
-    // Dynamic dropdown for regions (you can implement AJAX calls here)
     document.addEventListener('DOMContentLoaded', function() {
-        // You can add JavaScript for dynamic region selection here
-        // Example:
+        // Dynamic region selection can be implemented here
+        // Example for provinsi change:
         document.getElementById('provinsi').addEventListener('change', function() {
-            // AJAX call to get kabupaten based on selected provinsi
+            const provinsi = this.value;
+            const kabupatenSelect = document.getElementById('kabupaten');
+            
+            // Clear existing options
+            kabupatenSelect.innerHTML = '<option value="">Pilih Kabupaten/Kota</option>';
+            
+            if (provinsi === 'Jawa Tengah') {
+                // Add options for Jawa Tengah
+                const options = ['Kota Semarang', 'Kabupaten Semarang', 'Kota Salatiga'];
+                options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    kabupatenSelect.appendChild(option);
+                });
+            }
+            // Add more conditions for other provinces
         });
+        
+        // Similar logic for kabupaten -> kecamatan -> desa
     });
 </script>
 @endsection

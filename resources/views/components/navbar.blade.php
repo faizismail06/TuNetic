@@ -796,6 +796,12 @@
                             Ubah Password
                         </a>
 
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ route('masyarakat.jadi-petugas.form') }}" class="profile-dropdown-item">
+                            <i class="fas fa-user-shield"></i>
+                        Jadi Petugas
+                        </a>
+
                         <a href="#" class="profile-dropdown-item logout" id="logoutBtn">
                             <i class="fas fa-sign-out-alt"></i>
                             Logout

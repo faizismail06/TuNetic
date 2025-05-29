@@ -381,10 +381,20 @@ Route::group(['prefix' => 'tpst/jadwal-rute'], function () {
 
 // Routes untuk pengguna biasa yang ingin menjadi petugas
 Route::middleware(['auth'])->prefix('masyarakat')->name('masyarakat.')->group(function () {
-    Route::get('/jadi-petugas/form', [JadiPetugasController::class, 'JadipetugasForm'])->name('jadi-petugas.form');
-    Route::post('/jadi-petugas/submit', [JadiPetugasController::class, 'submit'])->name('jadi-petugas.submit');
-    Route::get('/jadi-petugas/success', [JadiPetugasController::class, 'success'])->name('jadi-petugas.success');
+    Route::get('/jadi-petugas/form', [JadiPetugasController::class, 'JadipetugasForm'])
+         ->name('jadi-petugas.form');
+         
+    Route::post('/jadi-petugas/submit', [JadiPetugasController::class, 'submitPetugasRequest'])
+         ->name('jadi-petugas.submit');
+         
+    Route::get('/jadi-petugas/success', [JadiPetugasController::class, 'success'])
+         ->name('jadi-petugas.success');
 });
+
+// Route untuk data wilayah
+    Route::get('/get-regencies/{province_id}', [JadiPetugasController::class, 'getRegencies'])->name('get.regencies');
+    Route::get('/get-districts/{regency_id}', [JadiPetugasController::class, 'getDistricts'])->name('get.districts');
+    Route::get('/get-villages/{district_id}', [JadiPetugasController::class, 'getVillages'])->name('get.villages');
 
 // Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
 // // Routes untuk CRUD petugas (khusus admin)
