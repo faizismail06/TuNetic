@@ -293,25 +293,50 @@ Route::middleware('auth')->group(function () {
 });
 
 
+// Route publik untuk masyarakat (tidak perlu login)
 Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
+    // Route untuk lapor sampah (publik)
     Route::get('/lapor', function () {
         return view('masyarakat.lapor');
     })->name('lapor');
+
+
+    Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+        // Halaman Profil Admin
+        Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+        Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
+        Route::get('/register', [UserController::class, 'showRegistrationForm'])->name('register');
+        Route::get('/get-regencies/{province_id}', [UserController::class, 'getRegencies']);
+        Route::get('/get-districts/{regency_id}', [UserController::class, 'getDistricts']);
+        Route::get('/get-villages/{district_id}', [UserController::class, 'getVillages']);
+
+        // Tambahkan resource lain di sini jika perlu
+    });
+
+
+
+    Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
+    Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
+
+    // Route untuk rute armada (publik)
+    Route::get('/rute-armada', [RuteArmadaController::class, 'index'])->name('rute-armada.index');
+    Route::get('/rute-armada/all-tps', [RuteArmadaController::class, 'showAllTps'])->name('rute-armada.all-tps');
+    Route::get('/rute-armada/jadwal/{id}', [RuteArmadaController::class, 'getJadwalDetail'])->name('rute-armada.jadwal-detail');
+    Route::get('/rute-armada/tracking/{id}', [RuteArmadaController::class, 'getRealtimeTracking'])->name('rute-armada.realtime-tracking');
 });
 
+// ===================
+// LAPORAN
+// ===================
+Route::resource('laporan-warga', LaporanWargaController::class);
+Route::resource('laporan-tps', LaporanTpsController::class);
 
-Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
-    // Halaman Profil Admin
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
-    Route::get('/index', [UserController::class, 'showRegistrationForm'])->name('index');
+// ===================
+// PERHITUNGAN SAMPAH
+// ===================
+Route::resource('tpst/perhitungan-sampah', LaporanTpsController::class);
 
-    // Route untuk data wilayah
-    Route::get('/get-regencies/{province_id}', [ProfileController::class, 'getRegencies'])->name('get.regencies');
-    Route::get('/get-districts/{regency_id}', [ProfileController::class, 'getDistricts'])->name('get.districts');
-    Route::get('/get-villages/{district_id}', [ProfileController::class, 'getVillages'])->name('get.villages');
-});
 
 
 Route::get('/email/verify', function () {

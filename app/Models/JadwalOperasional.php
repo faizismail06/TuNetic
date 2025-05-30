@@ -72,9 +72,9 @@ class JadwalOperasional extends Model
         return $this->hasMany(PenugasanPetugas::class, 'id_jadwal_operasional');
     }
 
-    // Relasi ke laporan warga
-    public function laporan()
+    // Relasi ke JadwalOperasional
+    public function laporanTps()
     {
-        return $this->belongsTo(LaporanWarga::class, 'id_laporan');
+        return $this->hasMany(JadwalOperasional::class, 'id_jadwal_operasional');
     }
 }
