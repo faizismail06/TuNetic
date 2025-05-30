@@ -279,6 +279,12 @@ Route::resource('laporan-warga', LaporanWargaController::class);
 Route::resource('laporan-tps', LaporanTpsController::class);
 
 // ===================
+// PERHITUNGAN SAMPAH
+// ===================
+Route::resource('tpst/perhitungan-sampah', LaporanTpsController::class);
+
+
+// ===================
 // EMAIL VERIFIKASI
 // ===================
 Route::get('/email/verify', function () {

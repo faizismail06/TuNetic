@@ -12,11 +12,11 @@ return new class extends Migration {
     {
         Schema::create('laporan_tps', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_petugas')->constrained('petugas');
+            $table->foreignId('id_jadwal_operasional')->constrained('jadwal_operasional');
             $table->float('total_sampah');
             $table->text('deskripsi');
             $table->date('tanggal_pengangkutan')->nullable(); // Tambahkan kolom tanggal_pengangkutan
-            $table->integer('status')->default(0);
+            // $table->integer('status')->default(0);
             $table->timestamps();
         });
     }
