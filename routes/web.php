@@ -89,6 +89,7 @@ Route::resource('pusat/manage-role', RoleController::class);
 Route::resource('pusat/manage-menu', MenuController::class);
 Route::resource('pusat/manage-petugas', PetugasController::class);
 Route::resource('pusat/manage-rute', RuteController::class);
+Route::resource('pusat/manage-armada', KelolaArmadaController::class);
 Route::resource('pusat/manage-permission', PermissionController::class)->only('store', 'destroy');
 // Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
 // Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
