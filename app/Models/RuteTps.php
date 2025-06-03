@@ -13,6 +13,7 @@ class RuteTps extends Model
     protected $fillable = [
         'id_rute',
         'id_lokasi_tps',
+        'urutan'
     ];
 
     public function jadwalOperasional()

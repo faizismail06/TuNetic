@@ -79,9 +79,10 @@
                                 </td>
                                 <td>
                                     @if ($item->laporan)
-                                        <a href="{{ route('laporan-warga.show', $item->laporan->id) }}">
+                                        {{-- <a href="{{ route('adminpusat.laporan-warga.show', $item->laporan->id) }}">
                                             {{ $item->laporan->judul }}
-                                        </a>
+                                        </a> --}}
+                                            {{ $item->laporan->judul }}
                                     @else
                                         -
                                     @endif

@@ -49,69 +49,54 @@
                                 <input type="text" class="form-control" id="wilayah" name="wilayah" required>
                             </div>
 
-                            {{-- <label>TPS</label>
-                            <div id="tps-container">
-                                <div class="form-group">
-                                    <select name="tps[]" class="form-control" required>
-                                        <option value="">Pilih TPS</option>
-                                        @foreach ($lokasiTps as $lokasi)
-                                            <option value="{{ $lokasi->id }}">{{ $lokasi->nama_lokasi }}</option>
-                                        @endforeach
-                                    </select>
+                            <div class="form-group mt-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label for="tps" class="mb-0">TPS</label>
+                                    <button type="button" class="btn btn-success" id="add-tps-btn">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
                                 </div>
-                            </div> --}}
 
-                            <div id="tps-input-wrapper">
-                                <label for="tps">TPS</label>
-                                <div class="tps-row input-group mb-2">
-                                    <select name="tps[]" class="form-control" required>
-                                        <option value="">Pilih TPS</option>
-                                        @foreach($lokasiTps as $tps)
-                                            @if($tps->tipe == 'TPS')
-                                                <option value="{{ $tps->id }}">{{ $tps->nama_lokasi }}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
+                                <div id="tps-input-wrapper">
+                                    <div class="tps-row input-group mb-2">
+                                        <select name="tps[]" class="form-control" required>
+                                            <option value="">Pilih TPS</option>
+                                            @foreach($lokasiTps as $lokasi)
+                                                @if($lokasi->tipe === 'TPS')
+                                                    <option value="{{ $lokasi->id }}">{{ $lokasi->nama_lokasi }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-danger remove-tps-btn">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-
-                            {{-- <div class="input-group-append">
-                                <button type="button" class="btn btn-success btn-add-tps">+</button>
-                            </div> --}}
-
-                            {{-- <button type="button" class="btn btn-success mb-3" id="add-tps-btn">
-                                <i class="fas fa-plus"></i>
-                            </button> --}}
-                            <div class="mb-3">
-                                <button type="button" class="btn btn-success" id="add-tps-btn">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger" id="remove-tps-btn">
-                                    <i class="fas fa-minus"></i>
-                                </button>
                             </div>
 
                             <div class="form-group">
-                                <label for="tps[]">TPST</label>
+                                <label for="tpst">TPST</label>
                                 <select name="tps[]" class="form-control">
                                     <option value="">Pilih TPST</option>
-                                        @foreach($lokasiTps as $tps)
-                                            @if($tps->tipe == 'TPST')
-                                                <option value="{{ $tps->id }}">{{ $tps->nama_lokasi }}</option>
-                                            @endif
-                                        @endforeach
+                                    @foreach($lokasiTps as $lokasi)
+                                        @if($lokasi->tipe == 'TPST')
+                                            <option value="{{ $lokasi->id }}">{{ $lokasi->nama_lokasi }}</option>
+                                        @endif
+                                    @endforeach
                                 </select>
                             </div>
 
                             <div class="form-group">
-                                <label for="tps[]">TPA</label>
+                                <label for="tpa">TPA</label>
                                 <select name="tps[]" class="form-control">
                                     <option value="">Pilih TPA</option>
-                                        @foreach($lokasiTps as $tps)
-                                            @if($tps->tipe == 'TPA')
-                                                <option value="{{ $tps->id }}">{{ $tps->nama_lokasi }}</option>
-                                            @endif
-                                        @endforeach
+                                    @foreach($lokasiTps as $lokasi)
+                                        @if($lokasi->tipe == 'TPA')
+                                            <option value="{{ $lokasi->id }}">{{ $lokasi->nama_lokasi }}</option>
+                                        @endif
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -124,86 +109,75 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('js')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const addBtn = document.getElementById('add-tps-btn');
-            const removeBtn = document.getElementById('remove-tps-btn');
-            const wrapper = document.getElementById('tps-input-wrapper');
-            // Tombol tambah TPS
-            // document.getElementById('add-tps-btn').addEventListener('click', function () {
-            //     const container = document.getElementById('tps-container');
-            //     const select = container.querySelector('select').cloneNode(true);
-            //     const wrapper = document.createElement('div');
-            //     wrapper.className = 'form-group';
-            //     wrapper.appendChild(select);
-            //     container.appendChild(wrapper);
-            // });
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const wrapper = document.getElementById('tps-input-wrapper');
+        const addBtn = document.getElementById('add-tps-btn');
 
-            addBtn.addEventListener('click', function () {
-                const rows = wrapper.querySelectorAll('.tps-row');
-                const lastRow = rows[rows.length -1];
-                const newRow = lastRow.cloneNode(true);
-                const select = newRow.querySelector('select');
+        function createTpsRow() {
+            const div = document.createElement('div');
+            div.className = 'tps-row input-group mb-2';
+            div.innerHTML = `
+                <select name="tps[]" class="form-control" required>
+                    <option value="">Pilih TPS</option>
+                    @foreach($lokasiTps as $lokasi)
+                        @if($lokasi->tipe === 'TPS')
+                            <option value="{{ $lokasi->id }}">{{ $lokasi->nama_lokasi }}</option>
+                        @endif
+                    @endforeach
+                </select>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-danger remove-tps-btn">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            `;
+            return div;
+        }
 
-                // Reset value dan pastikan placeholder selalu ada
-                select.value = "";
-                if (!select.querySelector('option[value=""]')) {
-                    const placeholderOption = document.createElement('option');
-                    placeholderOption.value = "";
-                    placeholderOption.textContent = "Pilih TPS";
-                    placeholderOption.disabled = true;
-                    placeholderOption.selected = true;
-                    select.insertBefore(placeholderOption, select.firstChild);
-                }
-
-                // const inputGroup = wrapper.querySelector('.input-group').cloneNode(true);
-                // inputGroup.querySelector('button').remove(); // remove "+" button from clones
-                wrapper.appendChild(newRow);
-            });
-
-            // Tombol hapus TPS
-            removeBtn.addEventListener('click', function () {
-                const rows = wrapper.querySelectorAll('.tps-row');
-                // const container = document.getElementById('tps-container');
-                // const selects = container.querySelectorAll('.form-group');
-
-                if (rows.length > 1) {
-                    wrapper.removeChild(rows[rows.length - 1]);
-                }
-            });
-
-            // Trigger konfirmasi saat klik tombol simpan
-            document.getElementById('btn-submit-form').addEventListener('click', function () {
-                Swal.fire({
-                    title: 'Konfirmasi',
-                    text: "Apakah Anda yakin ingin menambah rute ini?",
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#28a745',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, Simpan!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById('form-tambah-rute').submit();
-                    }
-                });
-            });
-
-            // Sweet alert untuk pesan sukses
-            @if(session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Sukses',
-                    text: '{{ session('success') }}',
-                    confirmButtonColor: '#28a745'
-                });
-            @endif
+        addBtn.addEventListener('click', () => {
+            const newRow = createTpsRow();
+            wrapper.appendChild(newRow);
         });
-    </script>
+
+        wrapper.addEventListener('click', function (e) {
+            if (e.target.closest('.remove-tps-btn')) {
+                const row = e.target.closest('.tps-row');
+                if (wrapper.querySelectorAll('.tps-row').length > 1) {
+                    row.remove();
+                }
+            }
+        });
+
+        document.getElementById('btn-submit-form').addEventListener('click', function () {
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: "Apakah Anda yakin ingin menambah rute ini?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Simpan!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('form-tambah-rute').submit();
+                }
+            });
+        });
+
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Sukses',
+                text: '{{ session('success') }}',
+                confirmButtonColor: '#28a745'
+            });
+        @endif
+    });
+</script>
 @endpush
