@@ -21,19 +21,41 @@ class JadiPetugasController extends Controller
      * Menampilkan form pendaftaran petugas
      */
     public function JadipetugasForm()
-{
-    // Cek jika user sudah petugas
-    if (auth()->user()->is_petugas) {
-        return redirect()->route('home')->with('warning', 'Anda sudah terdaftar sebagai petugas.');
+    {
+        // Cek jika user sudah petugas
+        if (auth()->user()->is_petugas) {
+            return redirect()->route('home')->with('warning', 'Anda sudah terdaftar sebagai petugas.');
+        }
+
+        $user = auth()->user();
+        $provinces = Province::all(); // Ambil semua provinsi
+
+        // Ambil data regencies, districts, villages jika user sudah punya data lokasi
+        $regencies = [];
+        $districts = [];
+        $villages = [];
+
+        if ($user->province_id) {
+            $regencies = Regency::where('province_id', $user->province_id)->get();
+        }
+
+        if ($user->regency_id) {
+            $districts = District::where('regency_id', $user->regency_id)->get();
+        }
+
+        if ($user->district_id) {
+            $villages = Village::where('district_id', $user->district_id)->get();
+        }
+
+        return view('masyarakat.jadipetugas.index', [
+            'provinces' => $provinces,
+            'regencies' => $regencies,
+            'districts' => $districts,
+            'villages' => $villages,
+            'user' => $user, // Pass user data untuk auto-fill
+            'is_petugas' => $user->is_petugas,
+        ]);
     }
-
-    $provinces = Province::all(); // Ambil semua provinsi
-
-    return view('masyarakat.jadipetugas.index', [
-        'provinces' => $provinces,
-        'is_petugas' => auth()->user()->is_petugas,
-    ]);
-}
 
     /**
      * Mengambil data kabupaten/kota berdasarkan provinsi
@@ -76,14 +98,14 @@ class JadiPetugasController extends Controller
         // Validasi input
         $request->validate([
             'nama_lengkap' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:petugas,username',
             'no_telepon' => 'required|string|max:20',
-            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'tanggal_lahir' => 'nullable|date',
             'provinsi_id' => 'required|exists:reg_provinces,id',
             'kabupaten_id' => 'required|exists:reg_regencies,id',
             'kecamatan_id' => 'required|exists:reg_districts,id',
             'desa_id' => 'required|exists:reg_villages,id',
+            'detail_alamat' => 'nullable|string|max:500',
             'foto_diri' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'foto_sim' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'alasan_bergabung' => 'required|string|max:1000',
@@ -102,7 +124,6 @@ class JadiPetugasController extends Controller
             // Update data user
             $user->update([
                 'name' => $request->nama_lengkap,
-                'username' => $request->username,
                 'no_telepon' => $request->no_telepon,
                 'email' => $request->email,
                 'tanggal_lahir' => $request->tanggal_lahir,
@@ -110,20 +131,21 @@ class JadiPetugasController extends Controller
                 'regency_id' => $request->kabupaten_id,
                 'district_id' => $request->kecamatan_id,
                 'village_id' => $request->desa_id,
+                'detail_alamat' => $request->detail_alamat,
             ]);
-            
+
             // Buat data petugas
             $petugas = Petugas::create([
                 'user_id' => $user->id,
                 'email' => $user->email,
-                'password' => Hash::make($request->password),
+                'password' => Hash::make($request->password ?? 'default_password'), // Sesuaikan dengan kebutuhan
                 'name' => $request->nama_lengkap,
-                'username' => $request->username,
                 'no_telepon' => $request->no_telepon,
                 'tanggal_lahir' => $request->tanggal_lahir,
                 'foto_diri_path' => $fotoDiriPath,
                 'foto_sim_path' => $fotoSimPath,
                 'alasan_bergabung' => $request->alasan_bergabung,
+                'detail_alamat' => $request->detail_alamat,
                 'email_verified_at' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -134,11 +156,10 @@ class JadiPetugasController extends Controller
 
             return redirect()->route('masyarakat.jadi-petugas.form')
                 ->with('success', 'Permohonan Anda berhasil dikirim. Tunggu verifikasi dari admin.');
-
         } catch (\Exception $e) {
             // Rollback transaksi jika ada error
             DB::rollBack();
-            
+
             return back()->withInput()
                 ->with('error', 'Gagal mengirim permohonan: ' . $e->getMessage());
         }
@@ -149,9 +170,9 @@ class JadiPetugasController extends Controller
      */
     private function uploadFile($file, $prefix)
     {
-        $filename = $prefix . '' . auth()->id() . '' . time() . '.' . $file->getClientOriginalExtension();
+        $filename = $prefix . '_' . auth()->id() . '_' . time() . '.' . $file->getClientOriginalExtension();
         $path = $file->storeAs('petugas_documents', $filename, 'public');
-        
+
         return $path;
     }
 
