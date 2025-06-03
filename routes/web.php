@@ -113,7 +113,13 @@ Route::resource('armada', ArmadaController::class);
 // ===================
 // Route::resource('petugas', PetugasController::class);
 
-Route::get('/petugas', [LaporanWargaController::class, 'index']);
+// Route::get('/petugas', [LaporanWargaController::class, 'index']);
+
+Route::get('/petugas', function () {
+    return view('petugas.dashboard.home-petugas');
+});
+
+
 Route::get('/petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
 
 Route::prefix('jadwal-template')->group(function () {

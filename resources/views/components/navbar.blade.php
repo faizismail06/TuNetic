@@ -8,7 +8,8 @@
     <title>@yield('title', 'TuNetic')</title>
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@400;500;550;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@400;500;550;700&display=swap"
+        rel="stylesheet">
 
     <!-- Bootstrap CSS - TAMBAHAN PENTING -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -782,7 +783,7 @@
                                 $accountRoute = route('petugas.akun.index');
                             } elseif (Auth::user()->level == 4) {
                                 $profileRoute = route('masyarakat.profile.index');
-                                $accountRoute = route('masyarakat.akun.index'); 
+                                $accountRoute = route('masyarakat.akun.index');
                             }
                         @endphp
 
@@ -790,17 +791,19 @@
                             <i class="fas fa-user"></i>
                             Detail Profile
                         </a>
-                            
+
                         <a href="{{ $accountRoute }}" class="profile-dropdown-item">
                             <i class="fas fa-id-card"></i>
                             Ubah Password
                         </a>
 
-                        <div class="dropdown-divider"></div>
-                        <a href="{{ route('masyarakat.jadi-petugas.form') }}" class="profile-dropdown-item">
-                            <i class="fas fa-user-shield"></i>
-                        Jadi Petugas
-                        </a>
+                        {{-- Hanya tampilkan menu "Jadi Petugas" jika user level bukan 3 --}}
+                        @if(Auth::user()->level != 3)
+                            <a href="{{ route('masyarakat.jadi-petugas.form') }}" class="profile-dropdown-item">
+                                <i class="fas fa-user-shield"></i>
+                                Jadi Petugas
+                            </a>
+                        @endif
 
                         <a href="#" class="profile-dropdown-item logout" id="logoutBtn">
                             <i class="fas fa-sign-out-alt"></i>
@@ -878,36 +881,31 @@
                     <h4 style="margin-bottom: 20px; color: #299E63;">TuNetic</h4>
                     <ul style="list-style: none; padding: 0; margin: 0;">
                         <li style="margin-bottom: 12px;">
-                            <a href="#"
-                                style="color: white; text-decoration: none; transition: color 0.3s ease;"
+                            <a href="#" style="color: white; text-decoration: none; transition: color 0.3s ease;"
                                 onmouseover="this.style.color='#299E63'" onmouseout="this.style.color='white'">
                                 Tentang Kami
                             </a>
                         </li>
                         <li style="margin-bottom: 12px;">
-                            <a href="#"
-                                style="color: white; text-decoration: none; transition: color 0.3s ease;"
+                            <a href="#" style="color: white; text-decoration: none; transition: color 0.3s ease;"
                                 onmouseover="this.style.color='#299E63'" onmouseout="this.style.color='white'">
                                 Layanan
                             </a>
                         </li>
                         <li style="margin-bottom: 12px;">
-                            <a href="#"
-                                style="color: white; text-decoration: none; transition: color 0.3s ease;"
+                            <a href="#" style="color: white; text-decoration: none; transition: color 0.3s ease;"
                                 onmouseover="this.style.color='#299E63'" onmouseout="this.style.color='white'">
                                 TPS
                             </a>
                         </li>
                         <li style="margin-bottom: 12px;">
-                            <a href="#"
-                                style="color: white; text-decoration: none; transition: color 0.3s ease;"
+                            <a href="#" style="color: white; text-decoration: none; transition: color 0.3s ease;"
                                 onmouseover="this.style.color='#299E63'" onmouseout="this.style.color='white'">
                                 Jadwal
                             </a>
                         </li>
                         <li style="margin-bottom: 12px;">
-                            <a href="#"
-                                style="color: white; text-decoration: none; transition: color 0.3s ease;"
+                            <a href="#" style="color: white; text-decoration: none; transition: color 0.3s ease;"
                                 onmouseover="this.style.color='#299E63'" onmouseout="this.style.color='white'">
                                 Edukasi
                             </a>
@@ -920,8 +918,7 @@
                     <h4 style="margin-bottom: 20px; color: #299E63;">Layanan</h4>
                     <ul style="list-style: none; padding: 0; margin: 0;">
                         <li style="margin-bottom: 12px;">
-                            <a href="#"
-                                style="color: white; text-decoration: none; transition: color 0.3s ease;"
+                            <a href="#" style="color: white; text-decoration: none; transition: color 0.3s ease;"
                                 onmouseover="this.style.color='#299E63'" onmouseout="this.style.color='white'">
                                 Jemput Sampah
                             </a>
@@ -981,13 +978,13 @@
     @stack('js')
     <script src="{{ asset('') }}dist/js/adminlte.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Mobile menu toggle functionality
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');
             const navLinks = document.getElementById('navLinks');
 
             if (mobileMenuToggle && navLinks) {
-                mobileMenuToggle.addEventListener('click', function(e) {
+                mobileMenuToggle.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     navLinks.classList.toggle('active');
@@ -1004,7 +1001,7 @@
                 });
 
                 // Close mobile menu when clicking outside
-                document.addEventListener('click', function(event) {
+                document.addEventListener('click', function (event) {
                     if (!navLinks.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
                         navLinks.classList.remove('active');
                         const icon = mobileMenuToggle.querySelector('i');
@@ -1014,7 +1011,7 @@
                 });
 
                 // Close mobile menu when window is resized to desktop
-                window.addEventListener('resize', function() {
+                window.addEventListener('resize', function () {
                     if (window.innerWidth > 768) {
                         navLinks.classList.remove('active');
                         const icon = mobileMenuToggle.querySelector('i');
@@ -1029,7 +1026,7 @@
             const profileDropdown = document.getElementById('profileDropdown');
 
             if (profileToggle && profileDropdown) {
-                profileToggle.addEventListener('click', function(e) {
+                profileToggle.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     profileDropdown.classList.toggle('show');
@@ -1046,7 +1043,7 @@
                 });
 
                 // Close dropdown when clicking outside
-                document.addEventListener('click', function(event) {
+                document.addEventListener('click', function (event) {
                     if (!profileToggle.contains(event.target) && !profileDropdown.contains(event.target)) {
                         profileDropdown.classList.remove('show');
                         const chevron = profileToggle.querySelector('.fa-chevron-down');
@@ -1057,7 +1054,7 @@
                 });
 
                 // Close dropdown when pressing Escape key
-                document.addEventListener('keydown', function(event) {
+                document.addEventListener('keydown', function (event) {
                     if (event.key === 'Escape' && profileDropdown.classList.contains('show')) {
                         profileDropdown.classList.remove('show');
                         const chevron = profileToggle.querySelector('.fa-chevron-down');
@@ -1074,7 +1071,7 @@
             const cancelLogout = document.getElementById('cancelLogout');
 
             if (logoutBtn && logoutModal) {
-                logoutBtn.addEventListener('click', function(e) {
+                logoutBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -1094,7 +1091,7 @@
             }
 
             if (cancelLogout && logoutModal) {
-                cancelLogout.addEventListener('click', function(e) {
+                cancelLogout.addEventListener('click', function (e) {
                     e.preventDefault();
                     logoutModal.style.display = "none";
                     document.body.style.overflow = 'auto'; // Restore scrolling
@@ -1103,7 +1100,7 @@
 
             // Close modal when clicking outside
             if (logoutModal) {
-                logoutModal.addEventListener('click', function(event) {
+                logoutModal.addEventListener('click', function (event) {
                     if (event.target === logoutModal) {
                         logoutModal.style.display = "none";
                         document.body.style.overflow = 'auto'; // Restore scrolling
@@ -1111,7 +1108,7 @@
                 });
 
                 // Close modal when pressing Escape key
-                document.addEventListener('keydown', function(event) {
+                document.addEventListener('keydown', function (event) {
                     if (event.key === 'Escape' && logoutModal.style.display === 'block') {
                         logoutModal.style.display = "none";
                         document.body.style.overflow = 'auto'; // Restore scrolling
@@ -1122,7 +1119,7 @@
             // Smooth scroll for anchor links
             const anchorLinks = document.querySelectorAll('a[href^="#"]');
             anchorLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
+                link.addEventListener('click', function (e) {
                     const targetId = this.getAttribute('href');
                     if (targetId === '#') return;
 
@@ -1140,7 +1137,7 @@
             // Add loading state to forms
             const forms = document.querySelectorAll('form');
             forms.forEach(form => {
-                form.addEventListener('submit', function() {
+                form.addEventListener('submit', function () {
                     const submitButtons = form.querySelectorAll(
                         'button[type="submit"], input[type="submit"]');
                     submitButtons.forEach(button => {
@@ -1266,13 +1263,13 @@
         });
 
         // Global error handler
-        window.addEventListener('error', function(event) {
+        window.addEventListener('error', function (event) {
             console.error('Global error:', event.error);
             // You can send this to your logging service
         });
 
         // Handle uncaught promise rejections
-        window.addEventListener('unhandledrejection', function(event) {
+        window.addEventListener('unhandledrejection', function (event) {
             console.error('Unhandled promise rejection:', event.reason);
             // You can send this to your logging service
         });
