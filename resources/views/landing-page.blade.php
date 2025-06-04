@@ -14,7 +14,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/css/landing-page.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
+        
+        
         html {
             scroll-behavior: smooth;
         }
@@ -116,7 +120,7 @@
 
                     <p class="lead mt-4" style="font-size: 2rem; font-family: 'Red Hat Text', sans-serif;">#Small Steps,
                         Big Impact</p>
-                    <a href="" class="btn btn-warning px-5 py-3 mt-3 start-now-btn">Mulai Sekarang</a>
+                    <a href="login" class="btn btn-warning px-5 py-3 mt-3 start-now-btn">Mulai Sekarang</a>
                 </div>
 
                 <!-- Gambar Kanan -->
@@ -505,58 +509,72 @@
             </div>
         </section>
 
-        <!-- Footer Section -->
-        <footer class="bg-dark text-white py-5 footer-custom" style="background-color: #2E3A40;">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-4 mb-4">
-                        <img src="{{ asset('assets/images/logoputih.png') }}" alt="TuNetic Logo" height="60"
-                            class="mb-3">
-                        <ul class="list-unstyled d-flex">
-                            <li class="me-3"><a href="#" class="text-white"><i class="fab fa-facebook-f fa-2x"></i></a>
-                            </li>
-                            <li class="me-3"><a href="#" class="text-white"><i class="fab fa-instagram fa-2x"></i></a>
-                            </li>
-                            <li class="me-3"><a href="#" class="text-white"><i class="fab fa-twitter fa-2x"></i></a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-2 mb-4">
-                        <h5 class="mb-3 fw-bold">TuNetic</h5>
-                        <ul class="list-unstyled">
-                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Tentang
-                                    Kami</a></li>
-                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Layanan</a>
-                            </li>
-                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">TPS</a></li>
-                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Jadwal</a>
-                            </li>
-                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Edukasi</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-2 mb-4">
-                        <h5 class="mb-3 fw-semibold">Layanan</h5>
-                        <ul class="list-unstyled">
-                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Jemput
-                                    Sampah</a></li>
-                            <li class="mb-3"><a href="#" class="text-white text-decoration-none fw-light">Lapor
-                                    Sampah</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mb-4">
-                        <h5 class="mb-3 fw-bold">Contact</h5>
-                        <ul class="list-unstyled">
-                            <li class="mb-3"><i class="fas fa-map-marker-alt me-2"></i> <span class="fw-light">Semarang,
-                                    Indonesia</span>
-                            </li>
-                            <li class="mb-3"><i class="fas fa-envelope me-2 fw-light"></i> <span
-                                    class="fw-light">TuNetic@gmail.com</span></li>
-                        </ul>
-                    </div>
-                </div>
+       <!-- Footer Section -->
+<footer class="bg-dark text-white py-5 footer-custom" style="background-color: #2E3A40;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <img src="{{ asset('assets/images/logoputih.png') }}" alt="TuNetic Logo" height="60" class="mb-3">
+                <ul class="list-unstyled d-flex">
+                    <li class="me-3">
+                        <a href="#" class="text-white"><i class="fab fa-facebook-f fa-2x"></i></a>
+                    </li>
+                    <li class="me-3">
+                        <a href="#" class="text-white"><i class="fab fa-instagram fa-2x"></i></a>
+                    </li>
+                    <li class="me-3">
+                        <a href="#" class="text-white"><i class="fab fa-twitter fa-2x"></i></a>
+                    </li>
+                </ul>
             </div>
-        </footer>
+            <div class="col-md-2 mb-4">
+                <h5 class="mb-3 fw-bold">TuNetic</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <a href="#" class="text-white text-decoration-none fw-light">Tentang Kami</a>
+                    </li>
+                    <li class="mb-3">
+                        <a href="#" class="text-white text-decoration-none fw-light">Layanan</a>
+                    </li>
+                    <li class="mb-3">
+                        <a href="#" class="text-white text-decoration-none fw-light">TPS</a>
+                    </li>
+                    <li class="mb-3">
+                        <a href="#" class="text-white text-decoration-none fw-light">Jadwal</a>
+                    </li>
+                    <li class="mb-3">
+                        <a href="#" class="text-white text-decoration-none fw-light">Edukasi</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-2 mb-4">
+                <h5 class="mb-3 fw-semibold">Layanan</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <a href="#" class="text-white text-decoration-none fw-light">Jemput Sampah</a>
+                    </li>
+                    <li class="mb-3">
+                        <a href="#" class="text-white text-decoration-none fw-light">Lapor Sampah</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3 fw-bold">Contact</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <i class="bi bi-geo-alt-fill me-2"></i>
+                        <span class="fw-light">Semarang, Indonesia</span>
+                    </li>
+                    <li class="mb-3">
+                        <i class="bi bi-envelope-fill me-2"></i>
+                        <span class="fw-light">TuNetic@gmail.com</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="{{ asset('js/script.js') }}"></script>
