@@ -285,6 +285,12 @@ Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
 Route::resource('laporan-warga', LaporanWargaController::class);
 Route::resource('laporan-tps', LaporanTpsController::class);
 
+
+
+// ===================
+// LAPORAN WARGA ADMIN
+// ===================
+
 // ===================
 // EMAIL VERIFIKASI
 // ===================
