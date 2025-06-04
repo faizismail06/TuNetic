@@ -77,4 +77,9 @@ class JadwalOperasional extends Model
     {
         return $this->hasMany(JadwalOperasional::class, 'id_jadwal_operasional');
     }
+
+    public function laporan()
+    {
+        return $this->belongsTo(LaporanWarga::class, 'id_laporan');
+    }
 }
