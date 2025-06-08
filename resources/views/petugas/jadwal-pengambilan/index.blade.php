@@ -1061,12 +1061,13 @@
 
             const tpsLayerGroup = L.layerGroup();
 
+            // TPS sudah terurut dari controller berdasarkan kolom urutan
             tpsPoints.forEach((tps, index) => {
                 const tpsMarker = createResponsiveTpsMarker(tps, index, jadwalId);
 
                 const popupContent = createResponsivePopupContent(
-                    `TPS ${index + 1}`,
-                    `${tps.nama}<br>Lat: ${tps.latitude}<br>Lng: ${tps.longitude}`
+                    `TPS ${tps.urutan || (index + 1)}`, // Gunakan urutan dari database jika ada, atau fallback ke index+1
+                    `${tps.nama}<br>Urutan: ${tps.urutan || (index + 1)}<br>Lat: ${tps.latitude}<br>Lng: ${tps.longitude}`
                 );
 
                 tpsMarker.bindPopup(popupContent);
