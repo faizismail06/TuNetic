@@ -24,7 +24,6 @@ class JadwalOperasional extends Model
         'id_armada',
         'id_jadwal',
         'id_rute',
-        'id_laporan',
         'tanggal',
         'jam_aktif',
         'status',
@@ -70,11 +69,5 @@ class JadwalOperasional extends Model
     public function penugasanPetugas()
     {
         return $this->hasMany(PenugasanPetugas::class, 'id_jadwal_operasional');
-    }
-
-    // Relasi ke laporan warga
-    public function laporan()
-    {
-        return $this->belongsTo(LaporanWarga::class, 'id_laporan');
     }
 }

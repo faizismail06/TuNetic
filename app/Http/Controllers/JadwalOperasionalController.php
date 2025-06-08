@@ -8,7 +8,6 @@ use App\Models\Jadwal;
 use App\Models\Rute;
 use App\Models\Petugas;
 use App\Models\PenugasanPetugas;
-use App\Models\LaporanWarga;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Exception;
@@ -29,10 +28,49 @@ class JadwalOperasionalController extends Controller
             'jadwal',
             'rute',
             'penugasanPetugas.petugas',
-            'laporan',
         ])->get();
-        return view('adminpusat/jadwal-operasional.index', compact('jadwals'));
+        $semuaPetugas = Petugas::all(); // untuk dropdown plotting
+        return view('adminpusat/jadwal-operasional.index', compact('jadwals', 'semuaPetugas'));
     }
+
+    // public function simpanPlotting(Request $request, $id)
+    // {
+    //     $jadwal = JadwalOperasional::findOrFail($id);
+    //     $jadwal->penugasanPetugas()->delete(); // reset
+
+    //     foreach ($request->petugas_ids as $i => $pid) {
+    //         $jadwal->penugasanPetugas()->create([
+    //             'petugas_id' => $pid,
+    //             'tugas' => $request->tugas[$i]
+    //         ]);
+    //     }
+
+    //     return response()->json(['message' => 'Berhasil']);
+    // }
+
+    public function simpanPlotting(Request $request, $id)
+    {
+        $jadwal = JadwalOperasional::findOrFail($id);
+        $jadwal->penugasanPetugas()->delete(); // Hapus dulu penugasan lama
+
+        foreach ($request->petugas_ids as $index => $petugas_id) {
+            $jadwal->penugasanPetugas()->create([
+                'id_petugas' => $petugas_id,
+                'tugas' => $request->tugas[$index],
+            ]);
+        }
+
+        return redirect()->route('jadwal-operasional.index')->with('success', 'Plotting berhasil diperbarui.');
+    }
+
+    public function plotting($id)
+    {
+        $jadwal = JadwalOperasional::with('penugasanPetugas.petugas')->findOrFail($id);
+        $semuaPetugas = Petugas::all();
+
+        return view('jadwal-operasional.plotting', compact('jadwal', 'semuaPetugas'));
+    }
+
 
     /**
      * Menyimpan jadwal operasional baru.
@@ -48,7 +86,6 @@ class JadwalOperasionalController extends Controller
                 'id_armada' => 'required|exists:armada,id',
                 'id_jadwal' => 'required|exists:jadwal,id',
                 'id_rute' => 'required|exists:rute,id',
-                'id_laporan' => 'nullable|exists:laporan_warga,id',
                 'tanggal' => 'required|date',
                 'jam_aktif' => [
                     'required',
@@ -62,13 +99,6 @@ class JadwalOperasionalController extends Controller
                 'status' => 'required|integer|in:0,1,2',
             ]));
 
-            // Jika ada laporan warga yang di-assign, update statusnya
-            if ($request->filled('id_laporan')) {
-                $laporan = LaporanWarga::find($request->id_laporan);
-                $laporan->status = 'diterima';
-                $laporan->waktu_diterima = now();
-                $laporan->save();
-            }
 
 
             // Simpan penugasan petugas
@@ -98,7 +128,6 @@ class JadwalOperasionalController extends Controller
             'jadwals' => Jadwal::all(),
             'rutes' => Rute::all(),
             'petugas' => Petugas::all(), // ✅ ini penting
-            'laporan' => LaporanWarga::all(),
         ]);
     }
 
@@ -112,7 +141,6 @@ class JadwalOperasionalController extends Controller
             'armada',
             'rute',
             'penugasanPetugas.petugas',
-            'laporan',
         ])->findOrFail($id);
 
         return view('adminpusat/jadwal-operasional.edit', [
@@ -121,7 +149,6 @@ class JadwalOperasionalController extends Controller
             'jadwals' => Jadwal::all(),
             'rutes' => Rute::all(),
             'petugas' => Petugas::all(),
-            'laporan' => LaporanWarga::all(),
         ]);
     }
 
@@ -137,7 +164,6 @@ class JadwalOperasionalController extends Controller
                 'id_armada' => 'required|exists:armada,id',
                 'id_jadwal' => 'required|exists:jadwal,id',
                 'id_rute' => 'required|exists:rute,id',
-                'id_laporan' => 'nullable|exists:laporan_warga,id',
                 'tanggal' => 'required|date',
                 'jam_aktif' => [
                     'required',
@@ -154,12 +180,6 @@ class JadwalOperasionalController extends Controller
             // Update jadwal operasional
             $jadwal->update($validatedData);
 
-            if ($request->filled('id_laporan')) {
-                $laporan = LaporanWarga::find($request->id_laporan);
-                $laporan->status = 'diterima';
-                $laporan->waktu_diterima = now();
-                $laporan->save();
-            }
             // Hapus semua penugasan lama
             $jadwal->penugasanPetugas()->delete();
 
@@ -188,13 +208,6 @@ class JadwalOperasionalController extends Controller
     {
         try {
             $jadwal = JadwalOperasional::findOrFail($id);
-
-            if ($jadwal->id_laporan) {
-                $laporan = LaporanWarga::find($jadwal->id_laporan);
-                $laporan->status = 'menunggu';
-                $laporan->waktu_diterima = null;
-                $laporan->save();
-            }
 
             $jadwal->delete();
 

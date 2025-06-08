@@ -15,7 +15,6 @@ return new class extends Migration {
             $table->foreignId('id_armada')->constrained('armada');
             $table->foreignId('id_jadwal')->constrained('jadwal');
             $table->foreignId('id_rute')->constrained('rute');
-            $table->foreignId('id_laporan')->nullable()->constrained('laporan_warga')->onDelete('set null');
             $table->date('tanggal');
             $table->tinyInteger('status')->default(0)->comment('0 = Belum Berjalan, 1 = Sedang Berjalan, 2 = Selesai');
             $table->time('jam_aktif');

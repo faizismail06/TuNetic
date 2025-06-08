@@ -128,16 +128,17 @@ Route::prefix('jadwal-template')->group(function () {
 Route::resource('jadwal-template', JadwalTemplateController::class)->except(['show']);
 
 
-// Jadwal Routes
-Route::get('pusat/daftar-jadwal/generate', [JadwalController::class, 'generateForm'])->name('daftar-jadwal.generate.form');
-Route::post('pusat/daftar-jadwal/generate', [JadwalController::class, 'generateStore'])->name('daftar-jadwal.generate.store');
-Route::resource('pusat/daftar-jadwal', JadwalController::class);
 
 // ===================
 // JADWAL
 // ===================
+Route::get('pusat/daftar-jadwal/generate', [JadwalController::class, 'generateForm'])->name('daftar-jadwal.generate.form');
+Route::post('pusat/daftar-jadwal/generate', [JadwalController::class, 'generateStore'])->name('daftar-jadwal.generate.store');
+Route::resource('pusat/daftar-jadwal', JadwalController::class);
 Route::resource('jadwal', JadwalController::class);
 
+Route::get('pusat/jadwal-operasional/{id}/plotting', [JadwalOperasionalController::class, 'plotting'])->name('jadwal-operasional.plotting');
+Route::post('pusat/jadwal-operasional/{id}/plotting', [JadwalOperasionalController::class, 'simpanPlotting'])->name('jadwal-operasional.simpanPlotting');
 Route::resource('pusat/jadwal-operasional', JadwalOperasionalController::class);
 
 // ===================
