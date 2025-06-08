@@ -61,18 +61,6 @@ class AdminTpstMenuSeeder extends Seeder
         Permission::create(['name' => 'update_perhitungan_tpst', 'menu_id' => $perhitunganSampahTpst->id]);
         Permission::create(['name' => 'delete_perhitungan_tpst', 'menu_id' => $perhitunganSampahTpst->id]);
 
-        // Profile Admin TPST
-        $profileAdminTpst = Menu::create([
-            'nama_menu' => 'Profile',
-            'url' => 'tpst/profile',
-            'icon' => 'fas fa-user',
-            'parent_id' => $menuAdminTpst->id,
-            'urutan' => 4
-        ]);
-
-        Permission::create(['name' => 'access_tpst_profile', 'menu_id' => $profileAdminTpst->id]);
-        Permission::create(['name' => 'update_tpst_profile', 'menu_id' => $profileAdminTpst->id]);
-
         // Return the main menu id to be used by MasterSeeder
         return $menuAdminTpst->id;
     }

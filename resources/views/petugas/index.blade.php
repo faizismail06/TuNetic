@@ -29,7 +29,7 @@
                         <div class="card-header">
                             <h3 class="card-title">Data Petugas</h3>
                             <div class="card-tools">
-                                <a href="{{ route('petugas.create') }}" class="btn btn-sm btn-success">
+                                <a href="{{ route('manage-petugas.create') }}" class="btn btn-sm btn-success">
                                     <i class="fas fa-plus-circle mr-1"></i> Tambah Petugas
                                 </a>
                             </div>
@@ -64,7 +64,7 @@
                                                     </button>
                                                     <div class="dropdown-menu dropdown-menu-right" role="menu">
                                                         <a class="dropdown-item"
-                                                            href="{{ route('petugas.edit', $item->id) }}">Edit</a>
+                                                            href="{{ route('manage-petugas.edit', $item->id) }}">Edit</a>
                                                         <a class="dropdown-item"
                                                             href="{{ route('petugas.detail', $item->id) }}">Detail</a>
                                                         <div class="dropdown-divider"></div>

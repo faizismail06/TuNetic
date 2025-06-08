@@ -13,11 +13,11 @@ class LaporanTps extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'id_petugas',
+        'id_jadwal_operasional',
         'total_sampah',
         'deskripsi',
         'tanggal_pengangkutan',
-        'status',
+        // 'status',
     ];
 
     protected $casts = [
@@ -27,10 +27,10 @@ class LaporanTps extends Model
     ];
 
     /**
-     * Relasi ke tabel petugas.
+     * Relasi ke tabel jadwalOperasional.
      */
-    public function petugas()
+    public function jadwalOperasional()
     {
-        return $this->belongsTo(Petugas::class, 'id_petugas');
+        return $this->belongsTo(JadwalOperasional::class, 'id_jadwal_operasional');
     }
 }
