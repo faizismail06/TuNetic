@@ -100,20 +100,32 @@ class JadwalRuteController extends Controller
                 // Data untuk peta
                 $color = $routeColors[$index % count($routeColors)];
 
-                // Ambil TPS untuk rute ini
+                // Ambil TPS untuk rute ini dengan urutan yang benar
                 $tpsData = [];
-                if ($jadwal->rute && $jadwal->rute->ruteTps) {
-                    foreach ($jadwal->rute->ruteTps as $ruteTps) {
-                        if ($ruteTps->lokasi_tps) {
-                            $tpsData[] = [
-                                'id' => $ruteTps->lokasi_tps->id,
-                                'nama_lokasi' => $ruteTps->lokasi_tps->nama_lokasi,
-                                'latitude' => (float) $ruteTps->lokasi_tps->latitude,
-                                'longitude' => (float) $ruteTps->lokasi_tps->longitude,
-                                'tipe' => $ruteTps->lokasi_tps->tipe ?? 'TPS'
-                            ];
-                        }
-                    }
+                if ($jadwal->rute) {
+                    // PERUBAHAN: Mengambil data TPS berdasarkan urutan seperti di JadwalPengambilanController
+                    $tpsPoints = RuteTps::with('lokasi_tps')
+                        ->where('id_rute', $jadwal->rute->id)
+                        ->orderBy('urutan') // Menggunakan kolom urutan untuk pengurutan
+                        ->get()
+                        ->map(function ($ruteTps) {
+                            $lokasiTps = $ruteTps->lokasi_tps;
+                            if ($lokasiTps) {
+                                return [
+                                    'id' => $lokasiTps->id,
+                                    'nama_lokasi' => $lokasiTps->nama_lokasi,
+                                    'latitude' => (float) $lokasiTps->latitude,
+                                    'longitude' => (float) $lokasiTps->longitude,
+                                    'tipe' => $lokasiTps->tipe ?? 'TPS',
+                                    'urutan' => $ruteTps->urutan // Menambahkan urutan ke data
+                                ];
+                            }
+                            return null;
+                        })
+                        ->filter() // Hapus nilai null
+                        ->toArray();
+
+                    $tpsData = $tpsPoints;
                 }
 
                 $allTps[$jadwal->id] = $tpsData;
@@ -154,7 +166,7 @@ class JadwalRuteController extends Controller
                 ->map(function ($tps) {
                     return [
                         'id' => $tps->id,
-                        'nama_lokasi' => $tps->nama_lokasi, // Perbaikan: nama_lokasi bukan nama
+                        'nama_lokasi' => $tps->nama_lokasi,
                         'latitude' => (float) $tps->latitude,
                         'longitude' => (float) $tps->longitude,
                         'tipe' => $tps->tipe ?? 'TPS',
@@ -210,6 +222,12 @@ class JadwalRuteController extends Controller
                 ->latest('timestamp')
                 ->first();
 
+            // PERUBAHAN: Ambil data TPS berdasarkan urutan
+            $tpsData = RuteTps::with('lokasi_tps')
+                ->where('id_rute', $jadwal->rute->id)
+                ->orderBy('urutan') // Menggunakan kolom urutan untuk pengurutan
+                ->get();
+
             // Siapkan data detail
             $detailData = [
                 'id' => $jadwal->id,
@@ -226,12 +244,12 @@ class JadwalRuteController extends Controller
                 ],
                 'rute' => [
                     'nama_rute' => $jadwal->rute->nama_rute ?? 'N/A',
-                    'jumlah_tps' => $jadwal->rute->ruteTps->count() ?? 0
+                    'jumlah_tps' => $tpsData->count() ?? 0
                 ],
                 'petugas' => $jadwal->penugasanPetugas->map(function ($penugasan) {
                     return [
                         'nama' => $penugasan->petugas->user->name ?? $penugasan->petugas->name ?? 'N/A',
-                        'tugas' => $penugasan->tugas // Menggunakan helper function
+                        'tugas' => $penugasan->tugas
                     ];
                 }) ?? collect(),
                 'last_tracking' => $lastTracking ? [
@@ -245,7 +263,8 @@ class JadwalRuteController extends Controller
 
             return view('jadwal-rute.show', [
                 'jadwal' => $jadwal,
-                'detailData' => $detailData
+                'detailData' => $detailData,
+                'tpsData' => $tpsData // PERUBAHAN: Mengirim data TPS terurut ke view
             ]);
         } catch (\Exception $e) {
             Log::error('Error saat menampilkan detail jadwal operasional: ' . $e->getMessage());
@@ -272,6 +291,29 @@ class JadwalRuteController extends Controller
                 ->latest('timestamp')
                 ->first();
 
+            // PERUBAHAN: Ambil data TPS berdasarkan urutan
+            $tpsPoints = RuteTps::with('lokasi_tps')
+                ->where('id_rute', $jadwal->rute->id)
+                ->orderBy('urutan') // Menggunakan kolom urutan untuk pengurutan
+                ->get()
+                ->map(function ($ruteTps) {
+                    $lokasiTps = $ruteTps->lokasi_tps;
+                    if ($lokasiTps) {
+                        return [
+                            'id' => $lokasiTps->id,
+                            'nama_lokasi' => $lokasiTps->nama_lokasi,
+                            'latitude' => (float) $lokasiTps->latitude,
+                            'longitude' => (float) $lokasiTps->longitude,
+                            'tipe' => $lokasiTps->tipe ?? 'TPS',
+                            'urutan' => $ruteTps->urutan
+                        ];
+                    }
+                    return null;
+                })
+                ->filter()
+                ->values()
+                ->toArray();
+
             $data = [
                 'id' => $jadwal->id,
                 'armada' => [
@@ -280,7 +322,8 @@ class JadwalRuteController extends Controller
                     'kapasitas' => $jadwal->armada->kapasitas ?? 0
                 ],
                 'rute' => [
-                    'nama' => $jadwal->rute->nama_rute ?? 'N/A'
+                    'nama' => $jadwal->rute->nama_rute ?? 'N/A',
+                    'tps_points' => $tpsPoints // PERUBAHAN: Menyertakan data TPS terurut
                 ],
                 'jadwal' => [
                     'hari' => $this->formatHari($jadwal->jadwal->hari ?? 'N/A'),
@@ -289,7 +332,7 @@ class JadwalRuteController extends Controller
                 'petugas' => $jadwal->penugasanPetugas->map(function ($penugasan) {
                     return [
                         'nama' => $penugasan->petugas->user->name ?? $penugasan->petugas->name ?? 'N/A',
-                        'tugas' => $penugasan->tugas // Menggunakan helper function
+                        'tugas' => $penugasan->tugas
                     ];
                 }),
                 'status' => $jadwal->status,
@@ -422,16 +465,6 @@ class JadwalRuteController extends Controller
     }
 
     /**
-     * Helper function untuk generate ID Jadwal
-     */
-    // private function generateIdJadwal($id, $tanggal)
-    // {
-    //     $year = Carbon::parse($tanggal)->format('y');
-    //     $month = Carbon::parse($tanggal)->format('m');
-    //     return $year . $month . 'G' . str_pad($id, 2, '0', STR_PAD_LEFT);
-    // }
-
-    /**
      * Helper function untuk format hari
      */
     private function formatHari($hari)
@@ -464,19 +497,4 @@ class JadwalRuteController extends Controller
                 return 'badge-secondary';
         }
     }
-
-    /**
-     * Helper function untuk mendapatkan text tugas petugas
-     */
-    // private function getTugasText($tugas)
-    // {
-    //     switch ($tugas) {
-    //         case 1:
-    //             return 'Driver';
-    //         case 2:
-    //             return 'Picker';
-    //         default:
-    //             return 'Undefined';
-    //     }
-    // }
 }

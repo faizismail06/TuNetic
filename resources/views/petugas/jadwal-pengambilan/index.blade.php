@@ -549,16 +549,10 @@
                                     </div>
                                     <div class="col-12">
                                         <div class="d-flex flex-wrap gap-2">
-                                            <button id="show-all-tps" class="btn btn-sm btn-info flex-fill flex-md-grow-0">
+                                            <button id="toggle-tps" class="btn btn-sm btn-info flex-fill flex-md-grow-0">
                                                 <i class="fas fa-eye d-md-none"></i>
                                                 <span class="d-none d-md-inline">Tampilkan Semua TPS</span>
                                                 <span class="d-md-none">Semua TPS</span>
-                                            </button>
-                                            <button id="hide-all-tps"
-                                                class="btn btn-sm btn-secondary flex-fill flex-md-grow-0">
-                                                <i class="fas fa-eye-slash d-md-none"></i>
-                                                <span class="d-none d-md-inline">Sembunyikan TPS</span>
-                                                <span class="d-md-none">Sembunyikan</span>
                                             </button>
                                             <button id="toggle-route"
                                                 class="btn btn-sm btn-primary flex-fill flex-md-grow-0">
@@ -608,7 +602,7 @@
                                                         <div class="mb-2">
                                                             <strong>Rute:</strong>
                                                             <span
-                                                                class="d-block d-sm-inline">{{ $jadwal->ruteTps->rute->nama_rute ?? 'N/A' }}</span>
+                                                                class="d-block d-sm-inline">{{ $jadwal->rute->nama_rute ?? 'N/A' }}</span>
                                                         </div>
                                                         <div class="mb-2">
                                                             <strong>Jam Aktif:</strong>
@@ -630,13 +624,13 @@
                                                     </div>
 
                                                     <!-- TPS Button - Full width on mobile -->
-                                                    <button
+                                                    {{-- <button
                                                         class="btn btn-sm btn-outline-primary show-tps-button w-100 mb-2"
                                                         data-jadwal-id="{{ $jadwal->id }}">
                                                         <i class="fas fa-map-marker-alt me-1"></i>
                                                         <span class="d-none d-sm-inline">Tampilkan TPS</span>
                                                         <span class="d-sm-none">TPS</span>
-                                                    </button>
+                                                    </button> --}}
 
                                                     <!-- Action Buttons - Responsive Layout -->
                                                     <div class="btn-group w-100" data-id="{{ $jadwal->id }}"
@@ -707,6 +701,7 @@
         let isRouteVisible = false;
         let isGpsLocationReady = false;
         let pendingRouteDrawing = null;
+        let isTpsVisible = false;
 
         // ===== DEBOUNCE FUNCTION =====
         function debounce(func, wait) {
@@ -1046,6 +1041,40 @@
             }
         }
 
+        function toggleTps() {
+            if (isTpsVisible) {
+                // Sembunyikan TPS
+                hideAllTps();
+
+                // Update teks tombol
+                const toggleButton = document.getElementById('toggle-tps');
+                toggleButton.innerHTML = `
+            <i class="fas fa-eye d-md-none"></i>
+            <span class="d-none d-md-inline">Tampilkan Semua TPS</span>
+            <span class="d-md-none">Semua TPS</span>
+        `;
+                toggleButton.classList.remove('btn-secondary');
+                toggleButton.classList.add('btn-info');
+
+                isTpsVisible = false;
+            } else {
+                // Tampilkan TPS
+                showAllTps();
+
+                // Update teks tombol
+                const toggleButton = document.getElementById('toggle-tps');
+                toggleButton.innerHTML = `
+            <i class="fas fa-eye-slash d-md-none"></i>
+            <span class="d-none d-md-inline">Sembunyikan Semua TPS</span>
+            <span class="d-md-none">Sembunyikan</span>
+        `;
+                toggleButton.classList.remove('btn-info');
+                toggleButton.classList.add('btn-secondary');
+
+                isTpsVisible = true;
+            }
+        }
+
         function showTpsOnMap(jadwalId) {
             if (tpsMarkers[jadwalId]) {
                 tpsMarkers[jadwalId].forEach(marker => map.removeLayer(marker));
@@ -1093,16 +1122,16 @@
         // ===== RESPONSIVE ROUTE DRAWING =====
         // Perbaiki fungsi drawResponsiveRoute
         function drawResponsiveRoute(tpsPoints) {
-            // Cek apakah GPS sudah siap
-            // if (!isGpsLocationReady || !marker) {
-            //     console.log('GPS belum siap, menunda pembuatan rute...');
-            //     pendingRouteDrawing = tpsPoints;
-            //     return;
-            // }
-
+            // Hapus rute lama jika ada
             if (routeControl) {
                 map.removeControl(routeControl);
                 routeControl = null;
+            }
+
+            // Hapus polyline sederhana jika ada
+            if (window.simplePath) {
+                map.removeLayer(window.simplePath);
+                window.simplePath = null;
             }
 
             if (!tpsPoints || tpsPoints.length === 0) {
@@ -1137,6 +1166,8 @@
                         },
                         function(error) {
                             console.error('Error mendapatkan lokasi untuk rute:', error);
+                            // Jika gagal mendapatkan lokasi, gunakan fallback polyline dengan posisi default
+                            drawSimpleRoute(currentPosition, tpsPoints);
                         },
                         getResponsiveGeolocationOptions()
                     );
@@ -1158,6 +1189,24 @@
             const lineWeight = isMobile ? 4 : 6;
             const whiteLineWeight = isMobile ? 1 : 2;
 
+            // Variable untuk mendeteksi timeout
+            let routeTimedOut = false;
+            const timeoutDuration = 15000; // 15 detik
+            let routeTimeout = setTimeout(function() {
+                routeTimedOut = true;
+                console.warn('OSRM request timed out, menggunakan rute sederhana sebagai fallback');
+
+                // Hapus kontrol routing yang mungkin sedang loading
+                if (routeControl) {
+                    map.removeControl(routeControl);
+                    routeControl = null;
+                }
+
+                // Gambar rute sederhana sebagai fallback
+                drawSimpleRoute(currentPosition, tpsPoints);
+            }, timeoutDuration);
+
+            // Coba gunakan OSRM terlebih dahulu
             routeControl = L.Routing.control({
                 waypoints: waypoints,
                 routeWhileDragging: false,
@@ -1179,25 +1228,93 @@
                     return null;
                 },
                 router: L.Routing.osrmv1({
-                    serviceUrl: 'https://router.project-osrm.org/route/v1',
+                    serviceUrl: '/api/osrm-proxy/route/v1',
                     profile: 'driving',
                     useHints: false,
                     geometryOnly: false,
                     suppressDemoServerWarning: true,
-                    roundTrip: false,
-                    alternatives: false,
-                    steps: true,
-                    overview: "full",
-                    geometries: "polyline"
+                    timeout: 12000 // 12 detik timeout (lebih rendah dari timeoutDuration)
                 })
             }).addTo(map);
 
+            // Jika rute ditemukan, batalkan timeout dan gunakan rute OSRM
             routeControl.on('routesfound', function(e) {
-                const routes = e.routes;
-                console.log('Rute dari armada ke TPS ditemukan:', routes);
-                isRouteVisible = true;
-                updateRouteButtonText();
+                clearTimeout(routeTimeout); // Batalkan timeout fallback
+
+                if (!routeTimedOut) { // Hanya proses jika belum timeout
+                    const routes = e.routes;
+                    console.log('Rute dari armada ke TPS ditemukan:', routes);
+                    isRouteVisible = true;
+                    updateRouteButtonText();
+                }
             });
+
+            // Jika terjadi error routing, gunakan rute sederhana
+            routeControl.on('routingerror', function(e) {
+                console.warn('Routing error:', e.error);
+
+                // Batalkan timeout fallback karena sudah ada error yang tertangkap
+                clearTimeout(routeTimeout);
+
+                // Hapus kontrol routing yang error
+                if (routeControl && !routeTimedOut) {
+                    map.removeControl(routeControl);
+                    routeControl = null;
+
+                    // Gambar rute sederhana sebagai fallback
+                    drawSimpleRoute(currentPosition, tpsPoints);
+                }
+            });
+        }
+
+        // Fungsi untuk menggambar rute sederhana sebagai fallback
+        function drawSimpleRoute(currentPosition, tpsPoints) {
+            // Hapus rute sederhana yang sudah ada jika ada
+            if (window.simplePath) {
+                map.removeLayer(window.simplePath);
+            }
+
+            // Buat array koordinat dari posisi armada (marker) ke semua TPS
+            const coordinates = [
+                [currentPosition.lat, currentPosition.lng], // Mulai dari posisi armada
+                ...tpsPoints.map(tps => [parseFloat(tps.latitude), parseFloat(tps.longitude)])
+            ];
+
+            // Buat polyline sederhana
+            window.simplePath = L.polyline(coordinates, {
+                color: 'blue',
+                weight: 4,
+                opacity: 0.7,
+                dashArray: '10, 10' // Garis putus-putus untuk menunjukkan ini bukan rute optimal
+            }).addTo(map);
+
+            // // Tambahkan popup ke garis untuk memberi tahu pengguna
+            // window.simplePath.bindPopup('Rute sederhana (bukan rute jalan sebenarnya)').openPopup();
+
+            isRouteVisible = true;
+            updateRouteButtonText();
+
+            // Tampilkan pesan dalam UI
+            const statusContainer = document.getElementById('status-container');
+            if (statusContainer) {
+                const routeNote = document.createElement('div');
+                routeNote.className = 'alert alert-info mt-2 p-2';
+                routeNote.innerHTML =
+                    '<small><i class="fas fa-info-circle me-1"></i> Menggunakan rute sederhana karena rute jalan tidak tersedia</small>';
+
+                // Hapus notifikasi lama jika ada
+                const oldNote = statusContainer.querySelector('.alert-info');
+                if (oldNote) {
+                    oldNote.remove();
+                }
+
+                statusContainer.appendChild(routeNote);
+
+                // Hapus pesan setelah 8 detik
+                setTimeout(() => {
+                    routeNote.remove();
+                }, 8000);
+            }
         }
 
         // ===== RESPONSIVE BUTTON TEXT UPDATES =====
@@ -1430,7 +1547,7 @@
             }, 500);
         }
 
-        // Menyiapkan event listeners (ditingkatkan dengan responsif)
+        // Setup event listeners
         function setupEventListeners() {
             document.querySelectorAll('.start-tracking').forEach(button => {
                 button.addEventListener('click', function() {
@@ -1454,15 +1571,10 @@
                 });
             });
 
-            document.querySelectorAll('.show-tps-button').forEach(button => {
-                button.addEventListener('click', function() {
-                    const jadwalId = this.dataset.jadwalId;
-                    showTpsOnMap(jadwalId);
-                });
-            });
+            // Hapus event listener untuk show-tps-button karena tombolnya sudah dihapus
 
-            document.getElementById('show-all-tps').addEventListener('click', showAllTps);
-            document.getElementById('hide-all-tps').addEventListener('click', hideAllTps);
+            // Ganti event listener untuk toggle TPS
+            document.getElementById('toggle-tps').addEventListener('click', toggleTps);
             document.getElementById('toggle-route').addEventListener('click', toggleRouteVisibility);
 
             window.addEventListener('beforeunload', function() {
@@ -1529,6 +1641,10 @@
                         startGpsTracking();
                         sendOfflineData();
                         showTpsOnMap(jadwalId);
+
+                        if (!isTpsVisible) {
+                            toggleTps();
+                        }
                     } else {
                         console.error('Gagal memulai tracking:', data.message);
                         alert('Gagal memulai tracking: ' + data.message);
