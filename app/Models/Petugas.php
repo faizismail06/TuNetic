@@ -16,7 +16,6 @@ class Petugas extends Authenticatable
         'user_id',
         'email',
         'name',
-        'username',
         'password',
         'nomor',
         'tanggal_lahir',
@@ -33,6 +32,7 @@ class Petugas extends Authenticatable
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->where('level', 3); // Relasi petugas ke user dengan level 3
     }
+
 }

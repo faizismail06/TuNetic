@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Petugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 class PetugasController extends Controller
 {
@@ -13,7 +15,7 @@ class PetugasController extends Controller
         $petugas = Petugas::all();
         return view('petugas.index', compact('petugas'));
     }
-    
+
 
     public function store(Request $request)
     {
@@ -30,7 +32,7 @@ class PetugasController extends Controller
             'role' => 'nullable|in:Petugas',
             'foto_diri' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // input name tetap foto_diri
         ]);
-    
+
         // Upload foto jika ada, simpan ke kolom sim_image
         if ($request->hasFile('foto_diri')) {
             $file = $request->file('foto_diri');
@@ -38,13 +40,13 @@ class PetugasController extends Controller
             $file->move(public_path('uploads/foto_petugas'), $filename);
             $validatedData['sim_image'] = $filename; // simpan ke kolom sim_image
         }
-    
+
         // Enkripsi password
         $validatedData['password'] = Hash::make($validatedData['password']);
-    
+
         // Default role jika tidak dikirim
         $validatedData['role'] = $validatedData['role'] ?? 'Petugas';
-    
+
         // Tambahkan user_id dan email_verified_at
         // Dapatkan user_id dari input yang dipilih.
         $user = User::find($validatedData['user_id']); //ambil data user berdasarkan id
@@ -52,25 +54,25 @@ class PetugasController extends Controller
            $user->level = 3; //ubah level user
            $user->save();
         }
-        
+
         $validatedData['email_verified_at'] = now(); // anggap email terverifikasi
-    
+
         // Hapus field 'foto_diri' agar tidak error saat insert (karena bukan kolom di tabel)
         unset($validatedData['foto_diri']);
-    
+
         // Simpan data
         Petugas::create($validatedData);
-    
+
         return redirect()->route('petugas.index')->with('success', 'Petugas berhasil ditambahkan!');
     }
-    
-    
+
+
     public function create()
     {
         $users = User::where('level', '=', 4)->get(); // Hanya ambil user yang levelnya bukan 3
         return view('petugas.create', compact('users')); // Kirim data users ke view
     }
-        
+
 
     public function show($id)
     {
@@ -134,6 +136,24 @@ class PetugasController extends Controller
         $petugas = Petugas::findOrFail($id);
         $petugas->delete();
         return redirect()->route('petugas.index')->with('success', 'Petugas berhasil dihapus!');
+    }
+
+    public function redirectToDashboard()
+    {
+        $user = Auth::user();
+
+        // Jika user memiliki petugas terkait, cek levelnya
+        if ($user->level == 3) {
+            // Cek apakah user ada di tabel petugas
+            $petugas = $user->petugas;
+
+            if ($petugas) {
+                return redirect()->route('jadwal-pengambilan.auto-tracking'); // Petugas yang sudah terdaftar
+            }
+        }
+
+        // Default route jika level tidak sesuai
+        return redirect()->route('home')->with('error', 'Anda tidak memiliki akses.');
     }
 }
 

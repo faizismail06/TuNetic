@@ -18,12 +18,12 @@ return new class extends Migration
 
             $table->string('email')->unique();
             $table->string('name');
-            $table->string('username');
+            // $table->string('username');
             $table->string('password');
             $table->bigInteger('nomor')->nullable();
             $table->date('tanggal_lahir')->nullable();
             $table->string('alamat')->nullable();
-            $table->string('sim_image')->nullable(); // Kolom untuk upload gambar SIM
+            $table->string('sim_image')->nullable();
             $table->string('alasan_bergabung');
             $table->enum('role', ['Petugas'])->nullable();
             $table->timestamp('email_verified_at')->nullable();
@@ -39,4 +39,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('petugas');
     }
+
 };

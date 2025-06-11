@@ -58,7 +58,7 @@ class RegisterController extends Controller
         ]);
     }
 
-//     protected function registered($request, $user)
+    //     protected function registered($request, $user)
 // {
 //     auth()->guard('web')->logout(); // Pastikan logout menggunakan guard yang benar
 //     return redirect('/login')->with('success', 'Registrasi berhasil! Silakan login.');
@@ -73,26 +73,20 @@ class RegisterController extends Controller
      * @return \App\Models\User
      */
     protected function create(array $data)
-{
-    $user = User::create([
-        'name' => $data['name'],
-        'email' => $data['email'],
-        'password' => Hash::make($data['password']),
-        'level' => 4,
-    ]);
+    {
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'level' => 4,
+        ]);
 
-    $user->assignRole('user'); // assign role
-
-    return $user; // ✅ return User object, bukan redirect!
-}
-protected function registered($request, $user)
-{
-    // dd(config('mail')); // ← Tambahkan ini untuk melihat konfigurasi email
-    event(new Registered($user));
-
-    Auth::logout();
-
-    return redirect('/login')->with('success', 'Registrasi berhasil! Silakan cek email untuk verifikasi.');
-}
-
+        $user->assignRole('user'); // assign role
+        return $user; // ✅ return User object, bukan redirect!
+    }
+    protected function registered($request, $user)
+    {
+        Auth::logout();
+        return redirect('/login')->with('success', 'Registrasi berhasil! Silakan cek email untuk verifikasi.');
+    }
 }

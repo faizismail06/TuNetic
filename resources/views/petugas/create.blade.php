@@ -38,7 +38,7 @@
                                 </div>
                             @endif
 
-                            <form action="{{ route('petugas.store') }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('manage-petugas.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
 
                                 <div class="form-group">

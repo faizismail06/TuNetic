@@ -23,7 +23,9 @@ class JadwalOperasional extends Model
     protected $fillable = [
         'id_armada',
         'id_jadwal',
-        'id_rute_tps',
+        'id_rute',
+        'id_laporan',
+        'tanggal',
         'jam_aktif',
         'status',
     ];
@@ -31,6 +33,14 @@ class JadwalOperasional extends Model
     protected $casts = [
         'jam_aktif' => 'string',
     ];
+
+    /**
+     * Relasi ke tabel Rute_Tps.
+     */
+    public function ruteTps()
+    {
+        return $this->belongsTo(RuteTps::class, 'id_rute_tps', 'id');
+    }
 
     /**
      * Relasi ke tabel Armada.
@@ -45,20 +55,31 @@ class JadwalOperasional extends Model
      */
     public function jadwal()
     {
-        return $this->belongsTo(Jadwal::class, 'id_jadwal');
+        return $this->belongsTo(Jadwal::class, 'id_jadwal', 'id');
     }
 
     /**
-     * Relasi ke tabel Rute TPS.
+     * Relasi ke tabel Rute.
      */
-    public function ruteTps()
+    public function rute()
     {
-        return $this->belongsTo(RuteTps::class, 'id_rute_tps');
+        return $this->belongsTo(Rute::class, 'id_rute');
     }
 
     // Relasi ke penugasan
     public function penugasanPetugas()
     {
         return $this->hasMany(PenugasanPetugas::class, 'id_jadwal_operasional');
+    }
+
+    // Relasi ke JadwalOperasional
+    public function laporanTps()
+    {
+        return $this->hasMany(JadwalOperasional::class, 'id_jadwal_operasional');
+    }
+
+    public function laporan()
+    {
+        return $this->belongsTo(LaporanWarga::class, 'id_laporan');
     }
 }

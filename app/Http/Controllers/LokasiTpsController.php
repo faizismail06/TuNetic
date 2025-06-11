@@ -46,7 +46,14 @@ class LokasiTpsController extends Controller
             $districts = District::where('regency_id', 3374)->get(); // Kota Semarang
             $villages = Village::where('district_id', 3374090)->get(); // Tembalang
 
-            return view('adminpusat.lokasi-tps.create', compact('provinces', 'regencies', 'districts', 'villages'));
+            // Menambahkan array tipes untuk dropdown pilihan kategori
+            $tipes = [
+                'TPS' => 'TPS (Tempat Pembuangan Sampah)',
+                'TPST' => 'TPST (Tempat Pembuangan Sampah Terpadu)',
+                'TPA' => 'TPA (Tempat Pembuangan Akhir)'
+            ];
+
+            return view('adminpusat.lokasi-tps.create', compact('provinces', 'regencies', 'districts', 'villages', 'tipes'));
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -60,6 +67,7 @@ class LokasiTpsController extends Controller
         try {
             $validatedData = $request->validate([
                 'nama_lokasi' => 'required|string|max:255',
+                'tipe' => 'required|string|in:TPS,TPST,TPA',
                 'province_id' => 'required|exists:reg_provinces,id',
                 'regency_id' => 'required|exists:reg_regencies,id',
                 'district_id' => 'required|exists:reg_districts,id',
@@ -82,6 +90,9 @@ class LokasiTpsController extends Controller
     {
         try {
             $lokasi = LokasiTps::findOrFail($id);
+            // Menambahkan informasi kategori
+            $lokasi->kategori = $this->getKategoriFromTipe($lokasi->tipe);
+
             return response()->json($lokasi, 200);
         } catch (Exception $e) {
             return response()->json(["error" => "Lokasi tidak ditemukan"], 404);
@@ -93,19 +104,26 @@ class LokasiTpsController extends Controller
         $validatedData = $request->validate([
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
+            'tipe' => 'nullable|string|in:TPS,TPST,TPA', // Menambahkan filter berdasarkan tipe
         ]);
 
         $latitude = $validatedData['latitude'];
         $longitude = $validatedData['longitude'];
 
-        $nearestTps = LokasiTps::selectRaw("
-            id, nama_lokasi, province_id, regency_id, district_id, village_id, latitude, longitude,
+        // Query dasar
+        $query = LokasiTps::selectRaw("
+            id, nama_lokasi, tipe, province_id, regency_id, district_id, village_id, latitude, longitude,
             (6371 * acos(cos(radians(?)) * cos(radians(latitude))
             * cos(radians(longitude) - radians(?))
             + sin(radians(?)) * sin(radians(latitude)))) AS distance
-        ", [$latitude, $longitude, $latitude])
-            ->orderByRaw("distance ASC")
-            ->first();
+        ", [$latitude, $longitude, $latitude]);
+
+        // Filter berdasarkan tipe jika parameter tipe disediakan
+        if (isset($validatedData['tipe'])) {
+            $query->where('tipe', $validatedData['tipe']);
+        }
+
+        $nearestTps = $query->orderByRaw("distance ASC")->first();
 
         if (!$nearestTps) {
             return response()->json(["message" => "Tidak ada TPS terdekat ditemukan"], 404);
@@ -116,57 +134,70 @@ class LokasiTpsController extends Controller
             "data" => [
                 "tps" => $nearestTps,
                 "desa" => $nearestTps->village_id,
+                "kategori" => $this->getKategoriFromTipe($nearestTps->tipe)
             ]
         ], 200);
     }
 
     /**
- * Menampilkan form edit lokasi TPS.
- */
-public function edit($id)
-{
-    try {
-        $lokasiTps = LokasiTps::findOrFail($id);
+     * Menampilkan form edit lokasi TPS.
+     */
+    public function edit($id)
+    {
+        try {
+            $lokasiTps = LokasiTps::findOrFail($id);
 
-        $provinces = Province::all();
-        $regencies = Regency::where('province_id', $lokasiTps->province_id)->get();
-        $districts = District::where('regency_id', $lokasiTps->regency_id)->get();
-        $villages = Village::where('district_id', $lokasiTps->district_id)->get();
+            $provinces = Province::all();
+            $regencies = Regency::where('province_id', $lokasiTps->province_id)->get();
+            $districts = District::where('regency_id', $lokasiTps->regency_id)->get();
+            $villages = Village::where('district_id', $lokasiTps->district_id)->get();
 
-        return view('adminpusat.lokasi-tps.edit', compact(
-            'lokasiTps', 'provinces', 'regencies', 'districts', 'villages'
-        ));
-    } catch (Exception $e) {
-        return back()->with('error', 'Gagal memuat data untuk diedit: ' . $e->getMessage());
+            // Menambahkan array tipes untuk dropdown pilihan kategori
+            $tipes = [
+                'TPS' => 'TPS (Tempat Pembuangan Sampah)',
+                'TPST' => 'TPST (Tempat Pembuangan Sampah Terpadu)',
+                'TPA' => 'TPA (Tempat Pembuangan Akhir)'
+            ];
+
+            return view('adminpusat.lokasi-tps.edit', compact(
+                'lokasiTps',
+                'provinces',
+                'regencies',
+                'districts',
+                'villages',
+                'tipes'
+            ));
+        } catch (Exception $e) {
+            return back()->with('error', 'Gagal memuat data untuk diedit: ' . $e->getMessage());
+        }
     }
-}
 
-/**
- * Memperbarui lokasi TPS berdasarkan ID.
- */
-public function update(Request $request, $id)
-{
-    try {
-        $lokasi = LokasiTps::findOrFail($id);
+    /**
+     * Memperbarui lokasi TPS berdasarkan ID.
+     */
+    public function update(Request $request, $id)
+    {
+        try {
+            $lokasi = LokasiTps::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'nama_lokasi' => 'required|string|max:255',
-            'province_id' => 'required|exists:reg_provinces,id',
-            'regency_id' => 'required|exists:reg_regencies,id',
-            'district_id' => 'required|exists:reg_districts,id',
-            'village_id' => 'required|exists:reg_villages,id',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-        ]);
+            $validatedData = $request->validate([
+                'nama_lokasi' => 'required|string|max:255',
+                'tipe' => 'required|string|in:TPS,TPST,TPA',
+                'province_id' => 'required|exists:reg_provinces,id',
+                'regency_id' => 'required|exists:reg_regencies,id',
+                'district_id' => 'required|exists:reg_districts,id',
+                'village_id' => 'required|exists:reg_villages,id',
+                'latitude' => 'required|numeric|between:-90,90',
+                'longitude' => 'required|numeric|between:-180,180',
+            ]);
 
-        $lokasi->update($validatedData);
+            $lokasi->update($validatedData);
 
-        return redirect()->route('lokasi-tps.index')->with('success', 'Lokasi TPS berhasil diperbarui.');
-    } catch (Exception $e) {
-        return back()->withInput()->with('error', 'Gagal memperbarui lokasi TPS: ' . $e->getMessage());
+            return redirect()->route('lokasi-tps.index')->with('success', 'Lokasi TPS berhasil diperbarui.');
+        } catch (Exception $e) {
+            return back()->withInput()->with('error', 'Gagal memperbarui lokasi TPS: ' . $e->getMessage());
+        }
     }
-}
-
 
     /**
      * Menghapus lokasi TPS berdasarkan ID.
@@ -214,12 +245,57 @@ public function update(Request $request, $id)
         return response()->json($villages);
     }
 
+    /**
+     * Filter lokasi TPS berdasarkan kategori (tipe)
+     */
+    public function filterByTipe($tipe)
+    {
+        try {
+            $lokasiTps = LokasiTps::with(['province', 'regency', 'district', 'village'])
+                ->where('tipe', $tipe)
+                ->get();
+
+            $kategori = $this->getKategoriFromTipe($tipe);
+
+            return view('adminpusat.lokasi-tps.index', compact('lokasiTps', 'kategori'));
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Fungsi helper untuk mendapatkan nama kategori dari nilai tipe
+     */
+    private function getKategoriFromTipe($tipe)
+    {
+        switch ($tipe) {
+            case 'TPS':
+                return 'TPS (Tempat Pembuangan Sampah)';
+            case 'TPST':
+                return 'TPST (Tempat Pembuangan Sampah Terpadu)';
+            case 'TPA':
+                return 'TPA (Tempat Pembuangan Akhir)';
+            default:
+                return 'Tidak Diketahui';
+        }
+    }
+
     public function indexView()
     {
-        // Ambil data TPS dari database (opsional jika ingin menampilkan data di peta)
-        $lokasi = LokasiTps::all();
+        // Mengelompokkan lokasi berdasarkan kategori
+        $tps = LokasiTps::with(['province', 'regency', 'district', 'village'])
+            ->where('tipe', 'TPS')
+            ->get();
 
-        // Menampilkan view dengan data TPS
-        return view('adminpusat.lokasi-tps.index', compact('lokasi'));
+        $tpst = LokasiTps::with(['province', 'regency', 'district', 'village'])
+            ->where('tipe', 'TPST')
+            ->get();
+
+        $tpa = LokasiTps::with(['province', 'regency', 'district', 'village'])
+            ->where('tipe', 'TPA')
+            ->get();
+
+        // Menampilkan view dengan data TPS yang sudah dikategorikan
+        return view('adminpusat.lokasi-tps.index', compact('tps', 'tpst', 'tpa'));
     }
 }

@@ -25,7 +25,7 @@
                             <h3 class="card-title">Edit Petugas</h3>
                         </div>
                         <div class="card-body">
-                            <form action="{{ route('petugas.update', $petugas->id) }}" method="POST">
+                            <form action="{{ route('petugas.profile.update', $petugas->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
 

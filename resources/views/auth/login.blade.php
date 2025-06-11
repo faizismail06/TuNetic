@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,22 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
+
 <body>
+    @if(auth()->check())
+        @php
+            $level = auth()->user()->level;
+            $redirect = match ($level) {
+                1 => '/pusat/home',
+                2 => '/tpst/home',
+                3 => '/petugas',
+                4 => '/masyarakat'
+            };
+        @endphp
+        <script>window.location.href = "{{ $redirect }}";</script>
+        @exit
+    @endif
+
     <div class="container">
         <!-- Login Form -->
         <div class="form-box login">
@@ -32,13 +48,13 @@
                     <a href="{{ route('password.request') }}">Lupa Password?</a>
                 </div>
                 <button type="submit" class="btn">Login</button>
-                <p>or login with social platforms</p>
-                <div class="social-icons">
+                <!-- <p>or login with social platforms</p> -->
+                <!-- <div class="social-icons">
                     <a href="#"><i class='bx bxl-google'></i></a>
                     <a href="#"><i class='bx bxl-facebook'></i></a>
                     <a href="#"><i class='bx bxl-github'></i></a>
                     <a href="#"><i class='bx bxl-linkedin'></i></a>
-                </div>
+                </div> -->
             </form>
         </div>
 
@@ -73,13 +89,13 @@
                     <i class='bx bxs-lock-alt'></i>
                 </div>
                 <button type="submit" class="btn">Register</button>
-                <p>or register with social platforms</p>
-                <div class="social-icons">
+                <!-- <p>or register with social platforms</p> -->
+                <!-- <div class="social-icons">
                     <a href="#"><i class='bx bxl-google'></i></a>
                     <a href="#"><i class='bx bxl-facebook'></i></a>
                     <a href="#"><i class='bx bxl-github'></i></a>
                     <a href="#"><i class='bx bxl-linkedin'></i></a>
-                </div>
+                </div> -->
                 <p class="switch-login">Already have an account? <a href="{{ route('login') }}">Login</a></p>
             </form>
         </div>
@@ -101,17 +117,18 @@
 
     <script src="{{ asset('assets/js/main.js') }}"></script>
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const params = new URLSearchParams(window.location.search);
-        const mode = params.get("mode");
+        document.addEventListener("DOMContentLoaded", function () {
+            const params = new URLSearchParams(window.location.search);
+            const mode = params.get("mode");
 
-        if (mode === "register") {
-            document.querySelector('.container').classList.add('active');
-        } else {
-            document.querySelector('.container').classList.remove('active');
-        }
-    });
-</script>
+            if (mode === "register") {
+                document.querySelector('.container').classList.add('active');
+            } else {
+                document.querySelector('.container').classList.remove('active');
+            }
+        });
+    </script>
 
 </body>
+
 </html>

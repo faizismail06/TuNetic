@@ -35,7 +35,7 @@ class UserController extends Controller
     public function showRegistrationForm()
     {
         $provinces = Province::all(); // atau Model yang sesuai
-        return view('auth/register', compact('provinces'));
+        return view('profile/index', compact('provinces'));
     }
     public function getRegencies($province_id)
     {
@@ -74,7 +74,7 @@ class UserController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|email:rfc|unique:users',
             'role' => 'nullable',
-            'alamat' => 'nullable|string',
+            'no_telepon' => 'required|integer',
             'province_id'  => 'required|exists:reg_provinces,id',
             'regency_id'  => 'required|exists:reg_regencies,id',
             'district_id'  => 'required|exists:reg_districts,id',
@@ -120,7 +120,6 @@ class UserController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|email:rfc|unique:users',
             'role' => 'nullable',
-            'alamat' => 'nullable|string',
             'province_id'  => 'required|exists:reg_provinces,id',
             'regency_id'  => 'required|exists:reg_regencies,id',
             'district_id'  => 'required|exists:reg_districts,id',
@@ -129,7 +128,7 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            toastr()->error('Perngguna gagal ditambah </br> Periksa kembali data anda');
+            toastr()->error('Pengguna gagal ditambah </br> Periksa kembali data anda');
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
@@ -145,7 +144,6 @@ class UserController extends Controller
                     'regency_id' => $request->regency_id,
                     'district_id' => $request->district_id,
                     'village_id' => $request->village_id,
-                    'alamat' => $request->alamat,
                     'level' => 4,
                     'email_verified_at' => !blank($request->verified) ? now() : null
                 ]
