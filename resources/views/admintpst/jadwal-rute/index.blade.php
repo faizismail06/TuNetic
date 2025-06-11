@@ -531,11 +531,11 @@
                         <i class="fas fa-map-marked-alt me-2"></i>
                         Peta Monitoring Armada
                     </h5>
-                    <div class="card-tools ms-auto">
+                    {{-- <div class="card-tools ms-auto">
                         <button id="hide-all-routes" class="btn btn-sm btn-secondary">
                             <i class="fas fa-eye-slash me-1"></i>Sembunyikan Semua Rute
                         </button>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
             <div class="card-body">
@@ -1618,8 +1618,8 @@
             window.location.href = url.toString();
         }
 
-        // Event listener untuk tombol hide all routes
-        document.getElementById('hide-all-routes').addEventListener('click', clearRoutes);
+        // // Event listener untuk tombol hide all routes
+        // document.getElementById('hide-all-routes').addEventListener('click', clearRoutes);
 
         // Event listener untuk tombol toggle route
         // document.getElementById('toggle-route').addEventListener('click', toggleRouteVisibility);
