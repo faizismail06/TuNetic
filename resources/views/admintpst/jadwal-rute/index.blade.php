@@ -4,6 +4,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <!-- Leaflet Routing Machine CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -407,6 +409,21 @@
             min-width: 70px;
         }
 
+        /* Leaflet Routing Machine custom styles */
+        .leaflet-routing-container {
+            display: none;
+            /* Sembunyikan panel instruksi */
+        }
+
+        .leaflet-routing-alt {
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        .leaflet-routing-container-hide {
+            display: none;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .d-flex.justify-content-between {
@@ -509,165 +526,175 @@
 
             <!-- Map Container - Pindahkan ke atas -->
             <div class="card map-container">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="m-0">
                         <i class="fas fa-map-marked-alt me-2"></i>
                         Peta Monitoring Armada
                     </h5>
-                </div>
-                <div class="card-body">
-                    <div id="map"></div>
+                    {{-- <div class="card-tools ms-auto">
+                        <button id="hide-all-routes" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-eye-slash me-1"></i>Sembunyikan Semua Rute
+                        </button>
+                    </div> --}}
                 </div>
             </div>
+            <div class="card-body">
+                <div id="map"></div>
+            </div>
+        </div>
 
-            <!-- Filter Section - Pindahkan ke bawah map dengan tampilan baru -->
-            <div class="row mb-3">
-                <div class="col-12">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <!-- Filter Button -->
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-outline-secondary dropdown-toggle"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-filter me-2"></i>Filter
-                            </button>
-                            <div class="dropdown-menu p-3" style="min-width: 300px;">
-                                <form method="GET" action="{{ route('jadwal-rute.index') }}" id="filterForm">
-                                    <div class="mb-3">
-                                        <label for="search" class="form-label">Cari</label>
-                                        <input type="text" class="form-control form-control-sm" id="search"
-                                            name="search" value="{{ $currentSearch }}" placeholder="No. Polisi, Rute...">
-                                    </div>
+        <!-- Filter Section - Pindahkan ke bawah map dengan tampilan baru -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- Filter Button -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="fas fa-filter me-2"></i>Filter
+                        </button>
+                        <div class="dropdown-menu p-3" style="min-width: 300px;">
+                            <form method="GET" action="{{ route('jadwal-rute.index') }}" id="filterForm">
+                                <div class="mb-3">
+                                    <label for="search" class="form-label">Cari</label>
+                                    <input type="text" class="form-control form-control-sm" id="search" name="search"
+                                        value="{{ $currentSearch }}" placeholder="No. Polisi, Rute...">
+                                </div>
 
-                                    <div class="mb-3">
-                                        <label for="status" class="form-label">Status</label>
-                                        <select class="form-select form-select-sm" id="status" name="status">
-                                            <option value="">Semua Status</option>
-                                            <option value="0" {{ $currentStatus == '0' ? 'selected' : '' }}>Belum
-                                                Berjalan</option>
-                                            <option value="1" {{ $currentStatus == '1' ? 'selected' : '' }}>Berjalan
-                                            </option>
-                                            <option value="2" {{ $currentStatus == '2' ? 'selected' : '' }}>Selesai
-                                            </option>
-                                        </select>
-                                    </div>
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Status</label>
+                                    <select class="form-select form-select-sm" id="status" name="status">
+                                        <option value="">Semua Status</option>
+                                        <option value="0" {{ $currentStatus == '0' ? 'selected' : '' }}>Belum
+                                            Berjalan</option>
+                                        <option value="1" {{ $currentStatus == '1' ? 'selected' : '' }}>Berjalan
+                                        </option>
+                                        <option value="2" {{ $currentStatus == '2' ? 'selected' : '' }}>Selesai
+                                        </option>
+                                    </select>
+                                </div>
 
-                                    <div class="mb-3">
-                                        <label for="date" class="form-label">Tanggal</label>
-                                        <input type="date" class="form-control form-control-sm" id="date"
-                                            name="date" value="{{ $currentDate }}">
-                                    </div>
+                                <div class="mb-3">
+                                    <label for="date" class="form-label">Tanggal</label>
+                                    <input type="date" class="form-control form-control-sm" id="date" name="date"
+                                        value="{{ $currentDate }}">
+                                </div>
 
-                                    <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary btn-sm flex-fill">
-                                            <i class="fas fa-search me-1"></i>Terapkan
-                                        </button>
-                                        <button type="button" class="btn btn-secondary btn-sm" onclick="resetFilter()">
-                                            <i class="fas fa-times me-1"></i>Reset
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Show entries dan Export -->
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="d-flex align-items-center">
-                                <label for="per_page" class="me-2 text-muted">Show</label>
-                                <select class="form-select form-select-sm" id="per_page" name="per_page"
-                                    onchange="changePerPage()" style="width: auto;">
-                                    <option value="5" {{ $currentPerPage == 5 ? 'selected' : '' }}>5</option>
-                                    <option value="10" {{ $currentPerPage == 10 ? 'selected' : '' }}>10</option>
-                                    <option value="25" {{ $currentPerPage == 25 ? 'selected' : '' }}>25</option>
-                                    <option value="50" {{ $currentPerPage == 50 ? 'selected' : '' }}>50</option>
-                                </select>
-                                <span class="ms-2 text-muted">entries</span>
-                            </div>
-
-                            <button type="button" class="btn btn-success btn-sm" onclick="exportData()">
-                                <i class="fas fa-download me-2"></i>Export
-                            </button>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                                        <i class="fas fa-search me-1"></i>Terapkan
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="resetFilter()">
+                                        <i class="fas fa-times me-1"></i>Reset
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Table Container -->
-            <div class="card card-success card-outline table-container">
-                <div class="card-header">
-                    <h5 class="m-0">Data Jadwal Operasional</h5>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-sm btn-success" onclick="window.location.reload()">
-                            <i class="fas fa-sync-alt"></i>
+                    <!-- Show entries dan Export -->
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center">
+                            <label for="per_page" class="me-2 text-muted">Show</label>
+                            <select class="form-select form-select-sm" id="per_page" name="per_page"
+                                onchange="changePerPage()" style="width: auto;">
+                                <option value="5" {{ $currentPerPage == 5 ? 'selected' : '' }}>5</option>
+                                <option value="10" {{ $currentPerPage == 10 ? 'selected' : '' }}>10</option>
+                                <option value="25" {{ $currentPerPage == 25 ? 'selected' : '' }}>25</option>
+                                <option value="50" {{ $currentPerPage == 50 ? 'selected' : '' }}>50</option>
+                            </select>
+                            <span class="ms-2 text-muted">entries</span>
+                        </div>
+
+                        <button type="button" class="btn btn-success btn-sm" onclick="exportData()">
+                            <i class="fas fa-download me-2"></i>Export
                         </button>
                     </div>
                 </div>
-                <!-- Sisa kode table tetap sama -->
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped text-sm">
-                            <thead class="text-center">
-                                <tr>
-                                    <th>ID Jadwal</th>
-                                    <th>Tanggal</th>
-                                    <th>Hari</th>
-                                    <th>Armada</th>
-                                    <th>Rute</th>
-                                    <th>Jam Aktif</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($tableData as $data)
-                                    <tr>
-                                        <td class="text-center">{{ $data['id'] }}</td>
-                                        <td class="text-center">{{ $data['tanggal'] }}</td>
-                                        <td class="text-center">{{ $data['hari'] }}</td>
-                                        <td class="text-center">{{ $data['armada'] }}</td>
-                                        <td class="text-center">{{ $data['rute'] }}</td>
-                                        <td class="text-center">{{ $data['jam_aktif'] }}</td>
-                                        <td class="text-center">
-                                            <span
-                                                class="status-badge {{ $data['status_class'] == 'badge-danger' ? 'status-belum' : ($data['status_class'] == 'badge-warning' ? 'status-sedang' : 'status-selesai') }}">
-                                                {{ $data['status_text'] }}
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <div class="btn-group">
-                                                <button type="button" class="btn btn-sm btn-outline-info dropdown-toggle"
-                                                    data-bs-toggle="dropdown">
-                                                    <i class="fas fa-cog"></i>
-                                                </button>
-                                                <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="#"
-                                                        onclick="showArmadaDetail({{ $data['id'] }})">
-                                                        <i class="fas fa-eye me-1"></i>Detail
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="8" class="text-center py-4">
-                                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                            <p class="text-muted">Tidak ada data jadwal operasional</p>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    @if ($jadwalOperasional->hasPages())
-                        <div class="d-flex justify-content-center mt-4">
-                            {{ $jadwalOperasional->links() }}
-                        </div>
-                    @endif
-                </div>
             </div>
         </div>
+
+        <!-- Table Container -->
+        <div class="card card-success card-outline table-container">
+            <div class="card-header">
+                <h5 class="m-0">Data Jadwal Operasional</h5>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-sm btn-success" onclick="window.location.reload()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Sisa kode table tetap sama -->
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped text-sm">
+                        <thead class="text-center">
+                            <tr>
+                                <th>ID Jadwal</th>
+                                <th>Tanggal</th>
+                                <th>Hari</th>
+                                <th>Armada</th>
+                                <th>Rute</th>
+                                <th>Jam Aktif</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($tableData as $data)
+                                <tr>
+                                    <td class="text-center">{{ $data['id'] }}</td>
+                                    <td class="text-center">{{ $data['tanggal'] }}</td>
+                                    <td class="text-center">{{ $data['hari'] }}</td>
+                                    <td class="text-center">{{ $data['armada'] }}</td>
+                                    <td class="text-center">{{ $data['rute'] }}</td>
+                                    <td class="text-center">{{ $data['jam_aktif'] }}</td>
+                                    <td class="text-center">
+                                        <span
+                                            class="status-badge {{ $data['status_class'] == 'badge-danger' ? 'status-belum' : ($data['status_class'] == 'badge-warning' ? 'status-sedang' : 'status-selesai') }}">
+                                            {{ $data['status_text'] }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-info dropdown-toggle"
+                                                data-bs-toggle="dropdown">
+                                                <i class="fas fa-cog"></i>
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="#"
+                                                    onclick="showArmadaDetail({{ $data['id'] }})">
+                                                    <i class="fas fa-eye me-1"></i>Detail
+                                                </a>
+                                                {{-- <a class="dropdown-item" href="#"
+                                                        onclick="showRouteForArmada({{ $data['id'] }})">
+                                                        <i class="fas fa-route me-1"></i>Tampilkan Rute
+                                                    </a> --}}
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">Tidak ada data jadwal operasional</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                @if ($jadwalOperasional->hasPages())
+                    <div class="d-flex justify-content-center mt-4">
+                        {{ $jadwalOperasional->links() }}
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
     </div>
 
     <!-- Modal Detail Armada tetap sama -->
@@ -698,6 +725,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <!-- Leaflet Routing Machine JS -->
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
     <script>
         // Data dari controller
@@ -716,6 +745,9 @@
         let armadaMarkers = [];
         let tpsMarkers = [];
         let routeLines = [];
+        let routeControl = null;
+        let isRouteVisible = true;
+        let activeJadwalId = null;
 
         // Tambahkan legenda ke peta
         const legend = L.control({
@@ -770,6 +802,11 @@
             armadaMarkers.forEach(marker => map.removeLayer(marker));
             tpsMarkers.forEach(marker => map.removeLayer(marker));
             routeLines.forEach(line => map.removeLayer(line));
+
+            if (routeControl) {
+                map.removeControl(routeControl);
+                routeControl = null;
+            }
 
             armadaMarkers = [];
             tpsMarkers = [];
@@ -837,59 +874,297 @@
                     `)
                         .addTo(map);
 
+                    // Tambahkan ID jadwal ke marker untuk referensi
+                    marker.jadwalId = jadwal.id;
                     armadaMarkers.push(marker);
                 }
             });
         }
 
-        // Function untuk show rute specific armada
+        // Function untuk show rute specific armada dengan routing
         function showRouteForArmada(jadwalId) {
             // Clear existing routes
+            clearRoutes();
+
+            // Set jadwal aktif
+            activeJadwalId = jadwalId;
+
+            const jadwal = mapData.find(j => j.id === jadwalId);
+            if (!jadwal || !jadwal.tps_data || jadwal.tps_data.length === 0) {
+                console.warn('Tidak ada data TPS untuk jadwal ini');
+                return;
+            }
+
+            // Buat waypoints dari data TPS yang sudah diurutkan
+            const waypoints = [];
+            let armadaPosition = null;
+
+            // Tambahkan posisi armada sebagai titik awal jika tersedia
+            if (jadwal.last_tracking) {
+                armadaPosition = L.latLng(jadwal.last_tracking.latitude, jadwal.last_tracking.longitude);
+                waypoints.push(armadaPosition);
+            }
+
+            // Tambahkan semua TPS ke waypoints - data sudah terurut dari controller
+            jadwal.tps_data.forEach(tps => {
+                waypoints.push(L.latLng(tps.latitude, tps.longitude));
+            });
+
+            if (waypoints.length < 2) {
+                alert('Minimal dibutuhkan 2 titik untuk membuat rute');
+                return;
+            }
+
+            // Tambahkan marker urutan TPS (terlepas dari tipe rute yang akan digunakan)
+            jadwal.tps_data.forEach((tps, index) => {
+                const routeMarker = L.divIcon({
+                    html: `<div style="background: ${jadwal.rute.color || '#3388ff'}; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">${tps.urutan || (index + 1)}</div>`,
+                    className: 'route-marker',
+                    iconSize: [25, 25],
+                    iconAnchor: [12, 12]
+                });
+
+                const marker = L.marker([tps.latitude, tps.longitude], {
+                        icon: routeMarker
+                    })
+                    .bindPopup(`
+            <div class="popup-header">TPS ${tps.urutan || (index + 1)}: ${tps.nama_lokasi}</div>
+            <div class="popup-content">
+                <p><strong>Jenis:</strong> ${tps.tipe}</p>
+                <p><strong>Urutan:</strong> ${tps.urutan || (index + 1)}</p>
+                <p><strong>Rute:</strong> ${jadwal.rute.nama}</p>
+            </div>
+        `).addTo(map);
+
+                routeLines.push(marker);
+            });
+
+            // Variable untuk mendeteksi timeout
+            let routeTimedOut = false;
+            const timeoutDuration = 15000; // 15 detik
+            let routeTimeout = setTimeout(function() {
+                routeTimedOut = true;
+                console.warn('OSRM request timed out, menggunakan rute sederhana sebagai fallback');
+
+                // Hapus kontrol routing yang mungkin sedang loading
+                if (routeControl) {
+                    map.removeControl(routeControl);
+                    routeControl = null;
+                }
+
+                // Gambar rute sederhana sebagai fallback
+                drawSimpleRouteForArmada(jadwal);
+            }, timeoutDuration);
+
+            // Coba gunakan OSRM terlebih dahulu
+            routeControl = L.Routing.control({
+                waypoints: waypoints,
+                routeWhileDragging: false,
+                showAlternatives: false,
+                fitSelectedRoutes: true,
+                show: false, // Jangan tampilkan panel instruksi
+                lineOptions: {
+                    styles: [{
+                        color: jadwal.rute.color || '#3388ff',
+                        opacity: 0.7,
+                        weight: 6
+                    }, {
+                        color: 'white',
+                        opacity: 0.5,
+                        weight: 2
+                    }]
+                },
+                createMarker: function() {
+                    return null; // Jangan buat marker di sepanjang rute
+                },
+                router: L.Routing.osrmv1({
+                    serviceUrl: 'https://router.project-osrm.org/route/v1',
+                    profile: 'driving',
+                    useHints: false,
+                    geometryOnly: false,
+                    suppressDemoServerWarning: true,
+                    roundTrip: false,
+                    alternatives: false,
+                    steps: true,
+                    overview: "full",
+                    geometries: "polyline",
+                    timeout: 12000 // 12 detik timeout (lebih rendah dari timeoutDuration)
+                })
+            }).addTo(map);
+
+            // Jika rute ditemukan, batalkan timeout dan gunakan rute OSRM
+            routeControl.on('routesfound', function(e) {
+                clearTimeout(routeTimeout); // Batalkan timeout fallback
+
+                if (!routeTimedOut) { // Hanya proses jika belum timeout
+                    const routes = e.routes;
+                    console.log('Rute dari armada ke TPS ditemukan:', routes);
+
+                    // Fit bounds to route with padding
+                    if (routes.length > 0) {
+                        map.fitBounds(routes[0].bounds, {
+                            padding: [50, 50]
+                        });
+                    }
+
+                    isRouteVisible = true;
+
+                    // Tampilkan notifikasi sukses (opsional)
+                    showNotification('success', 'Rute optimal berhasil dimuat', 3000);
+                }
+            });
+
+            // Jika terjadi error routing, gunakan rute sederhana
+            routeControl.on('routingerror', function(e) {
+                console.warn('Routing error:', e.error);
+
+                // Batalkan timeout fallback karena sudah ada error yang tertangkap
+                clearTimeout(routeTimeout);
+
+                // Hapus kontrol routing yang error
+                if (routeControl && !routeTimedOut) {
+                    map.removeControl(routeControl);
+                    routeControl = null;
+
+                    // Gambar rute sederhana sebagai fallback
+                    drawSimpleRouteForArmada(jadwal);
+                }
+            });
+        }
+
+        // Fungsi untuk menggambar rute sederhana sebagai fallback
+        function drawSimpleRouteForArmada(jadwal) {
+            // Hapus rute sederhana yang sudah ada jika ada
+            if (window.simplePath) {
+                map.removeLayer(window.simplePath);
+            }
+
+            const coordinates = [];
+
+            // Mulai dari posisi armada jika tersedia
+            if (jadwal.last_tracking) {
+                coordinates.push([
+                    parseFloat(jadwal.last_tracking.latitude),
+                    parseFloat(jadwal.last_tracking.longitude)
+                ]);
+            }
+
+            // Tambahkan semua TPS ke koordinat
+            jadwal.tps_data.forEach(tps => {
+                coordinates.push([
+                    parseFloat(tps.latitude),
+                    parseFloat(tps.longitude)
+                ]);
+            });
+
+            if (coordinates.length < 2) {
+                console.warn('Tidak cukup koordinat untuk membuat rute sederhana');
+                return;
+            }
+
+            // Buat polyline sederhana dengan warna yang sama seperti rute asli
+            window.simplePath = L.polyline(coordinates, {
+                color: jadwal.rute.color || '#3388ff',
+                weight: 4,
+                opacity: 0.7,
+                dashArray: '10, 10' // Garis putus-putus untuk menunjukkan ini bukan rute optimal
+            }).addTo(map);
+
+            // Tambahkan popup ke garis untuk memberi tahu pengguna
+            window.simplePath.bindPopup('Rute sederhana (bukan rute jalan sebenarnya)');
+
+            // Fit bounds pada semua titik
+            const bounds = L.latLngBounds(coordinates.map(coord => L.latLng(coord[0], coord[1])));
+            map.fitBounds(bounds, {
+                padding: [50, 50]
+            });
+
+            isRouteVisible = true;
+            routeLines.push(window.simplePath);
+
+            // Tampilkan pesan notifikasi
+            showNotification('info', 'Menggunakan rute sederhana karena rute jalan tidak tersedia', 5000);
+        }
+
+        // Fungsi helper untuk menampilkan notifikasi
+        function showNotification(type, message, duration = 5000) {
+            // Cek apakah container notifikasi sudah ada
+            let notifContainer = document.getElementById('map-notifications');
+
+            if (!notifContainer) {
+                // Buat container notifikasi jika belum ada
+                notifContainer = document.createElement('div');
+                notifContainer.id = 'map-notifications';
+                notifContainer.style.cssText =
+                    'position: absolute; top: 10px; right: 10px; z-index: 1000; max-width: 300px;';
+                document.querySelector('.leaflet-container').appendChild(notifContainer);
+            }
+
+            // Buat elemen notifikasi
+            const notif = document.createElement('div');
+            notif.className = `alert alert-${type} alert-dismissible fade show`;
+            notif.style.cssText = 'margin-bottom: 10px; padding: 10px 15px; font-size: 14px; opacity: 0.9;';
+            notif.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" style="font-size: 10px; padding: 8px;" onclick="this.parentElement.remove()"></button>
+    `;
+
+            notifContainer.appendChild(notif);
+
+            // Hapus notifikasi setelah durasi tertentu
+            setTimeout(() => {
+                notif.remove();
+            }, duration);
+        }
+        // Function untuk toggle visibilitas rute
+        function toggleRouteVisibility() {
+            if (!routeControl) {
+                return;
+            }
+
+            if (isRouteVisible) {
+                // Sembunyikan rute
+                const routingContainer = document.querySelector('.leaflet-routing-container');
+                if (routingContainer) {
+                    routingContainer.style.display = 'none';
+                }
+
+                map.eachLayer(function(layer) {
+                    if (layer instanceof L.Polyline && !(layer instanceof L.Marker)) {
+                        layer.setStyle({
+                            opacity: 0
+                        });
+                    }
+                });
+
+                isRouteVisible = false;
+            } else {
+                // Tampilkan rute
+                const routingContainer = document.querySelector('.leaflet-routing-container');
+                if (routingContainer) {
+                    routingContainer.style.display = '';
+                }
+
+                map.eachLayer(function(layer) {
+                    if (layer instanceof L.Polyline && !(layer instanceof L.Marker)) {
+                        layer.setStyle({
+                            opacity: 0.7
+                        });
+                    }
+                });
+
+                isRouteVisible = true;
+            }
+        }
+
+        // Function untuk membersihkan semua rute
+        function clearRoutes() {
             routeLines.forEach(line => map.removeLayer(line));
             routeLines = [];
 
-            const jadwal = mapData.find(j => j.id === jadwalId);
-            if (jadwal && jadwal.tps_data && jadwal.tps_data.length > 0) {
-                // Create route line
-                const coordinates = jadwal.tps_data.map(tps => [tps.latitude, tps.longitude]);
-
-                const routeLine = L.polyline(coordinates, {
-                    color: jadwal.rute.color,
-                    weight: 4,
-                    opacity: 0.8,
-                    smoothFactor: 1
-                }).addTo(map);
-
-                routeLines.push(routeLine);
-
-                // Add route markers with numbers
-                jadwal.tps_data.forEach((tps, index) => {
-                    const routeMarker = L.divIcon({
-                        html: `<div style="background: ${jadwal.rute.color}; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">${index + 1}</div>`,
-                        className: 'route-marker',
-                        iconSize: [25, 25],
-                        iconAnchor: [12, 12]
-                    });
-
-                    const marker = L.marker([tps.latitude, tps.longitude], {
-                            icon: routeMarker
-                        })
-                        .bindPopup(`
-                        <div class="popup-header">Stop ${index + 1}: ${tps.nama_lokasi}</div>
-                        <div class="popup-content">
-                            <p><strong>Jenis:</strong> ${tps.tipe}</p>
-                            <p><strong>Rute:</strong> ${jadwal.rute.nama}</p>
-                        </div>
-                    `)
-                        .addTo(map);
-
-                    routeLines.push(marker);
-                });
-
-                // Fit bounds to route
-                map.fitBounds(routeLine.getBounds(), {
-                    padding: [20, 20]
-                });
+            if (routeControl) {
+                map.removeControl(routeControl);
+                routeControl = null;
             }
         }
 
@@ -1018,13 +1293,13 @@
                             </div>
 
                             ${detail.petugas && detail.petugas.length > 0 ? `
-                                                                                        <div class="row mt-4">
-                                                                                            <div class="col-12">
-                                                                                                <h6 class="text-info mb-3">
-                                                                                                    <i class="fas fa-users me-2"></i>Tim Petugas
-                                                                                                </h6>
-                                                                                                <div class="row">
-                                                                                                    ${detail.petugas.map(petugas => `
+                                                        <div class="row mt-4">
+                                                            <div class="col-12">
+                                                                <h6 class="text-info mb-3">
+                                                                    <i class="fas fa-users me-2"></i>Tim Petugas
+                                                                </h6>
+                                                                <div class="row">
+                                                                    ${detail.petugas.map(petugas => `
                                                 <div class="col-md-6 mb-2">
                                                     <div class="card border-0 bg-light">
                                                         <div class="card-body py-2">
@@ -1034,47 +1309,79 @@
                                                     </div>
                                                 </div>
                                             `).join('')}
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    ` : ''}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ` : ''}
+
+                            ${detail.rute.tps_points && detail.rute.tps_points.length > 0 ? `
+                                                        <div class="row mt-4">
+                                                            <div class="col-12">
+                                                                <h6 class="text-primary mb-3">
+                                                                    <i class="fas fa-map-marker-alt me-2"></i>Daftar TPS
+                                                                </h6>
+                                                                <div class="table-responsive">
+                                                                    <table class="table table-sm table-bordered">
+                                                                        <thead class="table-light">
+                                                                            <tr>
+                                                                                <th>Urutan</th>
+                                                                                <th>Nama TPS</th>
+                                                                                <th>Tipe</th>
+                                                                                <th>Koordinat</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            ${detail.rute.tps_points.map(tps => `
+                                                        <tr>
+                                                            <td class="text-center">${tps.urutan || '-'}</td>
+                                                            <td>${tps.nama_lokasi}</td>
+                                                            <td>${tps.tipe || 'TPS'}</td>
+                                                            <td>${tps.latitude.toFixed(6)}, ${tps.longitude.toFixed(6)}</td>
+                                                        </tr>
+                                                    `).join('')}
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ` : ''}
 
                             ${detail.last_tracking ? `
-                                                                                        <div class="row mt-4">
-                                                                                            <div class="col-12">
-                                                                                                <h6 class="text-warning mb-3">
-                                                                                                    <i class="fas fa-map-marker-alt me-2"></i>Tracking Terakhir
-                                                                                                </h6>
-                                                                                                <div class="card border-0 bg-light">
-                                                                                                    <div class="card-body">
-                                                                                                        <div class="row">
-                                                                                                            <div class="col-md-4">
-                                                                                                                <small class="text-muted">Latitude</small>
-                                                                                                                <div class="fw-bold">${detail.last_tracking.latitude}</div>
-                                                                                                            </div>
-                                                                                                            <div class="col-md-4">
-                                                                                                                <small class="text-muted">Longitude</small>
-                                                                                                                <div class="fw-bold">${detail.last_tracking.longitude}</div>
-                                                                                                            </div>
-                                                                                                            <div class="col-md-4">
-                                                                                                                <small class="text-muted">Waktu Update</small>
-                                                                                                                <div class="fw-bold">${detail.last_tracking.timestamp}</div>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    ` : `
-                                                                                        <div class="row mt-4">
-                                                                                            <div class="col-12">
-                                                                                                <div class="alert alert-info text-center">
-                                                                                                    <i class="fas fa-info-circle me-2"></i>
-                                                                                                    Belum ada data tracking untuk armada ini
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    `}
+                                                        <div class="row mt-4">
+                                                            <div class="col-12">
+                                                                <h6 class="text-warning mb-3">
+                                                                    <i class="fas fa-map-marker-alt me-2"></i>Tracking Terakhir
+                                                                </h6>
+                                                                <div class="card border-0 bg-light">
+                                                                    <div class="card-body">
+                                                                        <div class="row">
+                                                                            <div class="col-md-4">
+                                                                                <small class="text-muted">Latitude</small>
+                                                                                <div class="fw-bold">${detail.last_tracking.latitude}</div>
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                <small class="text-muted">Longitude</small>
+                                                                                <div class="fw-bold">${detail.last_tracking.longitude}</div>
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                <small class="text-muted">Waktu Update</small>
+                                                                                <div class="fw-bold">${detail.last_tracking.timestamp}</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ` : `
+                                                        <div class="row mt-4">
+                                                            <div class="col-12">
+                                                                <div class="alert alert-info text-center">
+                                                                    <i class="fas fa-info-circle me-2"></i>
+                                                                    Belum ada data tracking untuk armada ini
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    `}
                         `;
                     } else {
                         content.innerHTML = `
@@ -1205,9 +1512,9 @@
                         .then(data => {
                             if (data.success) {
                                 // Update marker position
-                                const marker = armadaMarkers.find(m => m.jadwalId === jadwal.id);
-                                if (marker) {
-                                    marker.setLatLng([data.data.latitude, data.data.longitude]);
+                                const armadaMarker = armadaMarkers.find(m => m.jadwalId === jadwal.id);
+                                if (armadaMarker) {
+                                    armadaMarker.setLatLng([data.data.latitude, data.data.longitude]);
 
                                     // Update popup content
                                     const popupContent = `
@@ -1225,15 +1532,22 @@
                                             <button class="btn-popup" onclick="showRouteForArmada(${jadwal.id})">
                                                 <i class="fas fa-route me-1"></i>Tampilkan Rute
                                             </button>
-                                            <button class="btn-popup" onclick="hideRouteForArmada(${jadwal.id})">
-                                                <i class="fas fa-eye-slash me-1"></i>Sembunyikan Rute
-                                            </button>
                                             <button class="btn-popup" onclick="showArmadaDetail(${jadwal.id})">
                                                 <i class="fas fa-info-circle me-1"></i>Detail
                                             </button>
                                         </div>
                                     `;
-                                    marker.setPopupContent(popupContent);
+                                    armadaMarker.setPopupContent(popupContent);
+
+                                    // Update rute jika sedang aktif
+                                    if (routeControl && activeJadwalId === jadwal.id && isRouteVisible) {
+                                        const waypoints = routeControl.getWaypoints();
+                                        if (waypoints.length > 0) {
+                                            waypoints[0].latLng = L.latLng(data.data.latitude, data.data
+                                                .longitude);
+                                            routeControl.setWaypoints(waypoints);
+                                        }
+                                    }
                                 }
                             }
                         })
@@ -1242,72 +1556,6 @@
                         });
                 }
             });
-        }
-
-        // Function untuk hide rute specific armada
-        function hideRouteForArmada(jadwalId) {
-            // Remove only routes for this specific armada
-            routeLines = routeLines.filter(line => {
-                if (line.jadwalId === jadwalId) {
-                    map.removeLayer(line);
-                    return false;
-                }
-                return true;
-            });
-        }
-
-        // Enhanced show route function
-        function showRouteForArmadaEnhanced(jadwalId) {
-            // First hide existing route for this armada
-            hideRouteForArmada(jadwalId);
-
-            const jadwal = mapData.find(j => j.id === jadwalId);
-            if (jadwal && jadwal.tps_data && jadwal.tps_data.length > 0) {
-                // Create route line
-                const coordinates = jadwal.tps_data.map(tps => [tps.latitude, tps.longitude]);
-
-                const routeLine = L.polyline(coordinates, {
-                    color: jadwal.rute.color,
-                    weight: 4,
-                    opacity: 0.8,
-                    smoothFactor: 1
-                }).addTo(map);
-
-                // Add custom property
-                routeLine.jadwalId = jadwalId;
-                routeLines.push(routeLine);
-
-                // Add route markers with numbers
-                jadwal.tps_data.forEach((tps, index) => {
-                    const routeMarker = L.divIcon({
-                        html: `<div style="background: ${jadwal.rute.color}; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">${index + 1}</div>`,
-                        className: 'route-marker',
-                        iconSize: [25, 25],
-                        iconAnchor: [12, 12]
-                    });
-
-                    const marker = L.marker([tps.latitude, tps.longitude], {
-                            icon: routeMarker
-                        })
-                        .bindPopup(`
-                            <div class="popup-header">Stop ${index + 1}: ${tps.nama_lokasi}</div>
-                            <div class="popup-content">
-                                <p><strong>Jenis:</strong> ${tps.tipe}</p>
-                                <p><strong>Rute:</strong> ${jadwal.rute.nama}</p>
-                            </div>
-                        `)
-                        .addTo(map);
-
-                    // Add custom property
-                    marker.jadwalId = jadwalId;
-                    routeLines.push(marker);
-                });
-
-                // Fit bounds to route with padding
-                map.fitBounds(routeLine.getBounds(), {
-                    padding: [20, 20]
-                });
-            }
         }
 
         // Function untuk handle resize map
@@ -1329,12 +1577,6 @@
             });
         }
 
-        // Function untuk clear routes
-        function clearRoutes() {
-            routeLines.forEach(line => map.removeLayer(line));
-            routeLines = [];
-        }
-
         // Function untuk handle keyboard shortcuts
         function setupKeyboardShortcuts() {
             document.addEventListener('keydown', function(e) {
@@ -1347,52 +1589,6 @@
                 if (e.key === 'F5' && e.ctrlKey) {
                     e.preventDefault();
                     updateArmadaPositions();
-                }
-            });
-        }
-
-        // Enhanced markers dengan click tracking
-        function addArmadaMarkersEnhanced() {
-            mapData.forEach(jadwal => {
-                if (jadwal.last_tracking) {
-                    const icon = L.divIcon({
-                        html: `<div style="background: #ff4757; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;"><i class="fas fa-truck" style="font-size: 10px;"></i></div>`,
-                        className: 'truck-marker',
-                        iconSize: [24, 24],
-                        iconAnchor: [12, 12]
-                    });
-
-                    const marker = L.marker([jadwal.last_tracking.latitude, jadwal.last_tracking.longitude], {
-                            icon
-                        })
-                        .bindPopup(`
-                            <div class="popup-header">
-                                <i class="fas fa-truck me-2"></i>
-                                ${jadwal.armada.no_polisi}
-                            </div>
-                            <div class="popup-content">
-                                <p><strong>Rute:</strong> ${jadwal.rute.nama}</p>
-                                <p><strong>Status:</strong> <span class="badge bg-${getStatusColor(jadwal.status)}">${jadwal.status_text}</span></p>
-                                <p><strong>Jam Aktif:</strong> ${jadwal.jam_aktif}</p>
-                                <p><strong>Update Terakhir:</strong> ${new Date(jadwal.last_tracking.timestamp).toLocaleString('id-ID')}</p>
-                            </div>
-                            <div class="popup-footer">
-                                <button class="btn-popup" onclick="showRouteForArmadaEnhanced(${jadwal.id})">
-                                    <i class="fas fa-route me-1"></i>Tampilkan Rute
-                                </button>
-                                <button class="btn-popup" onclick="hideRouteForArmada(${jadwal.id})">
-                                    <i class="fas fa-eye-slash me-1"></i>Sembunyikan Rute
-                                </button>
-                                <button class="btn-popup" onclick="showArmadaDetail(${jadwal.id})">
-                                    <i class="fas fa-info-circle me-1"></i>Detail
-                                </button>
-                            </div>
-                        `)
-                        .addTo(map);
-
-                    // Add custom properties
-                    marker.jadwalId = jadwal.id;
-                    armadaMarkers.push(marker);
                 }
             });
         }
@@ -1422,10 +1618,11 @@
             window.location.href = url.toString();
         }
 
+        // // Event listener untuk tombol hide all routes
+        // document.getElementById('hide-all-routes').addEventListener('click', clearRoutes);
 
-        // Update the original function to use enhanced version
-        window.showRouteForArmada = showRouteForArmadaEnhanced;
-        window.hideRouteForArmada = hideRouteForArmada;
+        // Event listener untuk tombol toggle route
+        // document.getElementById('toggle-route').addEventListener('click', toggleRouteVisibility);
 
         // Initialize everything when document is ready
         document.addEventListener('DOMContentLoaded', function() {
@@ -1453,6 +1650,9 @@
         // Global functions for window access
         window.exportData = exportData;
         window.showArmadaDetail = showArmadaDetail;
+        window.showRouteForArmada = showRouteForArmada;
+        window.toggleRouteVisibility = toggleRouteVisibility;
+        window.clearRoutes = clearRoutes;
         window.updateArmadaPositions = updateArmadaPositions;
         // Update existing window functions
         window.changePerPage = changePerPage;

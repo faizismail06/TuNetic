@@ -15,6 +15,7 @@ class LaporanWarga extends Model
 
     protected $fillable = [
         'id_user',
+        'id_petugas',
         'judul',
         'gambar',
         'deskripsi',
