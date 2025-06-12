@@ -23,11 +23,9 @@ class PetugasSeeder extends Seeder
             'user_id' => $user->id,
             'email' => $user->email,
             'name' => $user->name,
-            'username' => 'petugastunetic',
             'password' => $user->password, // bisa pakai ulang password-nya
             'nomor' => '081234567890',
             'tanggal_lahir' => '1995-05-10',
-            'alamat' => $user->alamat,
             'sim_image' => null,
             'alasan_bergabung' => 'Bergabung untuk bantu lingkungan.',
             'role' => 'Petugas',
@@ -45,7 +43,6 @@ class PetugasSeeder extends Seeder
             'user_id' => $user->id,
             'email' => $user->email,
             'name' => $user->name,
-            'username' => 'petugastunetic2',
             'password' => $user->password, // bisa pakai ulang password-nya
             'nomor' => '081234567890',
             'tanggal_lahir' => '1995-05-10',

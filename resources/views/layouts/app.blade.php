@@ -56,6 +56,7 @@
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link text-white" data-widget="pushmenu" href="#" role="button"><i
+
                             class="fas fa-bars"></i></a>
                 </li>
             </ul>
@@ -77,7 +78,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
 
-                        <li class="user-header text-white" style="background-color: #299e63;" >
+                        <li class="user-header text-white" style="background-color: #299e63;">
                             <img src="../../dist/img/user2-160x160.jpg" class="img-circle elevation-3" alt="User Image">
                             <p>
                                 {{ Auth::user()->name }}
@@ -85,7 +86,7 @@
                             </p>
                         </li>
                         <li class="user-footer">
-                            <a href="{{ route('profil.index') }}" class="btn btn-default btn-flat">Profil</a>
+                            {{-- <a href="{{ route('masyarakat.profile.index') }}" class="btn btn-default btn-flat">Profil</a> --}}
                             <a href="#" class="btn btn-success btn-flat float-right" data-toggle="modal"
                                 data-target="#modal-logout"><i class="fas fa-sign-out-alt"></i> <span>Keluar</span></a>
                         </li>
@@ -112,10 +113,13 @@
                         <div class="modal-footer justify-content-between">
                             <button type="button" class="btn btn-sm btn-default btn-flat"
                                 data-dismiss="modal">Tidak</button>
-                            <a class="btn btn-sm btn-success btn-flat float-right" href="{{ route('logout') }}"
+                            <a class="btn btn-sm btn-flat float-right" style="background-color: #299e63; color: #fff;"
+                                href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
-                            this.closest('form').submit();"><span>Ya,
-                                    Keluar</span></a>
+                                    this.closest('form').submit();">
+                                <span>Ya, Keluar</span>
+                            </a>
+
                         </div>
                     </form>
                 </div>
@@ -125,22 +129,22 @@
         </div>
 
         <aside class="main-sidebar main-sidebar-custom sidebar-dark-info elevation-4">
-        <a href="{{ url('') }}" class="brand-link d-flex justify-content-center align-items-center">
-                    @php
-                $user = Auth::user();
-                $roleName = $user->getRoleNames()->first(); // Ambil 1 role pertama
+            <a href="{{ url('') }}" class="brand-link d-flex justify-content-center align-items-center">
+                @php
+                    $user = Auth::user();
+                    $roleName = $user->getRoleNames()->first(); // Ambil 1 role pertama
 
-                $panelText = match ($roleName) {
-                    'admin_pusat' => 'ADMIN PANEL',
-                    'admin_tps', 'admin_tpst' => 'ADMIN TPS/TPST',
-                    'petugas' => 'PETUGAS',
-                    'user' => 'WARGA',
-                    default => 'USER',
-                };
-            @endphp
+                    $panelText = match ($roleName) {
+                        'admin_pusat' => 'ADMIN PANEL',
+                        'admin_tps', 'admin_tpst' => 'ADMIN TPS/TPST',
+                        'petugas' => 'PETUGAS',
+                        'user' => 'WARGA',
+                        default => 'USER',
+                    };
+                @endphp
 
-            <span class="brand-text font-weight-bold text-white">{{ $panelText }}</span>
-        </a>
+                <span class="brand-text font-weight-bold text-white">{{ $panelText }}</span>
+            </a>
             <div class="sidebar">
                 <nav class="mt-2">
                     @include('layouts.sidebar')
@@ -231,7 +235,7 @@
         });
     </script>
 
-@stack('scripts') <!-- Wajib ada jika belum -->
+    @stack('scripts') <!-- Wajib ada jika belum -->
 </body>
 
 </html>

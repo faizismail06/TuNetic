@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ApiTrackingArmadaController;
+use App\Http\Controllers\OsrmProxyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,3 +33,5 @@ Route::prefix('tracking-armada')->group(function () {
 //     Route::post('petugas/jadwal-pengambilan/location', [JadwalPengambilanController::class, 'saveLocation']);
 // });
 
+Route::get('osrm-proxy/{path?}', [OsrmProxyController::class, 'proxyOsrmRequest'])
+    ->where('path', '.*');

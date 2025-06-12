@@ -34,7 +34,6 @@ class UserSeeder extends Seeder
             'regency_id' => '1101',
             'district_id' => '110101',
             'village_id' => '1101012001',
-            'alamat' => 'Jl. Contoh No. 123',
             'level' => 3,
         ]);
         $petugas1->assignRole('petugas');
@@ -47,7 +46,6 @@ class UserSeeder extends Seeder
             'regency_id' => '1101',
             'district_id' => '110101',
             'village_id' => '1101012001',
-            'alamat' => 'Jl. Contoh No. 123',
             'level' => 3,
         ]);
         $petugas2->assignRole('petugas');
