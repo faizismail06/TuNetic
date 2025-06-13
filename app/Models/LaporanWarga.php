@@ -22,6 +22,7 @@ class LaporanWarga extends Model
         'status',
         'latitude',
         'longitude',
+        'alamat',
     ];
 
     protected $casts = [
