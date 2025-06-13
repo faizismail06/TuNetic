@@ -47,8 +47,23 @@
                         <span id="alamat">Alamat akan ditampilkan di sini</span>
                     </div>
                 </div>
+                <label for="jenis_masalah">Jenis Masalah</label>
+                <div class="custom-select-wrapper">
+                    <select name="jenis_masalah" id="jenis_masalah" onchange="checkMasalahLainnya()" required>
+                        <option value="">-- Pilih Masalah --</option>
+                        <option value="Tumpukan Sampah">Tumpukan Sampah</option>
+                        <option value="TPS Penuh">TPS Penuh</option>
+                        <option value="Bau Menyengat">Bau Menyengat</option>
+                        <option value="Pembuangan Liar">Pembuangan Liar</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
 
-
+                <!-- Kolom input muncul jika "Lainnya" dipilih -->
+                <div id="masalah-lainnya-box" style="display:none;">
+                    <input type="text" name="masalah_lainnya" id="masalah_lainnya" placeholder="Tulis jenis masalah lainnya"
+                        style="margin-top: 10px; font-size: 1rem; width: 100%; padding: 18px; border-radius: 10px; border: 1px solid #ccc;" />
+                </div>
                 <label for="deskripsi"
                     style="font-size: 1rem; margin-top: 20px; font-weight: 550; display: block;">Deskripsi</label>
                 <textarea id="deskripsi" name="deskripsi" rows="7" placeholder="Tulis deskripsi..." required></textarea>
@@ -101,6 +116,29 @@
 
             return true;
         }
+        if (document.getElementById('jenis_masalah').value === '') {
+            alert('Silakan pilih jenis masalah.');
+            return false;
+        }
+        if (document.getElementById('jenis_masalah').value === 'Lainnya') {
+            const lainnya = document.getElementById('masalah_lainnya').value.trim();
+            if (lainnya === '') {
+                alert('Silakan tulis jenis masalah lainnya.');
+                return false;
+            }
+        }
+        <script>
+    function checkMasalahLainnya() {
+        const jenisMasalah = document.getElementById('jenis_masalah').value;
+        const masalahLainnyaBox = document.getElementById('masalah-lainnya-box');
+
+        if (jenisMasalah === 'Lainnya') {
+            masalahLainnyaBox.style.display = 'block';
+        } else {
+            masalahLainnyaBox.style.display = 'none';
+        }
+    }
+</script>
 
     </script>
 
@@ -267,6 +305,25 @@
             font-family: inherit;
         }
 
+        .custom-select-wrapper select {
+            font-size: 1rem;
+            width: 100%;
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-family: inherit;
+            background-color: white;
+            appearance: none; /* Hilangkan panah default */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23999' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 10px;
+         }
+
+
         .upload-box {
             background-color: #f9f9f9;
             height: 250px;
@@ -324,6 +381,7 @@
             align-items: center;
             gap: 10px;
         }
+        
 
         .alamat-box i {
             color: #FFB800;
@@ -358,4 +416,6 @@
             color: white;
         }
     </style>
+
+    
 @endsection
