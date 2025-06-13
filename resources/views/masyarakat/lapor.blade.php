@@ -321,7 +321,7 @@
             background-repeat: no-repeat;
             background-position: right 1rem center;
             background-size: 10px;
-         }
+        }
 
 
         .upload-box {
@@ -416,6 +416,4 @@
             color: white;
         }
     </style>
-
-    
 @endsection
