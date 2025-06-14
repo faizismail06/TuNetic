@@ -280,6 +280,8 @@ Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
 // ===================
 Route::resource('laporan-warga', LaporanWargaController::class);
 Route::resource('laporan-tps', LaporanTpsController::class);
+Route::get('/masyarakat/riwayat/{id}', [LaporanWargaController::class, 'detailRiwayat'])->name('masyarakat.detailRiwayat');
+Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
 
 // ===================
 // EMAIL VERIFIKASI
