@@ -185,6 +185,33 @@ class LaporanWargaController extends Controller
         return "Lokasi tidak tersedia";
     }
 
+    public function submit(Request $request)
+    {
+        $data = new Laporan();
+        $data->id_user = $request->id_user;
+        $data->judul = $request->judul;
+
+        // Upload foto kalau ada
+        if ($request->hasFile('gambar')) {
+            $path = $request->file('gambar')->store('uploads', 'public');
+            $data->gambar = $path;
+        }
+
+        $data->latitude = $request->latitude;
+        $data->longitude = $request->longitude;
+
+        // Kategori diambil dari dropdown atau input lain
+        $data->kategori = $request->jenis_masalah === 'Lainnya'
+            ? $request->masalah_lainnya
+            : $request->jenis_masalah;
+
+        $data->deskripsi = $request->deskripsi;
+        $data->status = 0;
+
+        $data->save();
+
+        return redirect()->route('lapor.sukses');
+    }
 
     /**
      * Menghapus laporan warga (Soft Delete).

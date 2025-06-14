@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 use App\Models\Rute;
 use App\Models\LokasiTps;
 use App\Models\RuteTps;
@@ -54,39 +55,43 @@ class RuteController extends Controller
     public function store(Request $request)
     {
         try {
-            $validatedData = $request->validate([
+            $request->validate([
                 'nama_rute' => 'required|string|max:255',
-                // 'latitude' => 'required|numeric|between:-90,90',
-                // 'longitude' => 'required|numeric|between:-180,180',
-                'wilayah' => 'required|string',
+                'wilayah' => 'required|string|max:255',
                 'tps' => 'required|array|min:1',
-                'tps.*' => 'nullable|exists:lokasi_tps,id', // validasi dropdown TPS
-                'tpst_id' => ['nullable', Rule::exists('lokasi_tps', 'id')->where('tipe', 'TPST')],
-                'tpa_id' => ['nullable', Rule::exists('lokasi_tps', 'id')->where('tipe', 'TPA')],
+                'tps.*' => 'nullable|exists:lokasi_tps,id',
             ]);
+
+            DB::beginTransaction();
 
             $rute = Rute::create([
                 'nama_rute' => $request->nama_rute,
                 'wilayah' => $request->wilayah,
-                'tpst_id' => $request->tpst_id,
-                'tpa_id' => $request->tpa_id,
             ]);
 
-            // foreach ($request->tps as $id_lokasi_tps) {
-            //     RuteTps::create([
-            //         'id_rute' => $rute->id,
-            //         'id_lokasi_tps' => $id_lokasi_tps,
-            //     ]);
-            // }
+            $dataInsert = [];
+            foreach ($request->tps as $index => $tpsId) {
+                if ($tpsId) { // skip null/empty values
+                    $dataInsert[] = [
+                        'id_rute' => $rute->id,
+                        'id_lokasi_tps' => $tpsId,
+                        'urutan' => $index + 1,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+            }
 
-            $rute->tps()->attach(array_filter($request->tps));
-            // return response()->json($rute, 201);
+            if (count($dataInsert)) {
+                DB::table('rute_tps')->insert($dataInsert);
+            }
+
+            DB::commit();
+
             return redirect()->route('manage-rute.index')->with('success', 'Rute berhasil ditambahkan');
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Gagal menyimpan rute',
-                'message' => $e->getMessage(),
-            ], 400);
+            DB::rollBack();
+            return redirect()->back()->withErrors('Gagal menyimpan rute: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -140,13 +145,11 @@ class RuteController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $validatedData = $request->validate([
+            $request->validate([
                 'nama_rute' => 'required|string|max:255',
                 'wilayah' => 'required|string',
                 'tps' => 'required|array|min:1',
                 'tps.*' => 'nullable|exists:lokasi_tps,id',
-                'tpst_id' => ['nullable', Rule::exists('lokasi_tps', 'id')->where('tipe', 'TPST')],
-                'tpa_id' => ['nullable', Rule::exists('lokasi_tps', 'id')->where('tipe', 'TPA')],
             ]);
 
             $rute = Rute::findOrFail($id);
@@ -155,9 +158,21 @@ class RuteController extends Controller
             $rute->update([
                 'nama_rute' => $request->nama_rute,
                 'wilayah' => $request->wilayah,
-                'tpst_id' => $request->tpst_id,
-                'tpa_id' => $request->tpa_id,
             ]);
+
+            // Hapus semua data rute_tps yang lama
+            DB::table('rute_tps')->where('id_rute', $rute->id)->delete();
+
+            // Masukkan data TPS baru satu per satu
+            foreach ($request->tps as $index => $tpsId) {
+                DB::table('rute_tps')->insert([
+                    'id_rute' => $rute->id,
+                    'id_lokasi_tps' => $tpsId,
+                    'urutan' => $index + 1, // urutan sesuai tampilan
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
 
             // Update relasi TPS
             $rute->tps()->sync(array_filter($request->tps));
@@ -170,31 +185,6 @@ class RuteController extends Controller
             ], 400);
         }
     }
-    // public function update(Request $request, $id)
-    // {
-    //     try {
-    //         $rute = Rute::findOrFail($id);
-
-    //         $validatedData = $request->validate([
-    //             'nama_rute' => 'sometimes|string|max:255',
-    //             // 'latitude' => 'sometimes|numeric|between:-90,90',
-    //             // 'longitude' => 'sometimes|numeric|between:-180,180',
-    //             'wilayah' => 'sometimes|string',
-    //         ]);
-
-    //         $rute->update($validatedData);
-
-    //         return response()->json([
-    //             'message' => 'Rute berhasil diperbarui',
-    //             'data' => $rute
-    //         ], 200);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'error' => 'Gagal mengupdate rute',
-    //             'message' => $e->getMessage(),
-    //         ], 400);
-    //     }
-    // }
 
     /**
      * Menghapus rute berdasarkan ID.

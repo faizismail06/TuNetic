@@ -12,13 +12,20 @@ return new class extends Migration {
     {
         Schema::create('laporan_warga', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_user')->constrained('users');
+            $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
+            $table->foreignId('id_petugas')->nullable()->constrained('petugas')->onDelete('set null');
             $table->string('judul')->nullable();
+            // $table->decimal('latitude', 10, 7);
+            // $table->decimal('longitude', 10, places: 7);
             $table->decimal('latitude', 10, 7);
-            $table->decimal('longitude', 10, places: 7);
+            $table->decimal('longitude', 10, 7);
             $table->string('gambar')->nullable();
             $table->text('deskripsi');
-            $table->integer('status')->default(0);
+            $table->integer('status')->default(1);
+            $table->string('alasan_ditolak')->nullable();
+            $table->enum('kategori', ['Tumpukan sampah', 'TPS Penuh', 'Bau Menyengat', 'Pembuangan Liar', 'Lainnya'])->default('Tumpukan sampah');
+            $table->timestamp('waktu_diambil')->nullable();
+            $table->timestamp('waktu_selesai')->nullable();
             $table->timestamps();
 
         });

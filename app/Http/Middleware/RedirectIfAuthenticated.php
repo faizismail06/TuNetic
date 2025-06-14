@@ -24,12 +24,15 @@ class RedirectIfAuthenticated
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 // Cek level user, jika level 4, arahkan ke halaman masyarakat
-                if (Auth::user()->level == 4) {
-                    return redirect('/masyarakat');  // Arahkan ke halaman masyarakat
+                if (Auth::user()->level == 1) {
+                    return redirect('/pusat/home');  // Arahkan ke halaman masyarakat
+                } elseif (Auth::user()->level == 2) {
+                    return redirect('/tpst/home');
+                } elseif (Auth::user()->level == 3) {
+                    return redirect('/petugas');
+                } elseif (Auth::user()->level == 4) {
+                    return redirect('/masyarakat');
                 }
-    
-                // Jika level tidak 4, arahkan ke halaman home
-                return redirect(RouteServiceProvider::HOME); // Arahkan ke halaman home
             }
         }
         return $next($request);

@@ -64,7 +64,7 @@ class CustomVerifyEmail extends Notification
 
         return (new MailMessage)
             ->subject('Ayo, Verifikasi Email Kamu!')
-            ->view('emails.verify-custom', [
+            ->view('vendor.notifications.email-verify', [
                 'url' => $verificationUrl,
                 'notifiable' => $notifiable,
             ]);

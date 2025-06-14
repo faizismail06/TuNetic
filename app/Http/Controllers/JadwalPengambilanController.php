@@ -69,7 +69,7 @@ class JadwalPengambilanController extends Controller
                     ->whereIn('status', [0, 1]) // Status 0=Belum Berjalan, 1=Sedang Berjalan
                     ->whereHas('penugasanPetugas', function ($query) use ($petugasId) {
                         $query->where('id_petugas', $petugasId);
-                    })  
+                    })
                     ->where('id', $jadwalId)
                     ->first();
 
@@ -184,7 +184,8 @@ class JadwalPengambilanController extends Controller
                                     'latitude' => $lokasiTps->latitude,
                                     'longitude' => $lokasiTps->longitude,
                                     'jadwal_id' => $jadwal->id,
-                                    'status' => $status
+                                    'status' => $status,
+                                    'urutan' => $ruteTps->urutan // Tambahkan informasi urutan ke data yang dikirim ke view
                                 ];
                             })
                             ->toArray();
@@ -203,9 +204,10 @@ class JadwalPengambilanController extends Controller
 
                     $tpsPoints = \App\Models\RuteTps::with('lokasi_tps')
                         ->where('id_rute', $ruteId)
-                        ->orderBy('id') // Asumsikan urutan sesuai dengan ID
+                        ->orderBy('urutan') // Use the explicit ordering field instead of ID
                         ->get()
                         ->map(function ($ruteTps) use ($jadwalOperasional) {
+
                             $lokasiTps = $ruteTps->lokasi_tps;
 
                             // PERBAIKAN: Hanya cek tracking berdasarkan id_jadwal_operasional
@@ -233,7 +235,8 @@ class JadwalPengambilanController extends Controller
                                 'latitude' => $lokasiTps->latitude,
                                 'longitude' => $lokasiTps->longitude,
                                 'jadwal_id' => $jadwalOperasional->id,
-                                'status' => $status
+                                'status' => $status,
+                                'urutan' => $ruteTps->urutan // Tambahkan informasi urutan ke data yang dikirim ke view
                             ];
                         })
                         ->toArray();
@@ -555,6 +558,7 @@ class JadwalPengambilanController extends Controller
             // Ambil semua TPS dalam rute
             $tpsLocations = RuteTps::with('lokasi_tps')
                 ->where('id_rute', $rute->id)
+                ->orderBy('urutan') // Gunakan kolom urutan untuk pengurutan
                 ->get()
                 ->map(function ($ruteTps) use ($jadwalOperasional) {
                     $lokasiTps = $ruteTps->lokasi_tps;

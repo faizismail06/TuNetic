@@ -31,16 +31,14 @@ class VerificationController extends Controller
         $role = (Auth::user()->roles->first())->name;
     
         if ($role === 'admin_pusat') {
-            return '/admin/home';
+            return '/pusat/home';
         } elseif ($role === 'admin_tpst') {
-            return '/admin-tpst/home';
+            return '/tpst/home';
         } elseif ($role === 'petugas') {
             return '/petugas/home';
-        } elseif ($role === 'warga') {
-            return '/warga/beranda';
-        } else {
-            return '/admin/home'; // default fallback
-        }
+        } elseif ($role === 'user') {
+            return '/masyarakat';
+        } 
     }    
 
     /**

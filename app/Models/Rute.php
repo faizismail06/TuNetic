@@ -40,7 +40,9 @@ class Rute extends Model
      */
     public function tps()
     {
-        return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps');
+        return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps')
+            ->withPivot('urutan')
+            ->orderBy('rute_tps.urutan');
     }
 
     /**
@@ -49,7 +51,7 @@ class Rute extends Model
     public function tpst()
     {
         return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps')
-                    ->where('lokasi_tps.tipe', 'TPST');
+            ->where('lokasi_tps.tipe', 'TPST');
     }
 
     /**
@@ -58,7 +60,7 @@ class Rute extends Model
     public function tpa()
     {
         return $this->belongsToMany(LokasiTps::class, 'rute_tps', 'id_rute', 'id_lokasi_tps')
-                    ->where('lokasi_tps.tipe', 'TPA');
+            ->where('lokasi_tps.tipe', 'TPA');
     }
 
     /**

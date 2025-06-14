@@ -42,6 +42,16 @@
                                 @csrf
 
                                 <div class="form-group">
+                                    <label for="user_id">User *</label>
+                                    <select class="form-control" id="user_id" name="user_id" required>
+                                        <option value="">-- Pilih User --</option>
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}">{{ $user->name }} - {{ $user->email }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
                                     <label for="name">Nama Lengkap *</label>
                                     <input type="text" class="form-control" id="name" name="name" required>
                                 </div>
@@ -79,6 +89,14 @@
                                 <div class="form-group">
                                     <label for="alasan_bergabung">Alasan Bergabung</label>
                                     <textarea class="form-control" id="alasan_bergabung" name="alasan_bergabung" rows="3"></textarea>
+                                </div>
+
+                                 <div class="form-group">
+                                    <label for="role">Role</label>
+                                    <select class="form-control" id="role" name="role">
+                                        <option value="">-- Pilih Role --</option>
+                                        <option value="Petugas">Petugas</option>
+                                        </select>
                                 </div>
 
                                 <div class="form-group">

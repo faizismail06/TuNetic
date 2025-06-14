@@ -27,10 +27,50 @@ class JadwalOperasionalController extends Controller
             'armada',
             'jadwal',
             'rute',
-            'penugasanPetugas.petugas'
+            'penugasanPetugas.petugas',
         ])->get();
-        return view('adminpusat/jadwal-operasional.index', compact('jadwals'));
+        $semuaPetugas = Petugas::all(); // untuk dropdown plotting
+        return view('adminpusat/jadwal-operasional.index', compact('jadwals', 'semuaPetugas'));
     }
+
+    // public function simpanPlotting(Request $request, $id)
+    // {
+    //     $jadwal = JadwalOperasional::findOrFail($id);
+    //     $jadwal->penugasanPetugas()->delete(); // reset
+
+    //     foreach ($request->petugas_ids as $i => $pid) {
+    //         $jadwal->penugasanPetugas()->create([
+    //             'petugas_id' => $pid,
+    //             'tugas' => $request->tugas[$i]
+    //         ]);
+    //     }
+
+    //     return response()->json(['message' => 'Berhasil']);
+    // }
+
+    public function simpanPlotting(Request $request, $id)
+    {
+        $jadwal = JadwalOperasional::findOrFail($id);
+        $jadwal->penugasanPetugas()->delete(); // Hapus dulu penugasan lama
+
+        foreach ($request->petugas_ids as $index => $petugas_id) {
+            $jadwal->penugasanPetugas()->create([
+                'id_petugas' => $petugas_id,
+                'tugas' => $request->tugas[$index],
+            ]);
+        }
+
+        return redirect()->route('jadwal-operasional.index')->with('success', 'Plotting berhasil diperbarui.');
+    }
+
+    public function plotting($id)
+    {
+        $jadwal = JadwalOperasional::with('penugasanPetugas.petugas')->findOrFail($id);
+        $semuaPetugas = Petugas::all();
+
+        return view('jadwal-operasional.plotting', compact('jadwal', 'semuaPetugas'));
+    }
+
 
     /**
      * Menyimpan jadwal operasional baru.
@@ -59,9 +99,11 @@ class JadwalOperasionalController extends Controller
                 'status' => 'required|integer|in:0,1,2',
             ]));
 
+
+
             // Simpan penugasan petugas
             foreach ($request->input('petugas', []) as $p) {
-                \App\Models\PenugasanPetugas::create([
+                PenugasanPetugas::create([
                     'id_jadwal_operasional' => $jadwal->id,
                     'id_petugas' => $p['id_petugas'],
                     'tugas' => $p['tugas'],
@@ -89,25 +131,7 @@ class JadwalOperasionalController extends Controller
         ]);
     }
 
-    /**
-     * Menampilkan jadwal operasional berdasarkan ID.
-     */
-    public function show($id)
-    {
-        // $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->findOrFail($id);
-        // return response()->json($jadwal, 200);
-        try {
-            $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->findOrFail($id);
-            return response()->json($jadwal, 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Data tidak ditemukan!',
-                'error' => $e->getMessage()
-            ], 404);
-        }
-    }
-
-    /**
+        /**
      * Memperbarui jadwal operasional.
      */
     public function edit($id)
@@ -116,7 +140,7 @@ class JadwalOperasionalController extends Controller
             'jadwal',
             'armada',
             'rute',
-            'penugasanPetugas.petugas'
+            'penugasanPetugas.petugas',
         ])->findOrFail($id);
 
         return view('adminpusat/jadwal-operasional.edit', [
@@ -161,7 +185,7 @@ class JadwalOperasionalController extends Controller
 
             // Tambahkan ulang penugasan yang baru dari form
             foreach ($request->input('petugas', []) as $p) {
-                \App\Models\PenugasanPetugas::create([
+                PenugasanPetugas::create([
                     'id_jadwal_operasional' => $jadwal->id,
                     'id_petugas' => $p['id_petugas'],
                     'tugas' => $p['tugas'],
@@ -184,6 +208,7 @@ class JadwalOperasionalController extends Controller
     {
         try {
             $jadwal = JadwalOperasional::findOrFail($id);
+
             $jadwal->delete();
 
 
@@ -197,6 +222,24 @@ class JadwalOperasionalController extends Controller
                 'message' => 'Terjadi kesalahan saat menghapus!',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Menampilkan jadwal operasional berdasarkan ID.
+     */
+    public function show($id)
+    {
+        // $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->findOrFail($id);
+        // return response()->json($jadwal, 200);
+        try {
+            $jadwal = JadwalOperasional::with(['armada', 'jadwal', 'ruteTps'])->findOrFail($id);
+            return response()->json($jadwal, 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Data tidak ditemukan!',
+                'error' => $e->getMessage()
+            ], 404);
         }
     }
 }
