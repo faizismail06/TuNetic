@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\User;
 class PetugasController extends Controller
 {
     public function index()
@@ -20,6 +20,7 @@ class PetugasController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
+            'user_id' => 'required|exists:users,id', // Validasi bahwa user_id ada di tabel users
             'email' => 'required|email|unique:petugas,email',
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:petugas,username',
@@ -47,8 +48,15 @@ class PetugasController extends Controller
         $validatedData['role'] = $validatedData['role'] ?? 'Petugas';
 
         // Tambahkan user_id dan email_verified_at
-        $validatedData['user_id'] = auth()->id(); // atau angka tetap seperti 1
+        // Dapatkan user_id dari input yang dipilih.
+        $user = User::find($validatedData['user_id']); //ambil data user berdasarkan id
+        if($user){
+           $user->level = 3; //ubah level user
+           $user->save();
+        }
+
         $validatedData['email_verified_at'] = now(); // anggap email terverifikasi
+
 
         // Hapus field 'foto_diri' agar tidak error saat insert (karena bukan kolom di tabel)
         unset($validatedData['foto_diri']);
@@ -58,6 +66,14 @@ class PetugasController extends Controller
 
         return redirect()->route('petugas.index')->with('success', 'Petugas berhasil ditambahkan!');
     }
+
+
+    public function create()
+    {
+        $users = User::where('level', '=', 4)->get(); // Hanya ambil user yang levelnya bukan 3
+        return view('petugas.create', compact('users')); // Kirim data users ke view
+    }
+
 
     public function show($id)
     {
@@ -111,10 +127,10 @@ class PetugasController extends Controller
         $petugas = Petugas::findOrFail($id);
         return view('petugas.detail', compact('petugas'));
     }
-        public function create()
-    {
-        return view('petugas.create'); // Pastikan ini mengarah ke view yang benar
-    }
+    //     public function create()
+    // {
+    //     return view('petugas.create'); // Pastikan ini mengarah ke view yang benar
+    // }
 
     public function destroy($id)
     {
