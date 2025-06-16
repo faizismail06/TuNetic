@@ -83,7 +83,7 @@
                             </div>
 
                             @if($laporan->status == 0)
-                            <button type="button" class="btn px-4 py-2" style="background-color: #ffb800; color: #fff; border: none; font-weight: 500; border-radius: 8px;" 
+                            <button type="button" class="btn px-4 py-2" style="background-color: #ffb800; color: #fff; border: none; font-weight: 500; border-radius: 8px;"
                                     data-bs-toggle="modal" data-bs-target="#buktiModal{{ $laporan->id }}">
                                 Kirim Bukti
                             </button>
@@ -103,14 +103,14 @@
                             <div class="modal-body">
                                 <form id="buktiForm{{ $laporan->id }}" action="{{ route('petugas.lapor.submit-bukti', $laporan->id) }}" method="POST" enctype="multipart/form-data">
                                     @csrf
-                                    
+
                                     <div class="mb-3">
                                         <label for="fileInput{{ $laporan->id }}" class="form-label">Pilih Foto Bukti:</label>
-                                        <input type="file" 
-                                               class="form-control" 
-                                               name="bukti_foto" 
+                                        <input type="file"
+                                               class="form-control"
+                                               name="bukti_foto"
                                                id="fileInput{{ $laporan->id }}"
-                                               accept="image/*" 
+                                               accept="image/*"
                                                required
                                                onchange="handleFileSelect(this, {{ $laporan->id }})">
                                         <div class="mt-2">
@@ -148,10 +148,10 @@
             <div class="text-center py-5">
                 <i class="fas fa-inbox text-muted mb-3" style="font-size: 4rem;"></i>
                 <h5 class="text-muted">Belum ada laporan sampah</h5>
-                <p class="text-muted">Silakan tambah laporan sampah baru</p>
+                {{-- <p class="text-muted">Silakan tambah laporan sampah baru</p>
                 <a href="{{ route('petugas.lapor.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus me-2"></i> Tambah Laporan
-                </a>
+                </a> --}}
             </div>
         @endif
     </div>
@@ -162,25 +162,25 @@
 function handleFileSelect(input, laporanId) {
     const file = input.files[0];
     if (!file) return;
-    
+
     // Validasi ukuran (2MB)
     if (file.size > 2 * 1024 * 1024) {
         alert('File terlalu besar! Maksimal 2MB');
         input.value = '';
         return;
     }
-    
+
     // Validasi tipe
     if (!file.type.startsWith('image/')) {
         alert('File harus berupa gambar!');
         input.value = '';
         return;
     }
-    
+
     // Show preview
     const previewArea = document.getElementById('previewArea' + laporanId);
     const imagePreview = document.getElementById('imagePreview' + laporanId);
-    
+
     if (previewArea && imagePreview) {
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -195,7 +195,7 @@ function handleFileSelect(input, laporanId) {
 function clearFile(laporanId) {
     const fileInput = document.getElementById('fileInput' + laporanId);
     const previewArea = document.getElementById('previewArea' + laporanId);
-    
+
     if (fileInput) fileInput.value = '';
     if (previewArea) previewArea.style.display = 'none';
 }
