@@ -18,7 +18,7 @@ class TambahanSeeder extends Seeder
     {
         $this->call(ArmadaSeeder::class);
         $this->call(RuteSeeder::class);
-        // $this->call(RuteTpsSeeder::class);
+        $this->call(RuteTpsSeeder::class);
         $this->call(JadwalSeeder::class);
         // $this->call(JadwalOperasionalSeeder::class);
         // $this->call(UserSeeder::class);
