@@ -24,6 +24,7 @@ use App\Http\Controllers\LaporanWargaController;
 use App\Http\Controllers\LaporanTpsController;
 use App\Http\Controllers\TrackingArmadaController;
 use App\Http\Controllers\ArtikelController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\RuteArmadaController;
@@ -135,6 +136,8 @@ Route::get('/petugas', function () {
     return view('petugas.dashboard.home-petugas');
 });
 
+Route::get('auth/google', [LoginController::class, 'redirectToGoogle']);
+Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
 
 Route::get('/petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
 
