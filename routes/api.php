@@ -33,5 +33,5 @@ Route::prefix('tracking-armada')->group(function () {
 //     Route::post('petugas/jadwal-pengambilan/location', [JadwalPengambilanController::class, 'saveLocation']);
 // });
 
-Route::get('osrm-proxy/{path?}', [OsrmProxyController::class, 'proxyOsrmRequest'])
-    ->where('path', '.*');
+// Route::get('osrm-proxy/{path?}', [OsrmProxyController::class, 'proxyOsrmRequest'])
+//     ->where('path', '.*');

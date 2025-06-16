@@ -1293,13 +1293,13 @@
                             </div>
 
                             ${detail.petugas && detail.petugas.length > 0 ? `
-                                                        <div class="row mt-4">
-                                                            <div class="col-12">
-                                                                <h6 class="text-info mb-3">
-                                                                    <i class="fas fa-users me-2"></i>Tim Petugas
-                                                                </h6>
-                                                                <div class="row">
-                                                                    ${detail.petugas.map(petugas => `
+                                                            <div class="row mt-4">
+                                                                <div class="col-12">
+                                                                    <h6 class="text-info mb-3">
+                                                                        <i class="fas fa-users me-2"></i>Tim Petugas
+                                                                    </h6>
+                                                                    <div class="row">
+                                                                        ${detail.petugas.map(petugas => `
                                                 <div class="col-md-6 mb-2">
                                                     <div class="card border-0 bg-light">
                                                         <div class="card-body py-2">
@@ -1309,29 +1309,29 @@
                                                     </div>
                                                 </div>
                                             `).join('')}
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    ` : ''}
+                                                        ` : ''}
 
                             ${detail.rute.tps_points && detail.rute.tps_points.length > 0 ? `
-                                                        <div class="row mt-4">
-                                                            <div class="col-12">
-                                                                <h6 class="text-primary mb-3">
-                                                                    <i class="fas fa-map-marker-alt me-2"></i>Daftar TPS
-                                                                </h6>
-                                                                <div class="table-responsive">
-                                                                    <table class="table table-sm table-bordered">
-                                                                        <thead class="table-light">
-                                                                            <tr>
-                                                                                <th>Urutan</th>
-                                                                                <th>Nama TPS</th>
-                                                                                <th>Tipe</th>
-                                                                                <th>Koordinat</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            ${detail.rute.tps_points.map(tps => `
+                                                            <div class="row mt-4">
+                                                                <div class="col-12">
+                                                                    <h6 class="text-primary mb-3">
+                                                                        <i class="fas fa-map-marker-alt me-2"></i>Daftar TPS
+                                                                    </h6>
+                                                                    <div class="table-responsive">
+                                                                        <table class="table table-sm table-bordered">
+                                                                            <thead class="table-light">
+                                                                                <tr>
+                                                                                    <th>Urutan</th>
+                                                                                    <th>Nama TPS</th>
+                                                                                    <th>Tipe</th>
+                                                                                    <th>Koordinat</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                ${detail.rute.tps_points.map(tps => `
                                                         <tr>
                                                             <td class="text-center">${tps.urutan || '-'}</td>
                                                             <td>${tps.nama_lokasi}</td>
@@ -1339,49 +1339,49 @@
                                                             <td>${tps.latitude.toFixed(6)}, ${tps.longitude.toFixed(6)}</td>
                                                         </tr>
                                                     `).join('')}
-                                                                        </tbody>
-                                                                    </table>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    ` : ''}
+                                                        ` : ''}
 
                             ${detail.last_tracking ? `
-                                                        <div class="row mt-4">
-                                                            <div class="col-12">
-                                                                <h6 class="text-warning mb-3">
-                                                                    <i class="fas fa-map-marker-alt me-2"></i>Tracking Terakhir
-                                                                </h6>
-                                                                <div class="card border-0 bg-light">
-                                                                    <div class="card-body">
-                                                                        <div class="row">
-                                                                            <div class="col-md-4">
-                                                                                <small class="text-muted">Latitude</small>
-                                                                                <div class="fw-bold">${detail.last_tracking.latitude}</div>
-                                                                            </div>
-                                                                            <div class="col-md-4">
-                                                                                <small class="text-muted">Longitude</small>
-                                                                                <div class="fw-bold">${detail.last_tracking.longitude}</div>
-                                                                            </div>
-                                                                            <div class="col-md-4">
-                                                                                <small class="text-muted">Waktu Update</small>
-                                                                                <div class="fw-bold">${detail.last_tracking.timestamp}</div>
+                                                            <div class="row mt-4">
+                                                                <div class="col-12">
+                                                                    <h6 class="text-warning mb-3">
+                                                                        <i class="fas fa-map-marker-alt me-2"></i>Tracking Terakhir
+                                                                    </h6>
+                                                                    <div class="card border-0 bg-light">
+                                                                        <div class="card-body">
+                                                                            <div class="row">
+                                                                                <div class="col-md-4">
+                                                                                    <small class="text-muted">Latitude</small>
+                                                                                    <div class="fw-bold">${detail.last_tracking.latitude}</div>
+                                                                                </div>
+                                                                                <div class="col-md-4">
+                                                                                    <small class="text-muted">Longitude</small>
+                                                                                    <div class="fw-bold">${detail.last_tracking.longitude}</div>
+                                                                                </div>
+                                                                                <div class="col-md-4">
+                                                                                    <small class="text-muted">Waktu Update</small>
+                                                                                    <div class="fw-bold">${detail.last_tracking.timestamp}</div>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    ` : `
-                                                        <div class="row mt-4">
-                                                            <div class="col-12">
-                                                                <div class="alert alert-info text-center">
-                                                                    <i class="fas fa-info-circle me-2"></i>
-                                                                    Belum ada data tracking untuk armada ini
+                                                        ` : `
+                                                            <div class="row mt-4">
+                                                                <div class="col-12">
+                                                                    <div class="alert alert-info text-center">
+                                                                        <i class="fas fa-info-circle me-2"></i>
+                                                                        Belum ada data tracking untuk armada ini
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    `}
+                                                        `}
                         `;
                     } else {
                         content.innerHTML = `
