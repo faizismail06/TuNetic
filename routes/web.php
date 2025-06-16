@@ -27,6 +27,7 @@ use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\RuteArmadaController;
+use App\Http\Controllers\DashboardArtikelController;
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LaporanWargaAdminController;
@@ -51,10 +52,19 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 // AUTH & LANDING PAGE
 // ===================
 Route::get('/', function () {
-    return view('landing-page');
-});
+    // Ambil artikel terbaru untuk ditampilkan di landing page
+    $artikels = App\Models\Artikel::where('status', 1)
+        ->orderBy('tanggal_publikasi', 'desc')
+        ->limit(3)
+        ->get();
 
+    // Return landing page view with articles
+    return view('landing-page', compact('artikels'));
+})->name('home');
+
+// Authentication routes
 Auth::routes(['verify' => true]);
+
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -470,3 +480,22 @@ Route::prefix('petugas/lapor')->name('petugas.')->middleware('auth')->group(func
 });
 
 Route::get('/osrm-route', [OsrmProxyController::class, 'getRoute']);
+// Dashboard Artikel Routes
+Route::prefix('dashboard')->name('dashboard.')->group(function () {
+
+    // Main artikel routes
+    Route::get('/artikel', [DashboardArtikelController::class, 'index'])->name('artikel.index');
+    Route::get('/artikel/search', [DashboardArtikelController::class, 'search'])->name('artikel.search');
+    Route::get('/artikel/recent/{limit?}', [DashboardArtikelController::class, 'recent'])->name('artikel.recent');
+    Route::get('/artikel/widget/{count?}', [DashboardArtikelController::class, 'widget'])->name('artikel.widget');
+    Route::get('/artikel/paginated', [DashboardArtikelController::class, 'paginated'])->name('artikel.paginated');
+
+    // Show artikel by ID
+    Route::get('/artikel/{id}', [DashboardArtikelController::class, 'show'])->name('artikel.show');
+
+    // Show artikel by slug (optional)
+    Route::get('/artikel/slug/{slug}', [DashboardArtikelController::class, 'showBySlug'])->name('artikel.slug');
+
+    // API endpoint for AJAX requests
+    Route::get('/artikel/api/data', [DashboardArtikelController::class, 'api'])->name('artikel.api');
+});

@@ -55,6 +55,35 @@
             width: 100%;
             height: 5px;
         }
+        .article-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    }
+    
+    .search-box .form-control:focus {
+        border-color: #299E63;
+        box-shadow: 0 0 0 0.2rem rgba(41, 158, 99, 0.25);
+    }
+    
+    .article-item {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
     </style>
 </head>
 
@@ -398,91 +427,134 @@
             </div>
         </section>
 
-        <!-- Edukasi Section -->
-        <section class="py-5" id="edukasi">
-            <div class="container">
-                <h2 class="fw-semibold mb-3 lexend-font">Edukasi</h2>
-                <p class="mb-4 redhat-fon fw-light">Baca Artikel Tentang Pengelolaan Sampah, Lingkungan, dan Gaya Hidup
-                    Berkelanjutan.</p>
+        <!-- Edukasi Section - Dynamic Version -->
+<section class="py-5" id="edukasi">
+    <div class="container">
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h2 class="fw-semibold mb-3" style="font-family: 'Red Hat Text', sans-serif;">Edukasi</h2>
+                <p class="mb-4" style="font-family: 'Red Hat Text', sans-serif; font-weight: 450;">
+                    Baca Artikel Tentang Pengelolaan Sampah, Lingkungan, dan Gaya Hidup Berkelanjutan.
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{{ route('dashboard.artikel.index') }}" class="btn btn-outline-success">
+                    Lihat Semua Artikel <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
 
-                <div class="row">
-                    <!-- First Article - Plastic Waste Impact -->
-                    <div class="col-md-6 mb-4">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="row g-0">
-                                <div class="col-md-5">
-                                    <img src="assets/images/image-6.png" class="img-fluid rounded-start h-100"
-                                        alt="Dampak Sampah Plastik" style="object-fit: cover;">
-                                </div>
-                                <div class="col-md-7">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <i class="far fa-calendar-alt me-2 text-muted"></i>
-                                            <small class="text-muted redhat-font">Kamis, 20 Juli 2023</small>
-                                        </div>
-                                        <h5 class="card-title lexend-font">Dampak Sampah Plastik Terhadap Lingkungan dan
-                                            Solusi Pengelolaannya</h5>
-                                        <p class="card-text redhat-font">Sampah plastik merusak lingkungan, mencemari
-                                            tanah dan laut, serta membahayakan satwa. Solusinya adalah pengurangan
-                                            plastik sekali pakai dan pengelolaan sampah yang lebih baik.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <!-- Search Box (Optional) -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <form action="{{ route('dashboard.artikel.search') }}" method="GET" class="search-box">
+                    <div class="position-relative">
+                        <input type="text" 
+                               name="q" 
+                               class="form-control" 
+                               placeholder="Cari artikel..."
+                               value="{{ request('q') }}"
+                               style="padding-left: 45px; border-radius: 25px; border: 2px solid #e9ecef;">
+                        <i class="fas fa-search position-absolute" 
+                           style="left: 15px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
                     </div>
+                </form>
+            </div>
+        </div>
 
-                    <!-- Second Article - Plastic Pollution in Rivers -->
-                    <div class="col-md-6 mb-4">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="row g-0">
-                                <div class="col-md-5">
-                                    <img src="assets/images/image.png" class="img-fluid rounded-start h-100"
-                                        alt="Sampah Plastik di Sungai" style="object-fit: cover;">
-                                </div>
-                                <div class="col-md-7">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <i class="far fa-calendar-alt me-2 text-muted"></i>
-                                            <small class="text-muted redhat-font">Kamis, 28 April 2022</small>
-                                        </div>
-                                        <h5 class="card-title lexend-font">Sampah Plastik Cemari Sungai di Indonesia
-                                        </h5>
-                                        <p class="card-text redhat-font">Sampah plastik mencemari sungai di Indonesia,
-                                            menyebabkan banjir dan merusak ekosistem. Solusinya: terapkan 3R (Reduce,
-                                            Reuse, Recycle).</p>
+        <!-- Articles Grid -->
+        <div class="row" id="articles-container">
+            @forelse($artikels ?? [] as $artikel)
+                <div class="col-md-6 mb-4 article-item">
+                    <div class="card border-0 shadow-sm h-100 article-card">
+                        <div class="row g-0">
+                            <!-- Article Image -->
+                            <div class="col-md-5">
+                                @if($artikel->gambar)
+                                    <img src="{{ asset('storage/' . $artikel->gambar) }}" 
+                                         class="img-fluid rounded-start h-100"
+                                         alt="{{ $artikel->judul_artikel }}" 
+                                         style="object-fit: cover;">
+                                @else
+                                    <div class="bg-light d-flex align-items-center justify-content-center h-100 rounded-start">
+                                        <i class="fas fa-image fa-3x text-muted"></i>
                                     </div>
-                                </div>
+                                @endif
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Third Article - KLHK Festival -->
-                    <div class="col-md-6 mb-4">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="row g-0">
-                                <div class="col-md-5">
-                                    <img src="assets/images/imageyo.png" class="img-fluid rounded-start h-100"
-                                        alt="Festival LIKE 2" style="object-fit: cover;">
-                                </div>
-                                <div class="col-md-7">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <i class="far fa-calendar-alt me-2 text-muted"></i>
-                                            <small class="text-muted redhat-font">Jumat, 9 Agustus 2024</small>
-                                        </div>
-                                        <h5 class="card-title lexend-font">KLHK Ajak Masyarakat "Gaya Hidup Minim
-                                            Sampah" dalam Festival LIKE 2</h5>
-                                        <p class="card-text redhat-font">KLHK menggelar Festival LIKE 2 untuk mendorong
-                                            gaya hidup minim sampah dengan prinsip pilah, guna ulang, dan daur ulang
-                                            guna mendukung ekonomi sirkular.</p>
+                            
+                            <!-- Article Content -->
+                            <div class="col-md-7">
+                                <div class="card-body">
+                                    <!-- Date -->
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="far fa-calendar-alt me-2 text-muted"></i>
+                                        <small class="text-muted" style="font-family: 'Red Hat Text', sans-serif;">
+                                            {{ \Carbon\Carbon::parse($artikel->tanggal_publikasi)->locale('id')->isoFormat('dddd, D MMMM Y') }}
+                                        </small>
+                                    </div>
+                                    
+                                    <!-- Title -->
+                                    <h5 class="card-title" style="font-family: 'Red Hat Text', sans-serif; font-weight: 600;">
+                                        {{ Str::limit($artikel->judul_artikel, 60) }}
+                                    </h5>
+                                    
+                                    <!-- Description -->
+                                    <p class="card-text" style="font-family: 'Red Hat Text', sans-serif; font-weight: 300;">
+                                        {{ Str::limit($artikel->deskripsi_singkat, 120) }}
+                                    </p>
+                                    
+                                    <!-- Read More Button -->
+                                    <div class="mt-auto">
+                                        @if($artikel->link_artikel)
+                                            <a href="{{ $artikel->link_artikel }}" 
+                                               target="_blank"
+                                               class="btn btn-sm btn-outline-success">
+                                                Baca Selengkapnya <i class="fas fa-external-link-alt ms-1"></i>
+                                            </a>
+                                        @else
+                                            <a href="{{ route('dashboard.artikel.show', $artikel->id) }}" 
+                                               class="btn btn-sm btn-outline-success">
+                                                Baca Selengkapnya <i class="fas fa-arrow-right ms-1"></i>
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            @empty
+                <!-- No Articles Message -->
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="fas fa-newspaper fa-4x text-muted mb-3"></i>
+                        <h4 style="font-family: 'Red Hat Text', sans-serif; color: #6c757d;">
+                            Belum Ada Artikel
+                        </h4>
+                        <p style="font-family: 'Red Hat Text', sans-serif; color: #6c757d;">
+                            Artikel edukasi akan segera hadir untuk Anda.
+                        </p>
+                    </div>
+                </div>
+            @endforelse
+        </div>
+
+        <!-- Load More Button (Optional) -->
+        @if(isset($artikels) && $artikels->count() >= 6)
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <button class="btn btn-success" id="load-more-btn" data-page="2">
+                        Muat Lebih Banyak
+                        <div class="spinner-border spinner-border-sm ms-2 d-none" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </button>
+                </div>
             </div>
-        </section>
+        @endif
+    </div>
+</section>
 
         <!-- Call to Action -->
         <section class="">
