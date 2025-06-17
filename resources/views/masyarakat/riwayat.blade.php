@@ -4,6 +4,7 @@
     <!-- Font Red Hat Text -->
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <div class="main-wrapper">
         <div class="riwayat-container">
             <h2>Riwayat Pengajuan</h2>
@@ -24,14 +25,22 @@
 
                         </div>
 
-                        @if($lapor->status == 1)
-                            <span class="status belum"><i class="fas fa-circle-exclamation icon-status"></i> Belum diangkut</span>
+                        @if($lapor->status == 0)
+                            <span class="status belum">
+                                <i class="fas fa-circle-exclamation icon-status"></i> Belum diangkut
+                            </span>
+                        @elseif($lapor->status == 1)
+                            <span class="status sedang">
+                                <i class="fas fa-clock icon-status"></i> Sedang proses
+                            </span>
                         @elseif($lapor->status == 2)
-                            <span class="status sedang"><i class="fas fa-spinner icon-status"></i> Sedang proses</span>
+                            <span class="status belum">
+                                <i class="fas fa-circle-xmark fa-1.5x icon-status"></i> Ditolak
+                            </span>
                         @elseif($lapor->status == 3)
-                            <span class="status belum"><i class="fas fa-circle-xmark icon-status"></i> Ditolak</span>
-                        @elseif($lapor->status == 4)
-                            <span class="status selesai"><i class="fas fa-circle-check icon-status"></i> Sudah diangkut</span>
+                            <span class="status selesai">
+                                <i class="fas fa-check-circle text-success icon-status"></i> Sudah diangkut
+                            </span>
                         @endif
 
                         <div class="laporan-action d-flex justify-content-end">
@@ -43,7 +52,7 @@
 
             @endforeach
 
-            <a href="{{ route('lapor.form') }}" class="btn-lapor-baru">Buat Laporan Baru</a>
+            <a href="{{ route('masyarakat.lapor') }}" class="btn-lapor-baru">Buat Laporan Baru</a>
         </div>
     </div>
 
@@ -122,13 +131,13 @@
         }
 
         .icon-status {
-            margin-right: 8px;
+            margin-right: 7px;
         }
 
         .status {
-            font-weight: 600;
+            font-weight: 400;
             display: inline-block;
-            margin-top: 12px;
+            font-family: 'Red Hat Text', sans-serif;
         }
 
         .status.belum {
@@ -182,8 +191,8 @@
         }
 
         /* .btn-detail:hover {
-                                background-color: #e0e0e0;
-                            } */
+                                                                background-color: #e0e0e0;
+                                                            } */
     </style>
 
 @endsection

@@ -52,8 +52,8 @@
         }
 
         /* .btn-detail:hover {
-                        background-color: #e0e0e0;
-                    } */
+                                                                            background-color: #e0e0e0;
+                                                                        } */
     </style>
 
 
@@ -121,53 +121,57 @@
                     <p>Belum ada laporan yang dikirim.</p>
                 @else
                     <div class="d-flex flex-column gap-4" style="padding-top: px;">
-                        @foreach ($laporanTerbaru as $laporan)
+                        @foreach ($laporanTerbaru as $lapor)
                             <div class="card border-0 shadow-sm p-3" style="border-radius: 16px; ">
                                 <div class="d-flex align-items-center gap-3">
                                     <!-- Gambar -->
                                     <div style="flex: 0 0 150px;">
-                                        @if($laporan->gambar)
-                                            <img src="{{ $laporan->gambar }}" class="img-fluid rounded"
+                                        @if($lapor->gambar)
+                                            <img src="{{ $lapor->gambar }}" class="img-fluid rounded"
                                                 style="width: 150px; height: 120px; object-fit: cover;" alt="Gambar Laporan">
                                         @else
                                             <img src="{{ asset('images/default.jpg') }}" class="img-fluid rounded"
-                                                style="width: 150px; height: 120px; object-fit: cover;"
-                                                alt="Tidak Ada Gambar">
+                                                style="width: 150px; height: 120px; object-fit: cover;" alt="Tidak Ada Gambar">
                                         @endif
                                     </div>
 
                                     <!-- Info Laporan -->
                                     <div style="flex: 1;">
                                         <h6 class="fw-bold mb-2" style="font-family: 'Red Hat Text', sans-serif;">
-                                            {{ $laporan->judul }}
+                                            {{ $lapor->judul }}
                                         </h6>
 
                                         <div class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9rem;">
                                             <i class="fas fa-calendar-alt me-2 text-success"></i>
-                                            {{ $laporan->created_at->format('d F Y') }}
+                                            {{ $lapor->created_at->format('d F Y') }}
                                         </div>
 
                                         <div class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.9rem;">
                                             <i class="fas fa-map-marker-alt me-2 text-success"></i>
-                                            {{ $laporan->lokasi ?? 'Lokasi tidak tersedia' }}
+                                            {{ $lapor->lokasi ?? 'Lokasi tidak tersedia' }}
                                         </div>
 
+                                        @if($lapor->status == 0)
+                                            <span class="status belum">
+                                                <i class="fas fa-circle-exclamation icon-status"></i> Belum diangkut
+                                            </span>
+                                        @elseif($lapor->status == 1)
+                                            <span class="status sedang">
+                                                <i class="fas fa-clock icon-status"></i> Sedang proses
+                                            </span>
+                                        @elseif($lapor->status == 2)
+                                            <span class="status belum">
+                                                <i class="fas fa-circle-xmark fa-1.5x icon-status"></i> Ditolak
+                                            </span>
+                                        @elseif($lapor->status == 3)
+                                            <span class="status selesai">
+                                                <i class="fas fa-check-circle text-success icon-status"></i> Sudah diangkut
+                                            </span>
+                                        @endif
 
-                                        <div class="d-flex align-items-center" style="font-size: 0.9rem;">
-                                            @if ($laporan->status == 0)
-                                                <i class="fas fa-exclamation-circle me-2 text-danger"></i>
-                                                <span class="text-danger">Belum diangkut</span>
-                                            @elseif($laporan->status == 1)
-                                                <i class="fas fa-hourglass-half me-2 text-warning"></i>
-                                                <span class="text-warning">Diproses</span>
-                                            @else
-                                                <i class="fas fa-check-circle me-2 text-success"></i>
-                                                <span class="text-success">Sudah diangkut</span>
-                                            @endif
 
-                                        </div>
                                         <div class="text-end mt-1">
-                                            <a href="{{ route('laporan.show', $laporan->id) }}" class="btn-detail text-success"
+                                            <a href="{{ route('laporan.show', $lapor->id) }}" class="btn-detail text-success"
                                                 style="font-family: 'Red Hat Text', sans-serif; font-weight: 500; text-decoration: none;">
                                                 Lihat Detail
                                             </a>
@@ -197,24 +201,44 @@
             <p style="color: #555; margin-bottom: 30px;">Cek Rute Armada dengan Mudah</p>
 
             <!-- Gambar Armada -->
-            <img src="{{ asset('assets/images/Masyarakat/maps-armada-placeholder.png') }}" alt="Peta Placeholder"
-                style="width: 1320px; height: 400px;
-                                                                                        margin-top: 30px;
-                                                                                        border-radius: 12px;
-                                                                                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <img src="{{ asset('assets/images/Masyarakat/maps-armada-placeholder.png') }}" alt="Peta Placeholder" style="width: 1320px; height: 400px;
+                                        margin-top: 30px;
+                                        border-radius: 12px;
+                                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
 
             <!-- Tombol kanan bawah -->
             <div style="display: flex; justify-content: flex-end; margin-top: 20px; padding-right: 100px;">
                 <a href="{{ route('masyarakat.lacak') }}" style="font-size: 1.1rem;
-                                                                                                      background-color: #299E63;
-                                                                                                      margin-top: 20px;
-                                                                                                      color: white;
-                                                                                                      padding: 15px 25px;
-                                                                                                      text-decoration: none;
-                                                                                                      border-radius: 8px;">
+                                            background-color: #299E63;
+                                            margin-top: 20px;
+                                            color: white;
+                                            padding: 15px 25px;
+                                            text-decoration: none;
+                                            border-radius: 8px;">
                     Cek Rute Armada
                 </a>
             </div>
         </div>
     </section>
 @endsection
+
+<style>
+    .status {
+        font-weight: 400;
+        font-size: 0.9rem;
+        display: inline-block;
+        font-family: 'Red Hat Text', sans-serif;
+    }
+
+    .status.belum {
+        color: #dc3545;
+    }
+
+    .status.sedang {
+        color: #FFB800;
+    }
+
+    .status.selesai {
+        color: #299E63;
+    }
+</style>

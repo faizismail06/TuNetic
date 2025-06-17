@@ -21,14 +21,16 @@ class RuteTpsSeeder extends Seeder
 
         // Hubungkan beberapa TPS ke rute secara acak
         foreach ($rutes as $rute) {
-            $lokasi_acak = $lokasis->random(rand(1, 3)); // 1-3 TPS per rute
-            foreach ($lokasi_acak as $lokasi) {
+            $lokasi_acak = $lokasis->random(rand(1, 3))->values(); // pastikan indexing dari 0
+            foreach ($lokasi_acak as $index => $lokasi) {
                 RuteTps::create([
                     'id_rute' => $rute->id,
-                    'id_lokasi_tps' => $lokasi->id
+                    'id_lokasi_tps' => $lokasi->id,
+                    'urutan' => $index + 1 // dimulai dari 1
                 ]);
             }
         }
+
 
         $this->command->info('Seeder Rute TPS berhasil dijalankan.');
     }

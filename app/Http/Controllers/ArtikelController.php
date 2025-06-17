@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Artikel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ArtikelController extends Controller
 {
@@ -104,8 +105,8 @@ class ArtikelController extends Controller
         $artikel = Artikel::findOrFail($id);
 
         // Hapus gambar jika ada
-        if ($artikel->gambar && \Storage::exists('public/' . $artikel->gambar)) {
-            \Storage::delete('public/' . $artikel->gambar);
+        if ($artikel->gambar && Storage::exists('public/' . $artikel->gambar)) {
+            Storage::delete('public/' . $artikel->gambar);
         }
 
         $artikel->delete();

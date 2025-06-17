@@ -19,19 +19,22 @@ use App\Http\Controllers\PenugasanPetugasController;
 use App\Http\Controllers\RuteController;
 use App\Http\Controllers\RuteTpsController;
 use App\Http\Controllers\SampahController;
+use App\Http\Controllers\LaporSampahController;
 use App\Http\Controllers\LaporanWargaController;
 use App\Http\Controllers\LaporanWargaAdminController;
 use App\Http\Controllers\LaporanTpsController;
 use App\Http\Controllers\TrackingArmadaController;
 use App\Http\Controllers\ArtikelController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\RuteArmadaController;
+use App\Http\Controllers\DashboardArtikelController;
 
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\JadwalRuteController;
-
+use App\Http\Controllers\OsrmProxyController;
 use App\Models\Role;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Auth;
@@ -50,10 +53,19 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 // AUTH & LANDING PAGE
 // ===================
 Route::get('/', function () {
-    return view('landing-page');
-});
+    // Ambil artikel terbaru untuk ditampilkan di landing page
+    $artikels = App\Models\Artikel::where('status', 1)
+        ->orderBy('tanggal_publikasi', 'desc')
+        ->limit(3)
+        ->get();
 
+    // Return landing page view with articles
+    return view('landing-page', compact('artikels'));
+})->name('home');
+
+// Authentication routes
 Auth::routes(['verify' => true]);
+
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -120,10 +132,15 @@ Route::resource('armada', ArmadaController::class);
 
 // Route::get('/petugas', [LaporanWargaController::class, 'index']);
 
-Route::get('/petugas', function () {
-    return view('petugas.dashboard.home-petugas');
-});
+// Route::get('/petugas', function () {
+//     return view('petugas.dashboard.home-petugas');
+// });
 
+Route::get('/petugas', [LaporSampahController::class, 'laporanSampah'])->name('petugas.home');
+Route::post('/lapor-sampah/kirim-bukti/{id}', [LaporSampahController::class, 'submitBukti'])->name('lapor-sampah.kirim-bukti');
+
+Route::get('auth/google', [LoginController::class, 'redirectToGoogle']);
+Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
 
 Route::get('/petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
 
@@ -351,6 +368,8 @@ Route::prefix('pusat/laporan-pengaduan')->name('laporan.')->group(function () {
 });
 Route::resource('pusat/laporan-warga', LaporanWargaController::class);
 Route::resource('laporan-tps', LaporanTpsController::class);
+Route::get('/masyarakat/riwayat/{id}', [LaporanWargaController::class, 'detailRiwayat'])->name('masyarakat.detailRiwayat');
+Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
 
 
 
@@ -439,13 +458,13 @@ Route::middleware(['auth'])->prefix('masyarakat')->name('masyarakat.')->group(fu
          ->name('jadi-petugas.submit');
 
     Route::get('/jadi-petugas/success', [JadiPetugasController::class, 'success'])
-         ->name('jadi-petugas.success');
+        ->name('jadi-petugas.success');
 });
 
 // Route untuk data wilayah
-    Route::get('/get-regencies/{province_id}', [JadiPetugasController::class, 'getRegencies'])->name('get.regencies');
-    Route::get('/get-districts/{regency_id}', [JadiPetugasController::class, 'getDistricts'])->name('get.districts');
-    Route::get('/get-villages/{district_id}', [JadiPetugasController::class, 'getVillages'])->name('get.villages');
+Route::get('/get-regencies/{province_id}', [JadiPetugasController::class, 'getRegencies'])->name('get.regencies');
+Route::get('/get-districts/{regency_id}', [JadiPetugasController::class, 'getDistricts'])->name('get.districts');
+Route::get('/get-villages/{district_id}', [JadiPetugasController::class, 'getVillages'])->name('get.villages');
 
 // Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
 // // Routes untuk CRUD petugas (khusus admin)
@@ -458,3 +477,39 @@ Route::middleware(['auth'])->prefix('masyarakat')->name('masyarakat.')->group(fu
 //     Route::put('/petugas/{id}', [JadiPetugasController::class, 'update'])->name('jadi-petugas.update');
 //     Route::delete('/petugas/{id}', [JadiPetugasController::class, 'destroy'])->name('jadi-petugas.destroy');
 // });
+
+// Tambahkan route Lapor Sampah di sini
+Route::prefix('petugas/lapor')->name('petugas.')->middleware('auth')->group(function () {
+    Route::get('/', [LaporSampahController::class, 'index'])->name('lapor.index');
+    Route::get('/create', [LaporSampahController::class, 'create'])->name('lapor.create');
+    Route::post('/', [LaporSampahController::class, 'store'])->name('lapor.store');
+    Route::get('/{lapor}', [LaporSampahController::class, 'show'])->name('lapor.show');
+    Route::get('/{lapor}/edit', [LaporSampahController::class, 'edit'])->name('lapor.edit');
+    Route::put('/{lapor}', [LaporSampahController::class, 'update'])->name('lapor.update');
+    Route::delete('/{lapor}', [LaporSampahController::class, 'destroy'])->name('lapor.destroy');
+    Route::get('/{lapor}/bukti', [LaporSampahController::class, 'buktiForm'])->name('lapor.bukti-form');
+
+    // Route khusus untuk submit bukti
+    Route::post('/{id}/submit-bukti', [LaporSampahController::class, 'submitBukti'])->name('lapor.submit-bukti');
+});
+
+Route::get('/osrm-route', [OsrmProxyController::class, 'getRoute']);
+// Dashboard Artikel Routes
+Route::prefix('dashboard')->name('dashboard.')->group(function () {
+
+    // Main artikel routes
+    Route::get('/artikel', [DashboardArtikelController::class, 'index'])->name('artikel.index');
+    Route::get('/artikel/search', [DashboardArtikelController::class, 'search'])->name('artikel.search');
+    Route::get('/artikel/recent/{limit?}', [DashboardArtikelController::class, 'recent'])->name('artikel.recent');
+    Route::get('/artikel/widget/{count?}', [DashboardArtikelController::class, 'widget'])->name('artikel.widget');
+    Route::get('/artikel/paginated', [DashboardArtikelController::class, 'paginated'])->name('artikel.paginated');
+
+    // Show artikel by ID
+    Route::get('/artikel/{id}', [DashboardArtikelController::class, 'show'])->name('artikel.show');
+
+    // Show artikel by slug (optional)
+    Route::get('/artikel/slug/{slug}', [DashboardArtikelController::class, 'showBySlug'])->name('artikel.slug');
+
+    // API endpoint for AJAX requests
+    Route::get('/artikel/api/data', [DashboardArtikelController::class, 'api'])->name('artikel.api');
+});

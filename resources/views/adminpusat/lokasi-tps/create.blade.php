@@ -109,8 +109,10 @@
 
                                         <div class="form-group">
                                             <label for="tipe">Kategori TPS <span class="text-danger">*</span></label>
-                                            <select class="form-control @error('tipe') is-invalid @enderror" id="tipe"
-                                                name="tipe" required>
+                                            <select
+                                                class="form-control select2-searchable @error('tipe') is-invalid @enderror"
+                                                id="tipe" name="tipe" required>
+
                                                 <option value="">-- Pilih Kategori --</option>
                                                 <option value="TPS" {{ old('tipe') == 'TPS' ? 'selected' : '' }}>TPS
                                                     (Tempat Pembuangan Sampah)</option>
@@ -345,6 +347,12 @@
                     placeholder: '-- Pilih Desa/Kelurahan --',
                     minimumInputLength: 0
                 });
+                // ✅ Tambahan untuk Kategori TPS
+                $('#tipe').select2({
+                    ...select2Config,
+                    placeholder: '-- Pilih Kategori --',
+                    minimumInputLength: 0
+                });
             }
 
             // Initialize Select2 on page load
@@ -438,13 +446,13 @@
                             // }).addTo(map);
 
                             // userLocationMarker.bindPopup(`
-                            //     <b>📍 Lokasi Anda</b><br>
-                            //     Koordinat: ${userLat.toFixed(6)}, ${userLng.toFixed(6)}<br>
-                            //     Akurasi: ±${Math.round(accuracy)} meter<br>
-                            //     <button onclick="useMyLocation(${userLat}, ${userLng})" class="btn btn-sm btn-primary mt-2">
-                            //         Gunakan Lokasi Ini
-                            //     </button>
-                            // `);
+                        //     <b>📍 Lokasi Anda</b><br>
+                        //     Koordinat: ${userLat.toFixed(6)}, ${userLng.toFixed(6)}<br>
+                        //     Akurasi: ±${Math.round(accuracy)} meter<br>
+                        //     <button onclick="useMyLocation(${userLat}, ${userLng})" class="btn btn-sm btn-primary mt-2">
+                        //         Gunakan Lokasi Ini
+                        //     </button>
+                        // `);
 
                             // // Tambahkan circle untuk menunjukkan akurasi
                             // L.circle([userLat, userLng], {
