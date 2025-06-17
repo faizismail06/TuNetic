@@ -29,6 +29,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\RuteArmadaController;
 use App\Http\Controllers\DashboardArtikelController;
+use App\Http\Controllers\ArticlePageController; 
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LaporanWargaAdminController;
@@ -65,6 +66,9 @@ Route::get('/', function () {
 
 // Authentication routes
 Auth::routes(['verify' => true]);
+
+// RUTE PUBLIK UNTUK HALAMAN SEMUA ARTIKEL
+Route::get('/edukasi', [ArticlePageController::class, 'index'])->name('articles.index');
 
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

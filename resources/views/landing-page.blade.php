@@ -439,15 +439,15 @@
                         <p class="mb-4" style="font-family: 'Red Hat Text', sans-serif; font-weight: 450;">
                             Baca Artikel Tentang Pengelolaan Sampah, Lingkungan, dan Gaya Hidup Berkelanjutan.
                         </p>
-                    </div>
+                    </div>  
                     <div class="col-md-4 text-end">
-                        <a href="{{ route('dashboard.artikel.index') }}" class="btn btn-outline-success">
+                        <a href="{{ route('articles.index') }}" class="btn btn-outline-success">
                             Lihat Semua Artikel <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- Search Box (Optional) -->
+                <!-- Search Box (Optional)
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <form action="{{ route('dashboard.artikel.search') }}" method="GET" class="search-box">
@@ -460,7 +460,7 @@
                             </div>
                         </form>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Articles Grid -->
                 <div class="row" id="articles-container">
