@@ -15,8 +15,6 @@ return new class extends Migration {
             $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
             $table->foreignId('id_petugas')->nullable()->constrained('petugas')->onDelete('set null');
             $table->string('judul')->nullable();
-            // $table->decimal('latitude', 10, 7);
-            // $table->decimal('longitude', 10, places: 7);
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
             $table->string('gambar')->nullable();
