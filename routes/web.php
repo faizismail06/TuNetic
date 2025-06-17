@@ -132,9 +132,12 @@ Route::resource('armada', ArmadaController::class);
 
 // Route::get('/petugas', [LaporanWargaController::class, 'index']);
 
-Route::get('/petugas', function () {
-    return view('petugas.dashboard.home-petugas');
-});
+// Route::get('/petugas', function () {
+//     return view('petugas.dashboard.home-petugas');
+// });
+
+Route::get('/petugas', [LaporSampahController::class, 'laporanSampah'])->name('petugas.home');
+Route::post('/lapor-sampah/kirim-bukti/{id}', [LaporSampahController::class, 'submitBukti'])->name('lapor-sampah.kirim-bukti');
 
 Route::get('auth/google', [LoginController::class, 'redirectToGoogle']);
 Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);

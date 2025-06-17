@@ -138,94 +138,109 @@
     <!-- Report Section -->
     <section id="lapor" class="report-section" style="margin-top: 100px; margin-bottom: 100px;">
         <div class="container">
-            <h2 class="section-title mb-2" style="font-family: 'Red Hat Text', sans-serif; font-weight: 700;">Lapor
-                Sampah</h2>
-            <p class="mb-5" style="font-family: 'Red Hat Text', sans-serif;">Lihat daftar laporan sampah yang perlu
-                diambil dan segera ditindaklanjuti.</p>
+            <h2 class="section-title mb-2" style="font-family: 'Red Hat Text', sans-serif; font-weight: 700;">Lapor Sampah</h2>
+            <p class="mb-5" style="font-family: 'Red Hat Text', sans-serif;">
+                Lihat daftar laporan sampah yang perlu diambil dan segera ditindaklanjuti.
+            </p>
 
-            <!-- First Report Card -->
-<div class="report-card mb-4 p-4 rounded shadow-sm border" style="background-color: #fff;">
-    <div class="row">
-        <div class="col-md-3 col-12">
-            <img src="{{ asset('assets/images/sampah1.jpg') }}" alt="Sampah di Jalan Banjarsari"
-                class="img-fluid rounded" style="height: 150px; width: 100%; object-fit: cover;">
-        </div>
-        <div class="col-md-9 col-12">
-            <h5 class="fw-bold mb-3" style="font-family: 'Red Hat Text', sans-serif;">Sampah Menumpuk di
-                Jalan Banjarsari Selatan</h5>
-            
-            <div class="mb-2">
-                <span class="badge rounded-pill px-3 py-2" style="background-color: #e8f5e8; color: #299e63; font-size: 0.9rem;">
-                    <i class="fas fa-calendar-alt me-1"></i> 20 Maret 2025
-                </span>
-            </div>
-            
-            <div class="mb-2">
-                <span style="color: #299e63; font-weight: 500;">
-                    <i class="fas fa-map-marker-alt me-2"></i> Jl Banjarsari Selatan, No 10, Tembalang, Semarang
-                </span>
-            </div>
-            
-            <div class="mb-3">
-                <span style="color: #666; font-size: 0.95rem;">
-                    <i class="fas fa-comment-dots me-2" style="color: #299e63;"></i> Ada banyak Sekali Sampah
-                    di sini, sangat bau dan mengganggu pejalan kaki. Dimohon petugas untuk cepat menindaklanjuti
-                </span>
-            </div>
-            
-            <div class="mb-3">
-                <span style="color: #299e63; font-weight: 500;">
-                    <i class="fas fa-check-circle me-2"></i> Sudah diangkut
-                </span>
-            </div>
-            
-             <button class="btn px-4 py-2" style="background-color: #ffb800; color: #fff; border: none; font-weight: 500; border-radius: 8px;">
-                Kirim Bukti
-            </button>
-        </div>
-    </div>
-</div>
-            <!-- Second Report Card -->
-            <div class="report-card p-4 rounded shadow-sm border" style="background-color: #fff;">
-                <div class="row">
-                    <div class="col-md-3 col-12">
-                        <img src="{{ asset('assets/images/sampah2.jpg') }}" alt="Sampah di Jalan Tembalang"
-                            class="img-fluid rounded" style="height: 150px; width: 100%; object-fit: cover;">
+            @if($laporSampah->count() > 0)
+                @foreach($laporSampah as $laporan)
+                    <div class="report-card mb-4 p-4 rounded shadow-sm border bg-white">
+                        <div class="row">
+                            <div class="col-md-3 col-12 mb-3 mb-md-0">
+                                @if($laporan->gambar)
+                                    <img src="{{ asset('storage/' . $laporan->gambar) }}" alt="Foto Sampah"
+                                        class="img-fluid rounded" style="height: 150px; width: 100%; object-fit: cover;">
+                                @else
+                                    <div class="d-flex align-items-center justify-content-center bg-light rounded"
+                                        style="height: 150px; width: 100%;">
+                                        <i class="fas fa-image text-muted" style="font-size: 2rem;"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="col-md-9 col-12">
+                                <h5 class="fw-bold mb-3" style="font-family: 'Red Hat Text', sans-serif;">
+                                    {{ $laporan->judul }}
+                                </h5>
+
+                                <div class="mb-2">
+                                    <span class="badge rounded-pill px-3 py-2" style="background-color: #e8f5e8; color: #299e63; font-size: 0.9rem;">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        {{ $laporan->created_at ? $laporan->created_at->format('d M Y') : 'Tanggal tidak tersedia' }}
+                                    </span>
+                                </div>
+
+                                <div class="mb-2">
+                                    <span style="color: #299e63; font-weight: 500;">
+                                        <i class="fas fa-map-marker-alt me-2"></i> {{ $laporan->alamat }}
+                                    </span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <span style="color: #666; font-size: 0.95rem;">
+                                        <i class="fas fa-comment-dots me-2" style="color: #299e63;"></i>
+                                        {{ $laporan->deskripsi }}
+                                    </span>
+                                </div>
+
+                                <div class="mb-3">
+                                    @if($laporan->status == 1)
+                                        <span style="color: #299e63; font-weight: 500;">
+                                            <i class="fas fa-check-circle me-2"></i> Sudah diangkut
+                                        </span>
+                                        @if($laporan->bukti_foto)
+                                            <div class="mt-2">
+                                                <a href="{{ asset('storage/' . $laporan->bukti_foto) }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                                    <i class="fas fa-eye me-1"></i> Lihat Bukti
+                                                </a>
+                                            </div>
+                                        @endif
+                                    @else
+                                        <span style="color: #dc3545; font-weight: 500;">
+                                            <i class="fas fa-exclamation-circle me-2"></i> Belum diangkut
+                                        </span>
+                                    @endif
+                                </div>
+
+                                @if($laporan->status == 0)
+                                <button type="button" class="btn px-4 py-2" style="background-color: #ffb800; color: #fff; border: none; font-weight: 500; border-radius: 8px;"
+                                        data-bs-toggle="modal" data-bs-target="#buktiModal{{ $laporan->id }}">
+                                    Kirim Bukti
+                                </button>
+                                @endif
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-9 col-12">
-                        <h5 class="fw-bold mb-3" style="font-family: 'Red Hat Text', sans-serif;">Sampah Menumpuk di
-                            Jalan Tembalang Raya</h5>
-                        
-                        <div class="mb-2">
-                            <span class="badge rounded-pill px-3 py-2" style="background-color: #e8f5e8; color: #299e63; font-size: 0.9rem;">
-                                <i class="fas fa-calendar-alt me-1"></i> 18 Maret 2025
-                            </span>
+                    <!-- Modal Bukti Kirim, optional: letakkan modal di luar loop jika tidak ingin banyak modal -->
+                    <div class="modal fade" id="buktiModal{{ $laporan->id }}" tabindex="-1" aria-labelledby="buktiModalLabel{{ $laporan->id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form action="{{ route('lapor-sampah.kirim-bukti', $laporan->id) }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="buktiModalLabel{{ $laporan->id }}">Kirim Bukti Pengangkutan</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="bukti_foto{{ $laporan->id }}" class="form-label">Upload Bukti Foto</label>
+                                            <input type="file" class="form-control" id="bukti_foto{{ $laporan->id }}" name="bukti_foto" accept="image/*" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                        <button type="submit" class="btn btn-success">Kirim</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                        
-                        <div class="mb-2">
-                            <span style="color: #299e63; font-weight: 500;">
-                                <i class="fas fa-map-marker-alt me-2"></i> Jalan Raya Tembalang No. 25, Kelurahan Tembalang, Semarang 50275
-                            </span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <span style="color: #666; font-size: 0.95rem;">
-                                <i class="fas fa-comment-dots me-2" style="color: #299e63;"></i> Tolong ini sampah nya sudah penuh, sangat mengganggu sekali
-                            </span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <span style="color: #dc3545; font-weight: 500;">
-                                <i class="fas fa-times-circle me-2"></i> Belum diangkut
-                            </span>
-                        </div>
-                        
-                         <button class="btn px-4 py-2" style="background-color: #ffb800; color: #fff; border: none; font-weight: 500; border-radius: 8px;">
-                            Kirim Bukti
-                        </button>
                     </div>
+                @endforeach
+            @else
+                <div class="alert alert-info">
+                    Belum ada laporan sampah.
                 </div>
-            </div>
+            @endif
         </div>
     </section>
 

@@ -281,4 +281,38 @@ class LaporSampahController extends Controller
     {
         return $this->getLocationName($lat, $lon);
     }
+
+    public function laporanSampah(Request $request)
+    {
+        // Query dasar (bisa filter kalau mau, contoh by status atau search)
+        $query = LaporanWarga::query();
+
+        // Contoh filter pencarian
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('judul', 'like', '%'.$search.'%')
+                ->orWhere('deskripsi', 'like', '%'.$search.'%');
+            });
+        }
+
+        // Contoh filter status
+        if ($request->has('status') && $request->status !== '') {
+            $query->where('status', $request->status);
+        }
+
+        // Ambil data laporan, misal paginate 10
+        $laporSampah = $query->latest()->paginate(10);
+
+        // Tambahkan reverse geocoding alamat (kalau memang ada di controller, kalau tidak, skip)
+        if (method_exists($this, 'getLocationName')) {
+            $laporSampah->getCollection()->transform(function ($laporan) {
+                $laporan->alamat = $this->getLocationName($laporan->latitude, $laporan->longitude);
+                return $laporan;
+            });
+        }
+
+        // Kirim data ke view
+        return view('petugas.dashboard.home-petugas', compact('laporSampah'));
+    }
 }
