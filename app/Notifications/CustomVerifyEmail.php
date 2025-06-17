@@ -54,9 +54,9 @@ class CustomVerifyEmail extends Notification
         ];
     }
 
-    public function toMail($notifiable)
+    public function toMail(object $notifiable): MailMessage
     {
-        $verificationUrl = URL::temporarySignedRoute(
+        $actionUrl = URL::temporarySignedRoute(
             'verification.verify',
             Carbon::now()->addMinutes(60),
             ['id' => $notifiable->getKey(), 'hash' => sha1($notifiable->getEmailForVerification())]
@@ -65,7 +65,7 @@ class CustomVerifyEmail extends Notification
         return (new MailMessage)
             ->subject('Ayo, Verifikasi Email Kamu!')
             ->view('vendor.notifications.email-verify', [
-                'url' => $verificationUrl,
+                'actionUrl' => $actionUrl,
                 'notifiable' => $notifiable,
             ]);
     }

@@ -5,15 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\LaporanWarga;
 use App\Models\LokasiTps;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 
-
 class LaporanWargaController extends Controller
 {
-    /**
-     * Menampilkan semua laporan warga.
-     */
+    // Tampilkan 2 laporan terbaru user
     public function index()
     {
         $laporanTerbaru = LaporanWarga::where('id_user', auth()->id())
@@ -23,15 +21,20 @@ class LaporanWargaController extends Controller
         foreach ($laporanTerbaru as $laporan) {
             $laporan->lokasi = $this->getLocationName($laporan->latitude, $laporan->longitude);
         }
-
         return view('masyarakat.index', compact('laporanTerbaru'));
     }
 
+    // Tampilkan form tambah laporan
+    public function create()
+    {
+        // Sesuaikan dengan enum migrasi
+        $kategoriList = collect([
+            'Tumpukan Sampah', 'TPS Penuh', 'Bau Menyengat', 'Pembuangan Liar', 'Lainnya'
+        ]);
+        return view('masyarakat.lapor', compact('kategoriList'));
+    }
 
-
-    /**
-     * Menyimpan laporan warga baru.
-     */
+    // Simpan laporan baru
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -41,10 +44,11 @@ class LaporanWargaController extends Controller
             'longitude' => 'required|numeric|between:-180,180',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'deskripsi' => 'required|string',
-            // 'status' => 'integer|in:1,2,3', // 0: Pending, 1: Diproses, 2: Selesai
+            'jenis_masalah' => 'required|string',
+            'masalah_lainnya' => 'nullable|string|max:100',
         ]);
 
-        // Pembersihan teks untuk menghapus aksara Jawa (dan karakter lainnya jika perlu)
+        // Hapus karakter jawa (atau lainnya jika perlu)
         $validatedData['judul'] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $validatedData['judul']);
         $validatedData['deskripsi'] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $validatedData['deskripsi']);
 
@@ -53,39 +57,31 @@ class LaporanWargaController extends Controller
             $validatedData['gambar'] = asset('storage/' . $path);
         }
 
+        // Mapping ke kolom kategori di DB
+        $validatedData['kategori'] = $request->jenis_masalah === 'Lainnya'
+            ? $request->masalah_lainnya
+            : $request->jenis_masalah;
+
+        // Pastikan yang dikirim hanya field di DB
+        unset($validatedData['jenis_masalah'], $validatedData['masalah_lainnya']);
+
         $laporan = LaporanWarga::create($validatedData);
+
         return redirect()->route('masyarakat.detailRiwayat', ['id' => $laporan->id])
             ->with('success', 'Laporan berhasil dikirim!');
-
-        // Cari TPS terdekat berdasarkan latitude & longitude laporan
-
-
     }
 
-
-    /**
-     * Menampilkan laporan berdasarkan ID.
-     */
+    // Tampilkan detail laporan
     public function show($id)
     {
         $laporan = LaporanWarga::findOrFail($id);
-
-        // Cek apakah latitude dan longitude ada
         if ($laporan->latitude && $laporan->longitude) {
-            $latitude = $laporan->latitude;
-            $longitude = $laporan->longitude;
-
-            // Panggil fungsi getLocationName untuk mendapatkan nama lokasi
-            $laporan->lokasi = $this->getLocationName($latitude, $longitude);
+            $laporan->lokasi = $this->getLocationName($laporan->latitude, $laporan->longitude);
         }
-
         return view('masyarakat.detailRiwayat', compact('laporan'));
     }
 
-
-    /**
-     * Memperbarui laporan warga.
-     */
+    // Update laporan warga
     public function update(Request $request, $id)
     {
         $laporan = LaporanWarga::findOrFail($id);
@@ -100,15 +96,12 @@ class LaporanWargaController extends Controller
             'status' => 'integer|in:0,1,2,3',
         ]);
 
-        // Pembersihan teks untuk menghapus aksara Jawa (dan karakter lainnya jika perlu)
         if (isset($validatedData['judul'])) {
             $validatedData['judul'] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $validatedData['judul']);
         }
-
         if (isset($validatedData['deskripsi'])) {
             $validatedData['deskripsi'] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $validatedData['deskripsi']);
         }
-
         if ($request->hasFile('gambar')) {
             if ($laporan->gambar) {
                 Storage::disk('public')->delete(str_replace(asset('storage/'), '', $laporan->gambar));
@@ -116,151 +109,75 @@ class LaporanWargaController extends Controller
             $path = $request->file('gambar')->store('laporan_warga', 'public');
             $validatedData['gambar'] = asset('storage/' . $path);
         }
-
         if (isset($validatedData['status']) && $validatedData['status'] == 3) {
-            $validatedData['tanggal_diangkut'] = now(); // Isi otomatis waktu sekarang
+            $validatedData['tanggal_diangkut'] = now();
         }
-
 
         $laporan->update($validatedData);
         return response()->json($laporan, 200);
     }
+
+    // Riwayat laporan user
     public function riwayat()
     {
         $userId = auth()->id();
         $laporan = LaporanWarga::where('id_user', $userId)->latest()->get();
-
         foreach ($laporan as $lapor) {
             $lapor->lokasi = $this->getLocationName($lapor->latitude, $lapor->longitude);
         }
-
         return view('masyarakat.riwayat', compact('laporan'));
     }
 
-
-    public function create()
-    {
-        return view('masyarakat.lapor');
-    }
-
+    // Helper: Ambil nama lokasi berdasarkan lat,lon
     public function getLocationName($latitude, $longitude)
     {
         try {
             $url = "https://nominatim.openstreetmap.org/reverse?lat={$latitude}&lon={$longitude}&format=json&addressdetails=1";
-
             $response = Http::timeout(5)->withHeaders([
                 'User-Agent' => 'YourAppName/1.0 (your-email@example.com)'
             ])->get($url);
 
             if ($response->successful()) {
                 $data = $response->json();
-
                 if (isset($data['address'])) {
                     $address = $data['address'];
-
                     $jalan = $address['road'] ?? ($address['neighbourhood'] ?? '');
                     $desa = $address['village'] ?? ($address['town'] ?? '');
                     $kabupaten = $address['city'] ?? ($address['county'] ?? '');
                     $provinsi = $address['state'] ?? '';
-
                     $lokasi = [];
-
                     if ($jalan)
-                        $lokasi[] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $jalan);  // Hapus aksara Jawa
+                        $lokasi[] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $jalan);
                     if ($desa)
-                        $lokasi[] = 'Desa/Kel. ' . preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $desa);  // Hapus aksara Jawa
+                        $lokasi[] = 'Desa/Kel. ' . preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $desa);
                     if ($kabupaten)
-                        $lokasi[] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $kabupaten);  // Hapus aksara Jawa
+                        $lokasi[] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $kabupaten);
                     if ($provinsi)
-                        $lokasi[] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $provinsi);  // Hapus aksara Jawa
-
+                        $lokasi[] = preg_replace('/[\x{A980}-\x{A9CD}]/u', '', $provinsi);
                     return implode(', ', $lokasi);
                 }
             }
         } catch (\Exception $e) {
-            // Kalau error apapun (timeout, DNS, dst) fallback default
             return "Lokasi tidak tersedia";
         }
-
         return "Lokasi tidak tersedia";
     }
 
-    public function submit(Request $request)
-    {
-        $data = new Laporan();
-        $data->id_user = $request->id_user;
-        $data->judul = $request->judul;
-
-        // Upload foto kalau ada
-        if ($request->hasFile('gambar')) {
-            $path = $request->file('gambar')->store('uploads', 'public');
-            $data->gambar = $path;
-        }
-
-        $data->latitude = $request->latitude;
-        $data->longitude = $request->longitude;
-
-        // Kategori diambil dari dropdown atau input lain
-        $data->kategori = $request->jenis_masalah === 'Lainnya'
-            ? $request->masalah_lainnya
-            : $request->jenis_masalah;
-
-        $data->deskripsi = $request->deskripsi;
-        $data->status = 0;
-
-        $data->save();
-
-        return redirect()->route('lapor.sukses');
-    }
-
-    /**
-     * Menghapus laporan warga (Soft Delete).
-     */
+    // Hapus laporan (soft delete)
     public function destroy($id)
     {
         $laporan = LaporanWarga::findOrFail($id);
-
         if ($laporan->gambar) {
             Storage::disk('public')->delete(str_replace(asset('storage/'), '', $laporan->gambar));
         }
-
         $laporan->delete();
         return response()->json(["message" => "Laporan berhasil dihapus"], 204);
     }
 
-    /**
-     * Mencari TPS terdekat berdasarkan latitude & longitude.
-     */
-    private function findNearestTps($latitude, $longitude)
-    {
-        $nearestTps = LokasiTps::selectRaw("
-            id, nama_lokasi, province_id, regency_id, district_id, village_id, latitude, longitude,
-            (6371 * acos(cos(radians(?)) * cos(radians(latitude))
-            * cos(radians(longitude) - radians(?))
-            + sin(radians(?)) * sin(radians(latitude)))) AS distance
-        ", [$latitude, $longitude, $latitude])
-            ->orderByRaw("distance ASC")
-            ->first();
-
-        if (!$nearestTps) {
-            return null;
-        }
-
-        return [
-            "tps" => [
-                "id" => $nearestTps->id,
-                "nama_lokasi" => $nearestTps->nama_lokasi,
-                "latitude" => $nearestTps->latitude,
-                "longitude" => $nearestTps->longitude,
-            ],
-            "desa" => $nearestTps->village ? $nearestTps->village->name : null // Ambil nama desa
-        ];
-    }
-
+    // Tampilkan detail riwayat
     public function detailRiwayat($id)
     {
         $laporan = LaporanWarga::findOrFail($id);
         return view('masyarakat.detailRiwayat', compact('laporan'));
     }
-
 }

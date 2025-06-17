@@ -239,12 +239,9 @@ Route::middleware('auth')->group(function () {
 // Route publik untuk masyarakat (tidak perlu login)
 Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
     // Route untuk lapor sampah (publik)
-    Route::get('/lapor', function () {
-        return view('masyarakat.lapor');
-    })->name('lapor');
-
+    Route::get('/lapor', [LaporanWargaController::class, 'create'])->name('lapor');
     Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
-    Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
+    // Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
 
     // Route untuk rute armada (publik)
     Route::get('/rute-armada', [RuteArmadaController::class, 'index'])->name('rute-armada.index');
@@ -304,12 +301,12 @@ Route::get('/lacak', function () {
     return view('masyarakat.lacak');
 })->name('masyarakat.lacak');
 
-Route::get('/lapor', function () {
-    return view('masyarakat.lapor');
-})->name('lapor');
+// Route::get('/lapor', function () {
+//     return view('masyarakat.lapor');
+// })->name('lapor');
 
-Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
-Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
+// Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
+// Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
 Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview'])->middleware('auth');
 
 // ===================
@@ -325,9 +322,9 @@ Route::middleware('auth')->group(function () {
 // Route publik untuk masyarakat (tidak perlu login)
 Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
     // Route untuk lapor sampah (publik)
-    Route::get('/lapor', function () {
-        return view('masyarakat.lapor');
-    })->name('lapor');
+    // Route::get('/lapor', function () {
+    //     return view('masyarakat.lapor');
+    // })->name('lapor');
 
 
     Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
@@ -345,8 +342,8 @@ Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
 
 
 
-    Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
-    Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
+    // Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
+    // Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
 
     // Route untuk rute armada (publik)
     Route::get('/rute-armada', [RuteArmadaController::class, 'index'])->name('rute-armada.index');
