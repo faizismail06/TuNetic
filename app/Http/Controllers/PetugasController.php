@@ -57,6 +57,7 @@ class PetugasController extends Controller
 
         $validatedData['email_verified_at'] = now(); // anggap email terverifikasi
 
+
         // Hapus field 'foto_diri' agar tidak error saat insert (karena bukan kolom di tabel)
         unset($validatedData['foto_diri']);
 

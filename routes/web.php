@@ -27,11 +27,15 @@ use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\RuteArmadaController;
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LaporanWargaAdminController;
+
 use App\Http\Controllers\JadwalRuteController;
+
 use App\Models\Role;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
@@ -97,7 +101,7 @@ Route::resource('pusat/manage-permission', PermissionController::class)->only('s
 // Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
 // Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
 // Route::post('petugas', [PetugasController::class, 'destroy'])->name('petugas.destroy');
-// Route::post('petugas', [PetugasController::class, 'index'])->name('petugas.index');
+Route::post('petugas', [PetugasController::class, 'index'])->name('petugas.index');
 Route::get('/rute/{id}/detail', [RuteController::class, 'show'])->name('rute.detail');
 Route::get('/rute/{id_rute}/detail', [RuteController::class, 'detail'])->name('rute.detail');
 Route::get('/api/rute/{id}', [RuteController::class, 'getDetailJson'])->name('api.rute.detail');
@@ -348,6 +352,12 @@ Route::prefix('pusat/laporan-pengaduan')->name('laporan.')->group(function () {
 });
 Route::resource('pusat/laporan-warga', LaporanWargaController::class);
 Route::resource('laporan-tps', LaporanTpsController::class);
+
+
+
+// ===================
+// LAPORAN WARGA ADMIN
+// ===================
 
 // ===================
 // PERHITUNGAN SAMPAH
