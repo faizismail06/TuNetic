@@ -66,63 +66,33 @@ class DashboardController extends Controller
             ];
         }
 
-        // --- The rest of your controller logic remains the same ---
         $kategoriList = ['Tumpukan sampah', 'TPS Penuh', 'Bau Menyengat', 'Pembuangan Liar', 'Lainnya'];
-        $laporanByStatus = DB::table('laporan_warga')
-            ->select('status', DB::raw('COUNT(*) as jumlah'))
-            ->groupBy('status')
+
+        // Query: Hitung jumlah laporan untuk setiap kategori
+        $laporanByKategori = DB::table('laporan_warga')
+            ->select('kategori', DB::raw('COUNT(*) as jumlah'))
+            ->groupBy('kategori')
             ->get();
 
-        $totalLaporan = $laporanByStatus->sum('jumlah');
+        $totalLaporan = $laporanByKategori->sum('jumlah');
         $kategoriMasalah = collect();
-        // Ensure $laporanByStatus is not empty before trying to access $kategoriList with its index
-        if ($laporanByStatus->isNotEmpty()) {
-            foreach ($laporanByStatus as $index => $laporan) {
-                 // Make sure index for kategoriList is within bounds
-                $kategoriIndex = $laporan->status % count($kategoriList); // Assuming status maps to kategoriList indices
-                // Or, if status values are not direct indices, you might need a mapping:
-                // Example mapping: $statusToKategori = [0 => 'Tumpukan Sampah', 1 => 'TPS Penuh', ...];
-                // $namaKategori = $statusToKategori[$laporan->status] ?? 'Lainnya';
 
-                $kategoriMasalah->push((object)[
-                    // Ensure this mapping is correct for your 'laporan_warga.status' values
-                    'nama' => $kategoriList[$kategoriIndex],
-                    'jumlah' => $laporan->jumlah,
-                    'persentase' => round($laporan->jumlah * 100 / max($totalLaporan, 1), 2),
-                ]);
-            }
+        // Loop kategoriList agar urutan tetap konsisten
+        foreach ($kategoriList as $kategoriName) {
+            // Cari data kategori yang sudah ada di query
+            $laporan = $laporanByKategori->firstWhere('kategori', $kategoriName);
+
+            $jumlah = $laporan ? $laporan->jumlah : 0;
+            $persentase = $totalLaporan > 0 ? round($jumlah * 100 / $totalLaporan, 2) : 0;
+
+            $kategoriMasalah->push((object)[
+                'nama' => $kategoriName,
+                'jumlah' => $jumlah,
+                'persentase' => $persentase,
+            ]);
         }
 
-
-        // This logic for filling up kategoriMasalah might need review based on how status maps to kategoriList
-        // The original loop might not populate all categories if some statuses have no reports.
-        $existingKategoriNames = $kategoriMasalah->pluck('nama');
-        foreach($kategoriList as $kategoriName) {
-            if (!$existingKategoriNames->contains($kategoriName)) {
-                $kategoriMasalah->push((object)[
-                    'nama' => $kategoriName,
-                    'jumlah' => 0,
-                    'persentase' => 100,
-                ]);
-            }
-        }
-        
-        // Recalculate totalLaporan if you added new categories with 0, though for persentase it's based on reported counts.
-        // The persentase adjustment logic might need re-evaluation if categories are dynamically added.
-        // It's generally better to ensure all percentages are derived consistently.
-        // Forcing sum to 100 by adjusting one category can be misleading. Consider if this is required.
-        // if ($kategoriMasalah->sum('persentase') < 100 && $kategoriMasalah->count() > 0 && $totalLaporan > 0) {
-        //    $diff = 100 - $kategoriMasalah->sum('persentase');
-        //    // Find a suitable item to adjust, or distribute the difference. Adjusting first item:
-        //    $kategoriMasalah = $kategoriMasalah->map(function($item, $idx) use ($diff) {
-        //        if ($idx === 0) {
-        //            $item->persentase += $diff;
-        //        }
-        //        return $item;
-        //    });
-        // }
-
-
+        // Urutkan berdasarkan persentase
         $kategoriMasalah = $kategoriMasalah->sortByDesc('persentase')->values();
 
         $daftarTPS = DB::table('lokasi_tps')
