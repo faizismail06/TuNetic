@@ -29,7 +29,6 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\RuteArmadaController;
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LaporanWargaAdminController;
 
 use App\Http\Controllers\JadwalRuteController;
 
