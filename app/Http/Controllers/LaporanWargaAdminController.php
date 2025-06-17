@@ -93,8 +93,8 @@ class LaporanWargaAdminController extends Controller
             'longitude' => 'sometimes|numeric|between:-180,180',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'deskripsi' => 'sometimes|string',
-            'status' => 'required|in:0,1,2',
-            'kategori' => 'required|in:Tumpukan sampah,TPS Penuh,Bau Menyengat,Pembuangan Liar,Lainnya',
+            'status' => 'required|in:0,1,2,3',
+            'kategori' => 'sometimes|in:Tumpukan sampah,TPS Penuh,Bau Menyengat,Pembuangan Liar,Lainnya',
             'id_petugas' => 'nullable|exists:petugas,id',
             'alasan_ditolak' => 'nullable|string|max:255',
         ]);
@@ -131,7 +131,7 @@ class LaporanWargaAdminController extends Controller
 
         $laporan->update($validatedData);
 
-        // Update waktu berdasarkan status
+        // Tambahan: logika status → waktu & alasan
         if ($validatedData['status'] == 1 && !$laporan->waktu_diambil) {
             $laporan->waktu_diambil = now();
         } elseif ($validatedData['status'] == 2 && !$laporan->waktu_selesai) {
@@ -139,10 +139,16 @@ class LaporanWargaAdminController extends Controller
         } elseif ($validatedData['status'] == 0) {
             $laporan->waktu_diambil = null;
             $laporan->waktu_selesai = null;
+
+            // Simpan alasan penolakan
+            $laporan->alasan_ditolak = $validatedData['alasan_ditolak'] ?? null;
+        } else {
+            $laporan->alasan_ditolak = null;
         }
+
         $laporan->save();
 
-        return redirect()->route('laporan.index', ['id' => $laporan->id])->with('success', 'Laporan berhasil diperbarui.');
+        return redirect()->route('laporan.show', $laporan->id)->with('success', 'Laporan berhasil diperbarui.');
     }
 
     /**
@@ -224,7 +230,7 @@ class LaporanWargaAdminController extends Controller
         $laporan->waktu_diambil = now();
         $laporan->save();
 
-        return redirect()->route('admin.laporan.show', $laporan->id)->with('success', 'Laporan berhasil ditugaskan.');
+        return redirect()->route('laporan.show', $laporan->id)->with('success', 'Laporan berhasil ditugaskan.');
     }
 
 

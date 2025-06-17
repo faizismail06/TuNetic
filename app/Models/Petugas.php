@@ -35,4 +35,8 @@ class Petugas extends Authenticatable
         return $this->belongsTo(User::class)->where('level', 3); // Relasi petugas ke user dengan level 3
     }
 
+    public function laporanWarga()
+    {
+        return $this->hasMany(LaporanWarga::class, 'id_petugas');
+    }
 }

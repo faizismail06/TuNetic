@@ -51,9 +51,10 @@ class LaporanWarga extends Model
     public static function getStatusLabels(): array
     {
         return [
-            0 => 'Ditolak',
-            1 => 'Diproses',
-            2 => 'Selesai',
+            0 => 'Belum Diangkut',
+            1 => 'Sedang Proses',
+            2 => 'Ditolak',
+            3 => 'Sudah Diangkut'
         ];
     }
 

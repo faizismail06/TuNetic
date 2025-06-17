@@ -20,6 +20,7 @@ use App\Http\Controllers\RuteController;
 use App\Http\Controllers\RuteTpsController;
 use App\Http\Controllers\SampahController;
 use App\Http\Controllers\LaporanWargaController;
+use App\Http\Controllers\LaporanWargaAdminController;
 use App\Http\Controllers\LaporanTpsController;
 use App\Http\Controllers\TrackingArmadaController;
 use App\Http\Controllers\ArtikelController;
@@ -146,6 +147,7 @@ Route::resource('jadwal', JadwalController::class);
 
 Route::get('pusat/jadwal-operasional/{id}/plotting', [JadwalOperasionalController::class, 'plotting'])->name('jadwal-operasional.plotting');
 Route::post('pusat/jadwal-operasional/{id}/plotting', [JadwalOperasionalController::class, 'simpanPlotting'])->name('jadwal-operasional.simpanPlotting');
+Route::get('pusat/jadwal-operasional/{id}/petugas', [JadwalOperasionalController::class, 'getPetugasByJadwal']);
 Route::resource('pusat/jadwal-operasional', JadwalOperasionalController::class);
 
 // ===================
@@ -337,7 +339,14 @@ Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
 // ===================
 // LAPORAN
 // ===================
-Route::resource('laporan-warga', LaporanWargaController::class);
+Route::prefix('pusat/laporan-pengaduan')->name('laporan.')->group(function () {
+    Route::get('/', [LaporanWargaAdminController::class, 'index'])->name('index');
+    Route::get('/{id}', [LaporanWargaAdminController::class, 'show'])->name('show');
+    Route::put('/{id}', [LaporanWargaAdminController::class, 'update'])->name('update');
+    Route::delete('/{id}', [LaporanWargaAdminController::class, 'destroy'])->name('destroy');
+    Route::post('/{id}/tugaskan', [LaporanWargaAdminController::class, 'tugaskan'])->name('tugaskan');
+});
+Route::resource('pusat/laporan-warga', LaporanWargaController::class);
 Route::resource('laporan-tps', LaporanTpsController::class);
 
 // ===================
@@ -416,10 +425,10 @@ Route::group(['prefix' => 'tpst/jadwal-rute'], function () {
 Route::middleware(['auth'])->prefix('masyarakat')->name('masyarakat.')->group(function () {
     Route::get('/jadi-petugas/form', [JadiPetugasController::class, 'JadipetugasForm'])
          ->name('jadi-petugas.form');
-         
+
     Route::post('/jadi-petugas/submit', [JadiPetugasController::class, 'submitPetugasRequest'])
          ->name('jadi-petugas.submit');
-         
+
     Route::get('/jadi-petugas/success', [JadiPetugasController::class, 'success'])
          ->name('jadi-petugas.success');
 });
