@@ -540,3 +540,55 @@ body {
 #layanan {
     font-family: 'Red Hat Text', sans-serif;
 }
+
+/* Style untuk Empty State Artikel */
+
+.empty-state-container {
+    background-color: #f8f9fa; /* Warna latar sedikit abu-abu agar menonjol */
+    border: 1px solid #e9ecef;
+    border-radius: 15px; /* Sudut yang lebih tumpul */
+    margin-top: 2rem;
+}
+
+.empty-state-icon i {
+    color: #299E63; /* Warna hijau tema Anda */
+    opacity: 0.8;
+}
+
+.empty-state-title {
+    font-family: 'Red Hat Text', sans-serif;
+    font-weight: 700;
+    color: #343a40; /* Warna teks gelap */
+    margin-bottom: 1rem;
+}
+
+.empty-state-text {
+    font-family: 'Red Hat Text', sans-serif;
+    color: #6c757d; /* Warna teks abu-abu */
+    max-width: 500px; /* Batasi lebar teks agar mudah dibaca */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* public/assets/css/landing-page.css */
+
+/* ... (CSS Anda yang lain) ... */
+
+
+/* ================================================== */
+/* === PERBAIKAN STICKY FOOTER (VERSI AMAN) === */
+/* ================================================== */
+
+/* 1. Aturan ini HANYA berlaku untuk body yang memiliki class 'layout-publik' */
+.layout-publik {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Minimal tinggi adalah 100% dari tinggi viewport */
+}
+
+/* 2. Ini akan membuat konten utama 'mendorong' footer ke bawah */
+.layout-publik > main {
+    flex-grow: 1;
+}
+
+/* ... (sisa CSS untuk efek keren bisa ditambahkan di sini) ... */
