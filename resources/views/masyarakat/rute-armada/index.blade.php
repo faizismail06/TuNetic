@@ -609,7 +609,7 @@
                             icon: L.divIcon({
                                 className: 'truck-marker',
                                 html: `<div style="position: relative;">
-                            <img src="/assets/images/img_truck.png" style="width: 24px; height: auto;">
+                            <img src="/assets/images/img_truck.png" style="width: 45px; height: auto;">
                         </div>`,
                                 iconSize: [30, 30]
                             })
