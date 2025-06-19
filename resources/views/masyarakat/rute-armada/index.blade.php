@@ -320,55 +320,20 @@
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
     <script>
         // Variabel global
+        // Variabel global
         let map;
         let markersLayer = L.layerGroup();
         let routesLayer = L.layerGroup();
         let detailModal;
+        let mapInitialized = false;
 
-        // Inisialisasi peta - menggunakan pendekatan yang lebih sederhana dan handal seperti di kode 2
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM Content Loaded');
-
-            // Cek apakah div map ada
-            const mapElement = document.getElementById('map');
-            if (!mapElement) {
-                console.error('Map element not found!');
-                return;
-            }
-
-            // Pastikan data sudah dimuat
-            if (!jadwalData || !allTps || !routeData || !armadaData) {
-                console.error('Data not loaded properly');
-                return;
-            }
-
-            // Debug data
-            console.log('TPS Data:', allTps);
-            console.log('Route Data:', routeData);
-
-            // Inisialisasi modal
-            detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
-
-            // Inisialisasi peta - lebih sederhana seperti di kode 2
-            initializeMap();
-
-            // Setup event listeners untuk interaksi pengguna
-            setupEventListeners();
-
-            // Menampilkan semua rute segera setelah inisialisasi peta
-            showAllRoutes();
-        });
-
-        try {
-            // Variabel global untuk menyimpan referensi peta
-            let map = null;
-
-            // Fungsi untuk inisialisasi peta dengan koordinat tertentu
-            function initializeMap(lat, lng, zoom = 15) {
+        // Inisialisasi peta dengan koordinat tertentu
+        function initializeMap(lat, lng, zoom = 15) {
+            try {
                 // Validasi koordinat
                 if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
                     console.error('Koordinat tidak valid:', lat, lng);
-                    return;
+                    return false;
                 }
 
                 // Hapus peta yang sudah ada jika ada
@@ -385,106 +350,109 @@
                     attribution: '&copy; OpenStreetMap contributors'
                 }).addTo(map);
 
-                // Tambahkan marker pada lokasi pengguna
-                // L.marker([lat, lng])
-                //     .addTo(map)
-                //     .bindPopup('Lokasi Anda')
-                //     .openPopup();
+                // Tambahkan layer groups ke peta
+                markersLayer.addTo(map);
+                routesLayer.addTo(map);
+
+                // Set flag bahwa peta sudah terinisialisasi
+                mapInitialized = true;
+
+                console.log('Map initialized successfully at:', lat, lng);
+                return true;
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                return false;
             }
+        }
 
-            // Cek apakah browser mendukung Geolocation
-            if (navigator.geolocation) {
-                // Tampilkan loading atau pesan sementara
-                console.log("Mengambil lokasi Anda...");
+        // Fungsi untuk inisialisasi dengan geolocation
+        function initializeWithGeolocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    console.warn('Browser tidak mendukung Geolocation');
+                    resolve(initializeMap(-7.056325, 110.454250, 12));
+                    return;
+                }
 
-                // Opsi untuk geolocation
                 const options = {
                     enableHighAccuracy: true,
                     timeout: 10000,
                     maximumAge: 60000
                 };
 
-                // Ambil lokasi pengguna
                 navigator.geolocation.getCurrentPosition(
-                    // Success callback
                     function(position) {
                         const userLat = position.coords.latitude;
                         const userLng = position.coords.longitude;
-
                         console.log(`Lokasi ditemukan: ${userLat}, ${userLng}`);
-
-                        // Validasi koordinat sebelum inisialisasi
-                        if (userLat && userLng && !isNaN(userLat) && !isNaN(userLng)) {
-                            initializeMap(userLat, userLng, 15);
-                        } else {
-                            console.error('Koordinat tidak valid dari geolocation');
-                            initializeMap(-7.056325, 110.454250, 12);
-                        }
+                        resolve(initializeMap(userLat, userLng, 15));
                     },
-                    // Error callback
                     function(error) {
                         console.warn('Error mendapatkan lokasi:', error.message);
-
-                        // Fallback ke lokasi default Jawa Tengah jika gagal
                         console.log('Menggunakan lokasi default: Jawa Tengah');
-                        initializeMap(-7.056325, 110.454250, 12);
-
-                        // Tampilkan pesan error kepada pengguna (opsional)
-                        alert('Tidak dapat mengakses lokasi Anda. Menggunakan lokasi default.');
+                        resolve(initializeMap(-7.056325, 110.454250, 12));
                     },
                     options
                 );
-            } else {
-                // Browser tidak mendukung Geolocation
-                console.warn('Browser tidak mendukung Geolocation');
-
-                // Gunakan lokasi default
-                initializeMap(-7.056325, 110.454250, 12);
-                alert('Browser Anda tidak mendukung deteksi lokasi. Menggunakan lokasi default.');
-            }
-
-        } catch (error) {
-            console.error('Error inisialisasi peta:', error);
-
-            // Fallback terakhir - pastikan tidak ada peta yang sudah diinisialisasi
-            if (map) {
-                map.remove();
-            }
-
-            map = L.map('map').setView([-7.056325, 110.454250], 12);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-        }
-
-        // Tambahkan legenda ke peta
-        function addMapLegend() {
-            const legend = L.control({
-                position: 'bottomright'
             });
-
-            legend.onAdd = function(map) {
-                const div = L.DomUtil.create('div', 'map-legend');
-                div.innerHTML = `
-        <h6 class="fw-bold mb-2">Legenda</h6>
-        <div class="legend-item">
-            <div class="legend-icon" style="background-color: #3388ff;"></div>
-            <span>TPS</span>
-        </div>
-        <div class="legend-item">
-            <i class="fas fa-truck truck-icon" style="color: #000;"></i>
-            <span>Posisi Armada</span>
-        </div>
-        <div class="legend-item">
-            <div style="width: 20px; height: 3px; background-color: blue; margin-right: 8px;"></div>
-            <span>Rute Armada</span>
-        </div>
-    `;
-                return div;
-            };
-
-            legend.addTo(map);
         }
+
+        // Event listener utama
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('DOM Content Loaded');
+
+            // Cek apakah div map ada
+            const mapElement = document.getElementById('map');
+            if (!mapElement) {
+                console.error('Map element not found!');
+                return;
+            }
+
+            // Pastikan data sudah dimuat
+            if (!jadwalData || !allTps || !routeData || !armadaData) {
+                console.error('Data not loaded properly');
+                return;
+            }
+
+            console.log('TPS Data:', allTps);
+            console.log('Route Data:', routeData);
+
+            // Inisialisasi modal
+            detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+
+            try {
+                // Tunggu peta selesai diinisialisasi
+                const mapReady = await initializeWithGeolocation();
+
+                if (!mapReady || !mapInitialized) {
+                    console.error('Failed to initialize map');
+                    return;
+                }
+
+                // Setup event listeners
+                setupEventListeners();
+
+                // Tunggu sebentar untuk memastikan peta benar-benar siap
+                setTimeout(() => {
+                    if (mapInitialized && map) {
+                        console.log('Map is ready, showing routes...');
+                        showAllRoutes();
+                    } else {
+                        console.error('Map still not ready after timeout');
+                    }
+                }, 500);
+
+            } catch (error) {
+                console.error('Error during initialization:', error);
+
+                // Fallback initialization
+                const fallbackSuccess = initializeMap(-7.056325, 110.454250, 12);
+                if (fallbackSuccess) {
+                    setupEventListeners();
+                    setTimeout(() => showAllRoutes(), 500);
+                }
+            }
+        });
 
         // Tampilkan semua rute - disederhanakan
         function showAllRoutes() {
