@@ -765,7 +765,7 @@
                 <div class="profile-container" style="margin-right: 20px;">
                     <div class="profile" id="profileToggle">
                         <span>{{ Auth::user()->name }}</span>
-                        <img src="{{ asset(Auth::user()->photo ?? 'assets/images/icons/user1.png') }}" alt="Profile">
+                        <img src="{{ Auth::user()->gambar ? asset('storage/profile/' . Auth::user()->gambar) : asset('assets/images/icons/user1.png') }}" alt="Profile">
                         <i class="fas fa-chevron-down" style="font-size: 12px; margin-left: 4px;"></i>
                     </div>
                     <div class="profile-dropdown" id="profileDropdown">
@@ -1240,7 +1240,7 @@
             const importantImages = [
                 "{{ asset('assets/images/Masyarakat/logo.png') }}",
                 "{{ asset('assets/images/Masyarakat/logoputih.png') }}",
-                "{{ asset('assets/images/icons/user1.png') }}"
+                // "{{ asset('assets/images/icons/user1.png') }}"
             ];
 
             importantImages.forEach(src => {
