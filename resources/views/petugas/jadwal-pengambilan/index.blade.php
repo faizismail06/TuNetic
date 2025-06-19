@@ -2380,7 +2380,7 @@
                 const speed = position.coords.speed || 0;
                 const timestamp = position.timestamp;
 
-                if (accuracy > 100) {
+                if (accuracy > 150) {
                     console.log(`Mengabaikan lokasi dengan akurasi rendah: ${accuracy}m`);
                     document.getElementById('location-info').textContent =
                         `Mencari sinyal GPS yang lebih akurat... (${accuracy.toFixed(1)}m)`;
