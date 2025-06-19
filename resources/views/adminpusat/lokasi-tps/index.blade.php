@@ -147,18 +147,29 @@
                                                 {{ $item->regency->name ?? '-' }},
                                                 {{ $item->province->name ?? '-' }}
                                             </td>
-                                            <td>
-                                                <div class="text-center">
-                                                    <a href="{{ route('lokasi-tps.edit', $item->id) }}"
-                                                        class="btn btn-sm btn-warning">Edit</a>
-                                                    <form action="{{ route('lokasi-tps.destroy', $item->id) }}"
-                                                        method="POST" class="d-inline">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button class="btn btn-sm btn-danger confirm-button">Hapus</button>
-                                                    </form>
+                                            <td class="text-center">
+                                                <div class="dropdown">
+                                                    <button type="button" class="btn btn-outline-info"
+                                                        data-toggle="dropdown" aria-expanded="false"
+                                                        style="width: 120px; height: 36px">
+                                                        <i class="fas fa-cog"></i>
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('lokasi-tps.edit', $item->id) }}">Edit</a>
+                                                        <div class="dropdown-divider"></div>
+                                                        <form action="{{ route('lokasi-tps.destroy', $item->id) }}"
+                                                            method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit"
+                                                                class="dropdown-item text-danger confirm-button">Hapus</button>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                             </td>
+
+
                                         </tr>
                                     @endforeach
                                 </tbody>
