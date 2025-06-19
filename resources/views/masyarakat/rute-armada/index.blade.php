@@ -202,6 +202,8 @@
             /* Tambahkan scrollbar jika konten melebihi max-height */
         }
 
+
+
         @keyframes pulse {
             0% {
                 opacity: 1;
@@ -320,55 +322,22 @@
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
     <script>
         // Variabel global
+        // Variabel global
         let map;
         let markersLayer = L.layerGroup();
         let routesLayer = L.layerGroup();
         let detailModal;
+        let mapInitialized = false;
+        let activeRouteJadwalId = null; // Untuk tracking rute yang sedang aktif
+        let currentRouteControl = null; // Untuk menyimpan routing control yang aktif
 
-        // Inisialisasi peta - menggunakan pendekatan yang lebih sederhana dan handal seperti di kode 2
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM Content Loaded');
-
-            // Cek apakah div map ada
-            const mapElement = document.getElementById('map');
-            if (!mapElement) {
-                console.error('Map element not found!');
-                return;
-            }
-
-            // Pastikan data sudah dimuat
-            if (!jadwalData || !allTps || !routeData || !armadaData) {
-                console.error('Data not loaded properly');
-                return;
-            }
-
-            // Debug data
-            console.log('TPS Data:', allTps);
-            console.log('Route Data:', routeData);
-
-            // Inisialisasi modal
-            detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
-
-            // Inisialisasi peta - lebih sederhana seperti di kode 2
-            initializeMap();
-
-            // Setup event listeners untuk interaksi pengguna
-            setupEventListeners();
-
-            // Menampilkan semua rute segera setelah inisialisasi peta
-            showAllRoutes();
-        });
-
-        try {
-            // Variabel global untuk menyimpan referensi peta
-            let map = null;
-
-            // Fungsi untuk inisialisasi peta dengan koordinat tertentu
-            function initializeMap(lat, lng, zoom = 15) {
+        // Inisialisasi peta dengan koordinat tertentu
+        function initializeMap(lat, lng, zoom = 15) {
+            try {
                 // Validasi koordinat
                 if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
                     console.error('Koordinat tidak valid:', lat, lng);
-                    return;
+                    return false;
                 }
 
                 // Hapus peta yang sudah ada jika ada
@@ -385,106 +354,109 @@
                     attribution: '&copy; OpenStreetMap contributors'
                 }).addTo(map);
 
-                // Tambahkan marker pada lokasi pengguna
-                // L.marker([lat, lng])
-                //     .addTo(map)
-                //     .bindPopup('Lokasi Anda')
-                //     .openPopup();
+                // Tambahkan layer groups ke peta
+                markersLayer.addTo(map);
+                routesLayer.addTo(map);
+
+                // Set flag bahwa peta sudah terinisialisasi
+                mapInitialized = true;
+
+                console.log('Map initialized successfully at:', lat, lng);
+                return true;
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                return false;
             }
+        }
 
-            // Cek apakah browser mendukung Geolocation
-            if (navigator.geolocation) {
-                // Tampilkan loading atau pesan sementara
-                console.log("Mengambil lokasi Anda...");
+        // Fungsi untuk inisialisasi dengan geolocation
+        function initializeWithGeolocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    console.warn('Browser tidak mendukung Geolocation');
+                    resolve(initializeMap(-7.056325, 110.454250, 12));
+                    return;
+                }
 
-                // Opsi untuk geolocation
                 const options = {
                     enableHighAccuracy: true,
                     timeout: 10000,
                     maximumAge: 60000
                 };
 
-                // Ambil lokasi pengguna
                 navigator.geolocation.getCurrentPosition(
-                    // Success callback
                     function(position) {
                         const userLat = position.coords.latitude;
                         const userLng = position.coords.longitude;
-
                         console.log(`Lokasi ditemukan: ${userLat}, ${userLng}`);
-
-                        // Validasi koordinat sebelum inisialisasi
-                        if (userLat && userLng && !isNaN(userLat) && !isNaN(userLng)) {
-                            initializeMap(userLat, userLng, 15);
-                        } else {
-                            console.error('Koordinat tidak valid dari geolocation');
-                            initializeMap(-7.056325, 110.454250, 12);
-                        }
+                        resolve(initializeMap(userLat, userLng, 15));
                     },
-                    // Error callback
                     function(error) {
                         console.warn('Error mendapatkan lokasi:', error.message);
-
-                        // Fallback ke lokasi default Jawa Tengah jika gagal
                         console.log('Menggunakan lokasi default: Jawa Tengah');
-                        initializeMap(-7.056325, 110.454250, 12);
-
-                        // Tampilkan pesan error kepada pengguna (opsional)
-                        alert('Tidak dapat mengakses lokasi Anda. Menggunakan lokasi default.');
+                        resolve(initializeMap(-7.056325, 110.454250, 12));
                     },
                     options
                 );
-            } else {
-                // Browser tidak mendukung Geolocation
-                console.warn('Browser tidak mendukung Geolocation');
-
-                // Gunakan lokasi default
-                initializeMap(-7.056325, 110.454250, 12);
-                alert('Browser Anda tidak mendukung deteksi lokasi. Menggunakan lokasi default.');
-            }
-
-        } catch (error) {
-            console.error('Error inisialisasi peta:', error);
-
-            // Fallback terakhir - pastikan tidak ada peta yang sudah diinisialisasi
-            if (map) {
-                map.remove();
-            }
-
-            map = L.map('map').setView([-7.056325, 110.454250], 12);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-        }
-
-        // Tambahkan legenda ke peta
-        function addMapLegend() {
-            const legend = L.control({
-                position: 'bottomright'
             });
-
-            legend.onAdd = function(map) {
-                const div = L.DomUtil.create('div', 'map-legend');
-                div.innerHTML = `
-        <h6 class="fw-bold mb-2">Legenda</h6>
-        <div class="legend-item">
-            <div class="legend-icon" style="background-color: #3388ff;"></div>
-            <span>TPS</span>
-        </div>
-        <div class="legend-item">
-            <i class="fas fa-truck truck-icon" style="color: #000;"></i>
-            <span>Posisi Armada</span>
-        </div>
-        <div class="legend-item">
-            <div style="width: 20px; height: 3px; background-color: blue; margin-right: 8px;"></div>
-            <span>Rute Armada</span>
-        </div>
-    `;
-                return div;
-            };
-
-            legend.addTo(map);
         }
+
+        // Event listener utama
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('DOM Content Loaded');
+
+            // Cek apakah div map ada
+            const mapElement = document.getElementById('map');
+            if (!mapElement) {
+                console.error('Map element not found!');
+                return;
+            }
+
+            // Pastikan data sudah dimuat
+            if (!jadwalData || !allTps || !routeData || !armadaData) {
+                console.error('Data not loaded properly');
+                return;
+            }
+
+            console.log('TPS Data:', allTps);
+            console.log('Route Data:', routeData);
+
+            // Inisialisasi modal
+            detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+
+            try {
+                // Tunggu peta selesai diinisialisasi
+                const mapReady = await initializeWithGeolocation();
+
+                if (!mapReady || !mapInitialized) {
+                    console.error('Failed to initialize map');
+                    return;
+                }
+
+                // Setup event listeners
+                setupEventListeners();
+
+                // Tunggu sebentar untuk memastikan peta benar-benar siap
+                setTimeout(() => {
+                    if (mapInitialized && map) {
+                        console.log('Map is ready, showing routes...');
+                        showAllRoutes();
+                    } else {
+                        console.error('Map still not ready after timeout');
+                    }
+                }, 500);
+
+            } catch (error) {
+                console.error('Error during initialization:', error);
+
+                // Fallback initialization
+                const fallbackSuccess = initializeMap(-7.056325, 110.454250, 12);
+                if (fallbackSuccess) {
+                    setupEventListeners();
+                    setTimeout(() => showAllRoutes(), 500);
+                }
+            }
+        });
 
         // Tampilkan semua rute - disederhanakan
         function showAllRoutes() {
@@ -577,109 +549,133 @@
                 });
 
                 // Tambahkan rute - Dengan pendekatan polyline terlebih dahulu seperti di kode 2
-                if (tpsPoints.length > 1) {
-                    console.log(`Adding route for jadwal ${jadwalId}`);
+                // if (tpsPoints.length > 1) {
+                //     console.log(`Adding route for jadwal ${jadwalId}`);
 
-                    try {
-                        const waypoints = tpsPoints
-                            .filter(tps => tps.latitude && tps.longitude)
-                            .map(tps => L.latLng(tps.latitude, tps.longitude));
+                //     try {
+                //         const waypoints = tpsPoints
+                //             .filter(tps => tps.latitude && tps.longitude)
+                //             .map(tps => L.latLng(tps.latitude, tps.longitude));
 
-                        if (waypoints.length < 2) {
-                            console.error(`Not enough valid waypoints for jadwal ${jadwalId}`);
-                            return;
-                        }
+                //         if (waypoints.length < 2) {
+                //             console.error(`Not enough valid waypoints for jadwal ${jadwalId}`);
+                //             return;
+                //         }
 
-                        // Gunakan polyline dulu sebagai baseline yang pasti berhasil
-                        const polyline = L.polyline(waypoints, {
-                            color: color,
-                            weight: 3,
-                            opacity: 0.7
-                        });
-                        routesLayer.addLayer(polyline);
+                //         // Gunakan polyline dulu sebagai baseline yang pasti berhasil
+                //         const polyline = L.polyline(waypoints, {
+                //             color: color,
+                //             weight: 3,
+                //             opacity: 0.7
+                //         });
+                //         routesLayer.addLayer(polyline);
 
-                        // Kemudian coba routing machine sebagai tambahan
-                        try {
-                            const routingControl = L.Routing.control({
-                                waypoints: waypoints,
-                                routeWhileDragging: false,
-                                showAlternatives: false,
-                                fitSelectedRoutes: false,
-                                createMarker: function() {
-                                    return null;
-                                },
-                                lineOptions: {
-                                    styles: [{
-                                        color: color,
-                                        weight: 3,
-                                        opacity: 0.7
-                                    }]
-                                },
-                                router: L.Routing.osrmv1({
-                                    serviceUrl: 'https://router.project-osrm.org/route/v1',
-                                    profile: 'driving'
-                                }),
-                                show: false
-                            });
+                //         // Kemudian coba routing machine sebagai tambahan
+                //         try {
+                //             const routingControl = L.Routing.control({
+                //                 waypoints: waypoints,
+                //                 routeWhileDragging: false,
+                //                 showAlternatives: false,
+                //                 fitSelectedRoutes: false,
+                //                 createMarker: function() {
+                //                     return null;
+                //                 },
+                //                 lineOptions: {
+                //                     styles: [{
+                //                         color: color,
+                //                         weight: 3,
+                //                         opacity: 0.7
+                //                     }]
+                //                 },
+                //                 router: L.Routing.osrmv1({
+                //                     serviceUrl: 'https://router.project-osrm.org/route/v1',
+                //                     profile: 'driving'
+                //                 }),
+                //                 show: false
+                //             });
 
-                            routingControl.addTo(routesLayer);
-                        } catch (err) {
-                            console.log('Routing failed, using polyline as fallback');
-                            // Polyline sudah ditambahkan sebelumnya
-                        }
-                    } catch (e) {
-                        console.error(`Error adding route for jadwal ${jadwalId}:`, e);
-                    }
-                }
+                //             routingControl.addTo(routesLayer);
+                //         } catch (err) {
+                //             console.log('Routing failed, using polyline as fallback');
+                //             // Polyline sudah ditambahkan sebelumnya
+                //         }
+                //     } catch (e) {
+                //         console.error(`Error adding route for jadwal ${jadwalId}:`, e);
+                //     }
+                // }
 
                 // Tambahkan marker armada jika ada lokasi terakhir
                 if (armadaData[jadwalId].last_location) {
                     const loc = armadaData[jadwalId].last_location;
                     try {
                         // Marker truk dengan popup yang lebih informatif
+                        // Marker truk dengan popup yang lebih informatif
                         const truckMarker = L.marker([loc.latitude, loc.longitude], {
                             icon: L.divIcon({
                                 className: 'truck-marker',
                                 html: `<div style="position: relative;">
-                            <img src="/assets/images/img_truck.png" style="width: 24px; height: auto;">
-                        </div>`,
+                    <img src="/assets/images/img_truck.png" style="width: 45px; height: auto;">
+                </div>`,
                                 iconSize: [30, 30]
                             })
                         });
 
                         truckMarker.bindPopup(`
-                            <div style="height: 250px; overflow-y: auto;">
-                                <div class="popup-header" style="background-color: ${routeData[jadwalId].warna}; margin-top: 25px;">
-                                    <i class="fas fa-truck me-2"></i> ${nopol}
-                                </div>
-                                <div class="popup-content">
-                                    <p class="mb-1">
-                                        <i class="fas fa-route text-muted me-1"></i>
-                                        <span class="fw-semibold">Rute:</span>
-                                        ${routeData[jadwalId].nama_rute}
-                                    </p>
-                                    <p class="mb-1">
-                                        <i class="fas fa-truck text-muted me-1"></i>
-                                        <span class="fw-semibold">Armada:</span>
-                                        ${armadaData[jadwalId].jenis}
-                                    </p>
-                                    <p class="mb-1">
-                                        <span class="status-badge status-${['belum', 'sedang', 'selesai'][armadaData[jadwalId].status]}">
-                                            ${['Belum Berjalan', 'Sedang Berjalan', 'Selesai'][armadaData[jadwalId].status]}
-                                        </span>
-                                    </p>
-                                </div>
-                                <div class="popup-footer">
-                                    <button class="btn btn-sm btn-primary w-100" onclick="showJadwalDetail('${jadwalId}')">
-                                        <i class="fas fa-info-circle me-1"></i> Detail Armada
-                                    </button>
-                                </div>
-                            </div>
-                        `, {
+    <div style="height: 280px; overflow-y: auto;">
+        <div class="popup-header" style="background-color: ${routeData[jadwalId].warna}; margin-top: 25px;">
+            <i class="fas fa-truck me-2"></i> ${nopol}
+        </div>
+        <div class="popup-content">
+            <p class="mb-1">
+                <i class="fas fa-route text-muted me-1"></i>
+                <span class="fw-semibold">Rute:</span>
+                ${routeData[jadwalId].nama_rute}
+            </p>
+            <p class="mb-1">
+                <i class="fas fa-truck text-muted me-1"></i>
+                <span class="fw-semibold">Armada:</span>
+                ${armadaData[jadwalId].jenis}
+            </p>
+            <p class="mb-1">
+                <span class="status-badge status-${['belum', 'sedang', 'selesai'][armadaData[jadwalId].status]}">
+                    ${['Belum Berjalan', 'Sedang Berjalan', 'Selesai'][armadaData[jadwalId].status]}
+                </span>
+            </p>
+        </div>
+        <div class="popup-footer">
+            <div class="d-grid gap-2">
+                <button class="btn btn-sm btn-success show-route-btn" data-jadwal-id="${jadwalId}">
+                    <i class="fas fa-route me-1"></i> Show Rute
+                </button>
+                <button class="btn btn-sm btn-primary" onclick="showJadwalDetail('${jadwalId}')">
+                    <i class="fas fa-info-circle me-1"></i> Detail Armada
+                </button>
+            </div>
+        </div>
+    </div>
+`, {
                             maxWidth: 300,
                             minWidth: 250,
                             className: 'custom-popup',
-                            closeButton: false // Menonaktifkan tombol close default
+                            closeButton: false
+                        });
+
+                        // Event listener untuk popup open/close
+                        truckMarker.on('popupopen', function(e) {
+                            setTimeout(() => {
+                                const showRouteBtn = document.querySelector('.show-route-btn');
+                                if (showRouteBtn) {
+                                    showRouteBtn.addEventListener('click', function() {
+                                        const jadwalId = this.dataset.jadwalId;
+                                        toggleRoute(jadwalId, this);
+                                    });
+                                }
+                            }, 100);
+                        });
+
+                        truckMarker.on('popupclose', function(e) {
+                            // Hapus rute ketika popup ditutup
+                            hideRoute();
                         });
 
                         markersLayer.addLayer(truckMarker);
@@ -706,6 +702,209 @@
                 // Fallback: gunakan view default
                 map.setView([-7.056325, 110.454250], 12);
             }
+        }
+
+        // Fungsi untuk toggle rute
+        function toggleRoute(jadwalId, buttonElement) {
+            if (activeRouteJadwalId === jadwalId) {
+                // Jika rute yang sama sedang aktif, sembunyikan
+                hideRoute();
+                buttonElement.innerHTML = '<i class="fas fa-route me-1"></i> Show Rute';
+                buttonElement.classList.remove('btn-danger');
+                buttonElement.classList.add('btn-success');
+            } else {
+                // Tampilkan rute baru
+                showRoute(jadwalId);
+                // Update semua tombol
+                document.querySelectorAll('.show-route-btn').forEach(btn => {
+                    btn.innerHTML = '<i class="fas fa-route me-1"></i> Show Rute';
+                    btn.classList.remove('btn-danger');
+                    btn.classList.add('btn-success');
+                });
+                // Update tombol yang diklik
+                buttonElement.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Hide Rute';
+                buttonElement.classList.remove('btn-success');
+                buttonElement.classList.add('btn-danger');
+            }
+        }
+
+        // Fungsi untuk menampilkan rute
+        function showRoute(jadwalId) {
+            if (!map || !allTps[jadwalId]) return;
+
+            // Hapus rute sebelumnya
+            hideRoute();
+
+            const tpsPoints = allTps[jadwalId];
+            const color = routeData[jadwalId].warna;
+            const armadaLocation = armadaData[jadwalId].last_location;
+
+            if (tpsPoints.length > 0) {
+                let waypoints = [];
+
+                // Mulai dari lokasi armada jika tersedia
+                if (armadaLocation && armadaLocation.latitude && armadaLocation.longitude) {
+                    waypoints.push(L.latLng(armadaLocation.latitude, armadaLocation.longitude));
+                }
+
+                // Tambahkan TPS points yang valid
+                const validTpsPoints = tpsPoints.filter(tps => tps.latitude && tps.longitude);
+                validTpsPoints.forEach(tps => {
+                    waypoints.push(L.latLng(tps.latitude, tps.longitude));
+                });
+
+                if (waypoints.length >= 2) {
+                    try {
+                        // Gunakan routing machine untuk rute yang berkelok-kelok
+                        currentRouteControl = L.Routing.control({
+                            waypoints: waypoints,
+                            routeWhileDragging: false,
+                            showAlternatives: false,
+                            fitSelectedRoutes: false,
+                            createMarker: function() {
+                                return null; // Tidak buat marker baru
+                            },
+                            lineOptions: {
+                                styles: [{
+                                    color: 'blue', // Ubah warna menjadi biru
+                                    weight: 5,
+                                    opacity: 0.8,
+                                    dashArray: '10, 5' // Garis putus-putus untuk highlight
+                                }]
+                            },
+                            router: L.Routing.osrmv1({
+                                serviceUrl: 'https://router.project-osrm.org/route/v1',
+                                profile: 'driving',
+                                timeout: 30 * 1000
+                            }),
+                            show: false, // Jangan tampilkan panel instruksi
+                            addWaypoints: false, // Tidak bisa menambah waypoint
+                            draggableWaypoints: false // Tidak bisa drag waypoint
+                        });
+
+                        currentRouteControl.addTo(map);
+                        activeRouteJadwalId = jadwalId;
+
+                        // Tambahkan marker START untuk lokasi armada
+                        if (armadaLocation && armadaLocation.latitude && armadaLocation.longitude) {
+                            const startMarker = L.marker([armadaLocation.latitude, armadaLocation.longitude], {
+                                // icon: L.divIcon({
+                                //     className: 'route-start-marker',
+                                //     html: `<div style="background-color: #28a745; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.4);">START</div>`,
+                                //     iconSize: [30, 30],
+                                //     iconAnchor: [15, 15]
+                                // })
+                            });
+
+                            startMarker.bindTooltip('Lokasi Armada Saat Ini', {
+                                permanent: false,
+                                direction: 'top'
+                            });
+
+                            routesLayer.addLayer(startMarker);
+                        }
+
+                        // Tambahkan marker nomor urutan TPS pada rute
+                        validTpsPoints.forEach((tps, index) => {
+                            const orderMarker = L.marker([tps.latitude, tps.longitude], {
+                                icon: L.divIcon({
+                                    className: 'route-order-marker',
+                                    html: `<div style="background-color: ${color}; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${index + 1}</div>`,
+                                    iconSize: [25, 25],
+                                    iconAnchor: [12, 12]
+                                })
+                            });
+
+                            orderMarker.bindTooltip(tps.nama, {
+                                permanent: false,
+                                direction: 'top'
+                            });
+
+                            routesLayer.addLayer(orderMarker);
+                        });
+
+                        // Tambahkan marker FINISH untuk TPS terakhir
+                        if (validTpsPoints.length > 0) {
+                            const lastTps = validTpsPoints[validTpsPoints.length - 1];
+                            // const finishMarker = L.marker([lastTps.latitude, lastTps.longitude], {
+                            //     icon: L.divIcon({
+                            //         className: 'route-finish-marker',
+                            //         html: `<div style="background-color: #dc3545; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 9px; box-shadow: 0 2px 5px rgba(0,0,0,0.4);">FINISH</div>`,
+                            //         iconSize: [30, 30],
+                            //         iconAnchor: [15, 15]
+                            //     }),
+                            //     zIndexOffset: 1000 // Pastikan marker finish tampil di atas
+                            // });
+
+                            // finishMarker.bindTooltip('Tujuan Terakhir: ' + lastTps.nama, {
+                            //     permanent: false,
+                            //     direction: 'top'
+                            // });
+
+                            // // Tidak menambahkan ke routesLayer agar tidak bentrok dengan marker nomor urutan
+                            // finishMarker.addTo(map);
+
+                            // // Simpan referensi untuk dihapus nanti
+                            // if (!window.tempMarkers) window.tempMarkers = [];
+                            // window.tempMarkers.push(finishMarker);
+                        }
+
+                    } catch (error) {
+                        console.error('Error creating route:', error);
+
+                        // Fallback dengan polyline jika routing gagal
+                        const polyline = L.polyline(waypoints, {
+                            color: color,
+                            weight: 5,
+                            opacity: 0.8,
+                            dashArray: '10, 5'
+                        });
+                        routesLayer.addLayer(polyline);
+                        activeRouteJadwalId = jadwalId;
+
+                        // Tambahkan marker start dan finish untuk fallback polyline
+                        if (armadaLocation && armadaLocation.latitude && armadaLocation.longitude) {
+                            const startMarker = L.marker([armadaLocation.latitude, armadaLocation.longitude], {
+                                icon: L.divIcon({
+                                    className: 'route-start-marker',
+                                    html: `<div style="background-color: #28a745; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.4);">START</div>`,
+                                    iconSize: [25, 25],
+                                    iconAnchor: [12, 12]
+                                })
+                            });
+                            routesLayer.addLayer(startMarker);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Fungsi untuk menyembunyikan rute
+        function hideRoute() {
+            if (currentRouteControl) {
+                map.removeControl(currentRouteControl);
+                currentRouteControl = null;
+            }
+
+            // Clear semua layer rute
+            routesLayer.clearLayers();
+
+            // Hapus marker sementara (seperti marker FINISH)
+            if (window.tempMarkers) {
+                window.tempMarkers.forEach(marker => {
+                    map.removeLayer(marker);
+                });
+                window.tempMarkers = [];
+            }
+
+            activeRouteJadwalId = null;
+
+            // Reset semua tombol
+            document.querySelectorAll('.show-route-btn').forEach(btn => {
+                btn.innerHTML = '<i class="fas fa-route me-1"></i> Show Rute';
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-success');
+            });
         }
 
         // Tampilkan jadwal tertentu di peta - Menggunakan pendekatan yang lebih sederhana
@@ -761,57 +960,57 @@
             });
 
             // Tambahkan rute - Menggunakan polyline terlebih dahulu seperti di kode 2
-            if (tpsPoints.length > 1) {
-                const waypoints = tpsPoints
-                    .filter(tps => tps.latitude && tps.longitude)
-                    .map(tps => L.latLng(tps.latitude, tps.longitude));
+            // if (tpsPoints.length > 1) {
+            //     const waypoints = tpsPoints
+            //         .filter(tps => tps.latitude && tps.longitude)
+            //         .map(tps => L.latLng(tps.latitude, tps.longitude));
 
-                if (waypoints.length < 2) {
-                    console.error(`Not enough valid waypoints for jadwal ${jadwalId}`);
-                } else {
-                    try {
-                        // Coba gunakan polyline terlebih dahulu sebagai alternatif yang lebih stabil
-                        const polyline = L.polyline(waypoints, {
-                            color: color,
-                            weight: 4,
-                            opacity: 0.8
-                        });
-                        routesLayer.addLayer(polyline);
+            //     if (waypoints.length < 2) {
+            //         console.error(`Not enough valid waypoints for jadwal ${jadwalId}`);
+            //     } else {
+            //         try {
+            //             // Coba gunakan polyline terlebih dahulu sebagai alternatif yang lebih stabil
+            //             const polyline = L.polyline(waypoints, {
+            //                 color: color,
+            //                 weight: 4,
+            //                 opacity: 0.8
+            //             });
+            //             routesLayer.addLayer(polyline);
 
-                        // Opsional: coba routing jika polyline berhasil dibuat
-                        try {
-                            const routingControl = L.Routing.control({
-                                waypoints: waypoints,
-                                routeWhileDragging: false,
-                                showAlternatives: false,
-                                fitSelectedRoutes: false,
-                                createMarker: function() {
-                                    return null;
-                                },
-                                lineOptions: {
-                                    styles: [{
-                                        color: color,
-                                        weight: 4,
-                                        opacity: 0.8
-                                    }]
-                                },
-                                router: L.Routing.osrmv1({
-                                    serviceUrl: 'https://router.project-osrm.org/route/v1',
-                                    profile: 'driving'
-                                }),
-                                show: false
-                            });
+            //             // Opsional: coba routing jika polyline berhasil dibuat
+            //             try {
+            //                 const routingControl = L.Routing.control({
+            //                     waypoints: waypoints,
+            //                     routeWhileDragging: false,
+            //                     showAlternatives: false,
+            //                     fitSelectedRoutes: false,
+            //                     createMarker: function() {
+            //                         return null;
+            //                     },
+            //                     lineOptions: {
+            //                         styles: [{
+            //                             color: color,
+            //                             weight: 4,
+            //                             opacity: 0.8
+            //                         }]
+            //                     },
+            //                     router: L.Routing.osrmv1({
+            //                         serviceUrl: 'https://router.project-osrm.org/route/v1',
+            //                         profile: 'driving'
+            //                     }),
+            //                     show: false
+            //                 });
 
-                            routingControl.addTo(routesLayer);
-                        } catch (err) {
-                            console.error('Error adding routing control to layer:', err);
-                            // Polyline sudah ditambahkan sebelumnya sebagai fallback
-                        }
-                    } catch (e) {
-                        console.error(`Error adding routing control for jadwal ${jadwalId}:`, e);
-                    }
-                }
-            }
+            //                 routingControl.addTo(routesLayer);
+            //             } catch (err) {
+            //                 console.error('Error adding routing control to layer:', err);
+            //                 // Polyline sudah ditambahkan sebelumnya sebagai fallback
+            //             }
+            //         } catch (e) {
+            //             console.error(`Error adding routing control for jadwal ${jadwalId}:`, e);
+            //         }
+            //     }
+            // }
 
             // Tambahkan marker armada
             if (armadaData[jadwalId].last_location) {

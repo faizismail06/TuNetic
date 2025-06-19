@@ -30,6 +30,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\RuteArmadaController;
 use App\Http\Controllers\DashboardArtikelController;
 use App\Http\Controllers\ArticlePageController; 
+use App\Http\Controllers\LandingPageController;
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LaporanWargaAdminController;
@@ -53,22 +54,18 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 // ===================
 // AUTH & LANDING PAGE
 // ===================
-Route::get('/', function () {
-    // Ambil artikel terbaru untuk ditampilkan di landing page
-    $artikels = App\Models\Artikel::where('status', 1)
-        ->orderBy('tanggal_publikasi', 'desc')
-        ->limit(3)
-        ->get();
+// RUTE UNTUK LANDING PAGE (home)
+Route::get('/', [LandingPageController::class, 'index'])->name('home');
 
-    // Return landing page view with articles
-    return view('landing-page', compact('artikels'));
-})->name('home');
+// RUTE PUBLIK UNTUK HALAMAN SEMUA ARTIKEL
+Route::get('/edukasi', [ArticlePageController::class, 'index'])->name('articles.index');
+Route::get('/tpsaktif', [LandingPageController::class, 'daftar_tps'])->name('tps.index');
+
 
 // Authentication routes
 Auth::routes(['verify' => true]);
 
-// RUTE PUBLIK UNTUK HALAMAN SEMUA ARTIKEL
-Route::get('/edukasi', [ArticlePageController::class, 'index'])->name('articles.index');
+
 
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

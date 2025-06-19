@@ -14,7 +14,7 @@
         <div class="row">
             @forelse($articles as $key => $artikel)
                 {{-- Ini adalah baris yang sudah diperbaiki, tanpa teks tambahan di akhir --}}
-                <div class="col-md-6 mb-4 fade-in-up" style="animation-delay: {{ $key * 0.1 }}s;">
+                <div class="col-md-6 mb-4 fade-in-up" style="animation-delay: {{ $key * 0.1 }}sw">
                     <div class="card border-0 shadow-sm h-100 article-card">
                         <div class="row g-0">
                             <div class="col-md-5">
