@@ -24,21 +24,21 @@
                 </div>
 
                 @if($laporan->status == 0)
-                    <span class="status belum">
-                        <i class="fas fa-circle-exclamation icon-status"></i> Belum diangkut
-                    </span>
+                    <div class="status-item belum">
+                        <i class="fas fa-circle-exclamation"></i> Belum diangkut
+                    </div>
                 @elseif($laporan->status == 1)
-                    <span class="status sedang">
-                        <i class="fas fa-clock icon-status"></i> Sedang proses
-                    </span>
+                    <div class="status-item sedang">
+                        <i class="fas fa-clock"></i> Sedang proses
+                    </div>
                 @elseif($laporan->status == 2)
-                    <span class="status belum">
-                        <i class="fas fa-circle-xmark fa-1.5x icon-status"></i> Ditolak
-                    </span>
+                    <div class="status-item belum">
+                        <i class="fas fa-circle-xmark"></i> Ditolak
+                    </div>
                 @elseif($laporan->status == 3)
-                    <span class="status selesai">
-                        <i class="fas fa-check-circle text-success icon-status"></i> Sudah diangkut
-                    </span>
+                    <div class="status-item selesai">
+                        <i class="fas fa-check-circle"></i> Sudah diangkut
+                    </div>
                 @endif
 
                 @if($laporan->status == 3 && !empty($laporan->tanggal_diangkut))
@@ -88,12 +88,10 @@
             .detail-card img {
                 width: 100%;
                 max-height: 500px;
-                /* Maksimal tinggi yang diinginkan */
                 object-fit: cover;
                 border-radius: 8px;
                 margin-bottom: 20px;
             }
-
 
             .detail-info h3 {
                 font-size: 1.8rem;
@@ -126,31 +124,36 @@
                 margin-bottom: 12px;
             }
 
-            .icon-status {
+            .status-item {
+                font-size: 1rem;
                 margin-left: 20px;
-                font-size: 20px;
-                margin-bottom: 20px;
-                margin-right: 7px;
-            }
-
-            .status {
-                font-weight: 400;
-                font-size: 20px;
-                display: inline-block;
-
+                margin-top: 15px;
+                margin-bottom: 15px;
                 font-family: 'Red Hat Text', sans-serif;
+                display: inline-block;
+                padding: 8px 12px;
+                border-radius: 9px;
+                font-weight: 500;
             }
 
-            .status.belum {
+            .status-item i {
+                margin-right: 6px;
+                font-size: 14px;
+            }
+
+            .status-item.belum {
                 color: #dc3545;
+                background-color: #ffeaea;
             }
 
-            .status.sedang {
-                color: #FFB800;
+            .status-item.sedang {
+                color: #ff8c00;
+                background: rgba(255, 140, 0, 0.1);
             }
 
-            .status.selesai {
+            .status-item.selesai {
                 color: #299E63;
+                background: rgba(41, 158, 99, 0.1);
             }
         </style>
 @endsection
