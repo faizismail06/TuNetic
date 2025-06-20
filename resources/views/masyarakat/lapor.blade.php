@@ -352,7 +352,7 @@
         <div class="form-wrapper">
             <h2>Laporan Sampah Baru</h2>
 
-            <form action="{{ route('lapor.submit') }}" method="POST" enctype="multipart/form-data"
+            <form action="{{ route('masyarakat.lapor.submit') }}" method="POST" enctype="multipart/form-data"
                 onsubmit="return validateForm()">
 
                 @csrf

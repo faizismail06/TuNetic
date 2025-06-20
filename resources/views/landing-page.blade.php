@@ -816,7 +816,7 @@
                         <div class="stat-item">
                             <div class="stat-label">Jumlah Sampah</div>
                             <div class="stat-value" style="font-family: 'Red Hat Text', sans-serif;">
-                                {{($jumlahSampah) }} Kg
+                                {{ $jumlahSampah }} Kg
                             </div>
                         </div>
                         <div class="stats-divider"></div>
