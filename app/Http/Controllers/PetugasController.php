@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Petugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use App\Models\User;
+
 class PetugasController extends Controller
 {
     public function index()
@@ -16,11 +17,16 @@ class PetugasController extends Controller
         return view('petugas.index', compact('petugas'));
     }
 
+    public function create()
+    {
+        $users = User::whereDoesntHave('petugas')->get(); // Ambil user level 4
+        return view('petugas.create', compact('users'));
+    }
 
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id', // Validasi bahwa user_id ada di tabel users
+            'user_id' => 'required|exists:users,id',
             'email' => 'required|email|unique:petugas,email',
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:petugas,username',
@@ -30,55 +36,53 @@ class PetugasController extends Controller
             'alamat' => 'nullable|string|max:1000',
             'alasan_bergabung' => 'required|string|max:1000',
             'role' => 'nullable|in:Petugas',
-            'foto_diri' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // input name tetap foto_diri
+            'sim_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Upload foto jika ada, simpan ke kolom sim_image
-        if ($request->hasFile('foto_diri')) {
-            $file = $request->file('foto_diri');
+        if ($request->hasFile('sim_image')) {
+            $file = $request->file('sim_image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/foto_petugas'), $filename);
-            $validatedData['sim_image'] = $filename; // simpan ke kolom sim_image
+            $file->storeAs(('public/foto_sim'), $filename);
+            $validatedData['sim_image'] = 'storage/foto_sim/' . $filename;
         }
 
-        // Enkripsi password
         $validatedData['password'] = Hash::make($validatedData['password']);
-
-        // Default role jika tidak dikirim
         $validatedData['role'] = $validatedData['role'] ?? 'Petugas';
+        $validatedData['email_verified_at'] = now();
 
-        // Tambahkan user_id dan email_verified_at
-        // Dapatkan user_id dari input yang dipilih.
-        $user = User::find($validatedData['user_id']); //ambil data user berdasarkan id
-        if($user){
-           $user->level = 3; //ubah level user
-           $user->save();
+        $user = User::find($validatedData['user_id']);
+        if ($user) {
+            $user->level = 3;
+            $user->save();
         }
-
-        $validatedData['email_verified_at'] = now(); // anggap email terverifikasi
-
-
-        // Hapus field 'foto_diri' agar tidak error saat insert (karena bukan kolom di tabel)
-        unset($validatedData['foto_diri']);
-
-        // Simpan data
+        $validatedData['status'] = 'Disetujui'; 
         Petugas::create($validatedData);
 
-        return redirect()->route('petugas.index')->with('success', 'Petugas berhasil ditambahkan!');
+        return redirect()->route('manage-petugas.index')->with('success', 'Petugas berhasil ditambahkan!');
     }
-
-
-    public function create()
-    {
-        $users = User::where('level', '=', 4)->get(); // Hanya ambil user yang levelnya bukan 3
-        return view('petugas.create', compact('users')); // Kirim data users ke view
-    }
-
 
     public function show($id)
     {
         $petugas = Petugas::findOrFail($id);
         return response()->json($petugas, 200);
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $petugas = Petugas::findOrFail($id);
+        $petugas->status = $request->status;
+        $petugas->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status berhasil diubah'
+        ]);
+    }
+
+    public function showDetail($id)
+    {
+        $petugas = Petugas::findOrFail($id);
+        return view('petugas.detail', compact('petugas'));
     }
 
     public function edit($id)
@@ -93,44 +97,34 @@ class PetugasController extends Controller
 
         $validatedData = $request->validate([
             'email' => 'sometimes|email|unique:petugas,email,' . $id,
-            'name' => 'sometimes|string',
-            'username' => 'sometimes|string',
-            'password' => 'sometimes|string|min:8|nullable',
+            'name' => 'sometimes|string|max:255',
+            'username' => 'sometimes|string|max:255|unique:petugas,username,' . $id,
+            'password' => 'nullable|string|min:8',
             'nomor' => 'nullable|numeric',
             'tanggal_lahir' => 'nullable|date',
-            'alamat' => 'nullable|string',
-            'sim_image' => 'nullable|string',
-            'alasan_bergabung' => 'sometimes|string',
+            'alamat' => 'nullable|string|max:1000',
+            'alasan_bergabung' => 'nullable|string|max:1000',
             'role' => 'nullable|in:Petugas',
+            'sim_image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ]);
 
-        $petugas->name = $validatedData['name'] ?? $petugas->name;
-        $petugas->email = $validatedData['email'] ?? $petugas->email;
-        $petugas->username = $validatedData['username'] ?? $petugas->username;
-        $petugas->nomor = $validatedData['nomor'] ?? $petugas->nomor;
-        $petugas->tanggal_lahir = $validatedData['tanggal_lahir'] ?? $petugas->tanggal_lahir;
-        $petugas->alamat = $validatedData['alamat'] ?? $petugas->alamat;
-        $petugas->sim_image = $validatedData['sim_image'] ?? $petugas->sim_image;
-        $petugas->alasan_bergabung = $validatedData['alasan_bergabung'] ?? $petugas->alasan_bergabung;
-        $petugas->role = $validatedData['role'] ?? $petugas->role;
-
-        if (!empty($validatedData['password'])) {
-            $petugas->password = Hash::make($validatedData['password']);
+        if ($request->hasFile('sim_image')) {
+            $file = $request->file('sim_image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs(('public/foto_sim'), $filename);
+            $validatedData['sim_image'] = 'storage/foto_sim/' . $filename;
         }
 
-        $petugas->save();
+        if (!empty($validatedData['password'])) {
+            $validatedData['password'] = Hash::make($validatedData['password']);
+        } else {
+            unset($validatedData['password']);
+        }
 
-        return redirect()->route('petugas.index')->with('success', 'Data Petugas berhasil diupdate!');
+        $petugas->update($validatedData);
+
+        return redirect()->route('manage-petugas.index')->with('success', 'Data Petugas berhasil diupdate!');
     }
-        public function showDetail($id)
-    {
-        $petugas = Petugas::findOrFail($id);
-        return view('petugas.detail', compact('petugas'));
-    }
-    //     public function create()
-    // {
-    //     return view('petugas.create'); // Pastikan ini mengarah ke view yang benar
-    // }
 
     public function destroy($id)
     {
@@ -143,18 +137,11 @@ class PetugasController extends Controller
     {
         $user = Auth::user();
 
-        // Jika user memiliki petugas terkait, cek levelnya
-        if ($user->level == 3) {
-            // Cek apakah user ada di tabel petugas
-            $petugas = $user->petugas;
-
-            if ($petugas) {
-                return redirect()->route('jadwal-pengambilan.auto-tracking'); // Petugas yang sudah terdaftar
-            }
+        if ($user->level == 3 && $user->petugas) {
+            return redirect()->route('jadwal-pengambilan.auto-tracking');
         }
 
-        // Default route jika level tidak sesuai
         return redirect()->route('home')->with('error', 'Anda tidak memiliki akses.');
     }
+    
 }
-

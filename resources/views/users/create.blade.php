@@ -55,17 +55,23 @@
                                     <label>Password</label>
                                     <input type="password" name="password" class="form-control" placeholder="Password">
                                 </div>
+
                                 <div class="form-group">
-                                    <label>Role Pengguna</label>
-                                    @foreach ($roles as $item)
-                                        <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" name="role[]" class="custom-control-input"
-                                                id="{{ $item->name . $item->id }}" value="{{ strtolower($item->name) }}">
-                                            <label class="custom-control-label"
-                                                for="{{ $item->name . $item->id }}">{{ strtoupper($item->name) }}</label>
+                                    <label>Level Pengguna</label>
+                                    <select name="level" class="form-control @error('level') is-invalid @enderror" required>
+                                        <option value="">-- Pilih Level --</option>
+                                        <option value="1">Admin</option>
+                                        <option value="2">Staff</option>
+                                        <option value="3">User Biasa</option>
+                                        <option value="4">Publik</option>
+                                    </select>
+                                    @error('level')
+                                        <div class="invalid-feedback" role="alert">
+                                            <span>{{ $message }}</span>
                                         </div>
-                                    @endforeach
+                                    @enderror
                                 </div>
+
                                 <div class="form-group">
                                     <label>Verified</label>
                                     <div class="input-group">
@@ -93,5 +99,23 @@
                 $(this).bootstrapSwitch('state', $(this).prop('checked'));
             })
         })
+            const roleLevelMap = {
+        'admin': 1,
+        'staff': 2,
+        'user': 3,
+        'publik': 4
+    };
+
+    $('input[name="role[]"]').on('change', function () {
+        let selectedRole = $('input[name="role[]"]:checked').first().val(); // ambil role pertama yang dicentang
+        let level = roleLevelMap[selectedRole] || 4; // default level = 4 jika tidak cocok
+        $('#level').val(level);
+    }); 
+
+    // Set level saat halaman pertama kali dibuka (kalau ada role tercentang)
+    $(document).ready(function () {
+        $('input[name="role[]"]').trigger('change');
+    });
+
     </script>
 @endpush

@@ -16,6 +16,8 @@ class Petugas extends Authenticatable
         'user_id',
         'email',
         'name',
+        'username',
+        'status',
         'password',
         'nomor',
         'tanggal_lahir',

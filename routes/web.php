@@ -26,6 +26,8 @@ use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\RuteArmadaController;
+use App\Http\Controllers\SampahPusatController;
+use App\Http\Controllers\VerifyUserController;
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LaporanWargaAdminController;
@@ -38,6 +40,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
+
+
 
 
 /*
@@ -439,6 +443,15 @@ Route::middleware(['auth'])->prefix('masyarakat')->name('masyarakat.')->group(fu
     Route::get('/get-districts/{regency_id}', [JadiPetugasController::class, 'getDistricts'])->name('get.districts');
     Route::get('/get-villages/{district_id}', [JadiPetugasController::class, 'getVillages'])->name('get.villages');
 
+
+// Route Perhitungan sampah admin pusat
+
+Route::prefix('pusat')->name('adminpusat.')->middleware(['auth'])->group(function () {
+    Route::resource('perhitungan-sampah', SampahPusatController::class);
+    Route::get('/perhitungan-sampah/create', [SampahPusatController::class, 'create'])->name('perhitungan-sampah.create');
+    // Perhatikan: yang penting adalah .create saja, bukan full "adminpusat.perhitungan-sampah.create"
+});
+
 // Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
 // // Routes untuk CRUD petugas (khusus admin)
 // Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -450,3 +463,13 @@ Route::middleware(['auth'])->prefix('masyarakat')->name('masyarakat.')->group(fu
 //     Route::put('/petugas/{id}', [JadiPetugasController::class, 'update'])->name('jadi-petugas.update');
 //     Route::delete('/petugas/{id}', [JadiPetugasController::class, 'destroy'])->name('jadi-petugas.destroy');
 // });
+Route::resource('petugas', PetugasController::class);
+Route::put('/petugas/{id}/update', [PetugasController::class, 'update'])->name('petugas.profile.update');
+Route::put('/petugas/{id}/update-status', [PetugasController::class, 'updateStatus'])->name('petugas.updateStatus');
+Route::delete('/petugas/{id}', [PetugasController::class, 'destroy'])->name('petugas.destroy');
+Route::put('/verifikasi-user/{id}', [VerifyUserController::class, 'approve'])->name('verifikasi.user');
+
+
+Route::prefix('pusat')->name('adminpusat.')->middleware(['auth'])->group(function () {
+    Route::resource('perhitungan-sampah', \App\Http\Controllers\SampahAdminPusatController::class);
+});

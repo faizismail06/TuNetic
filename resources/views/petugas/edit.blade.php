@@ -9,7 +9,7 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('petugas.index') }}">Data Petugas</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('manage-petugas.index') }}">Data Petugas</a></li>
                         <li class="breadcrumb-item active">Edit</li>
                     </ol>
                 </div>
@@ -25,7 +25,7 @@
                             <h3 class="card-title">Edit Petugas</h3>
                         </div>
                         <div class="card-body">
-                            <form action="{{ route('petugas.profile.update', $petugas->id) }}" method="POST">
+                            <form action="{{ route('petugas.profile.update', $petugas->id) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
 
@@ -65,9 +65,29 @@
                                     <input type="text" class="form-control" name="alamat" value="{{ $petugas->alamat ?? '' }}">
                                 </div>
 
+                                {{-- Tampilkan SIM lama jika ada --}}
+                                @if ($petugas->sim_image)
+                                    <div class="form-group mb-2">
+                                        <label>Foto SIM Saat Ini:</label><br>
+                                        <img src="{{ asset($petugas->sim_image) }}" alt="Foto SIM" width="120" class="img-thumbnail mb-2">
+                                    </div>
+                                @endif
+
+                                {{-- Upload Foto SIM Baru --}}
                                 <div class="form-group mb-3">
-                                    <label for="sim_image">SIM Image</label>
-                                    <input type="text" class="form-control" name="sim_image" value="{{ $petugas->sim_image ?? '' }}">
+                                    <label for="sim_image">Upload Foto SIM Baru (jika ingin mengganti)</label>
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="sim_image" name="sim_image" onchange="previewImage(event)">
+                                            <label class="custom-file-label" for="sim_image">Pilih Foto</label>
+                                        </div>
+                                    </div>
+                                    <small class="form-text text-muted">Rasio 1:1 dan ukuran &lt; 2MB.</small>
+                                </div>
+
+                                {{-- PREVIEW GAMBAR YANG BARU DIPILIH --}}
+                                <div class="mt-3">
+                                    <img id="simImagePreview" src="#" alt="Preview Foto SIM" style="display: none;" width="120" class="img-thumbnail">
                                 </div>
 
                                 <div class="form-group mb-3">
@@ -77,11 +97,11 @@
 
                                 <div class="form-group mb-4">
                                     <label for="role">Role</label>
-                                    <input type="text" class="form-control" name="role" value="{{ $petugas->role ?? '' }}">
+                                    <input type="text" class="form-control" name="role" value="{{ $petugas->role ?? '' }}" readonly>
                                 </div>
 
                                 <button type="submit" class="btn btn-primary">Update Petugas</button>
-                                <a href="{{ route('petugas.index') }}" class="btn btn-secondary ml-2">Batal</a>
+                                <a href="{{ route('manage-petugas.index') }}" class="btn btn-secondary ml-2">Batal</a>
                             </form>
                         </div>
                     </div>
@@ -90,3 +110,22 @@
         </div>
     </div>
 @endsection
+
+@push('js')
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const preview = document.getElementById('simImagePreview');
+            const file = input.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+@endpush
