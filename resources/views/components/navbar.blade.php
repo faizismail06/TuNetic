@@ -33,7 +33,7 @@
         }
 
         /* Navbar Base Styles */
-        .navbar {
+        ..navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -49,6 +49,8 @@
             font-family: 'Red Hat Text', sans-serif;
             font-weight: 550;
             min-height: 80px;
+            transition: transform 0.3s ease-in-out;
+            /* Sudah ada */
         }
 
         .navbar-content {
@@ -62,6 +64,7 @@
         .logo img {
             height: 50px;
             transition: all 0.3s ease;
+            margin-left: 20px;
         }
 
         .logo img:hover {
@@ -394,6 +397,304 @@
             }
         }
 
+        footer {
+            background-color: #2c3e43;
+            color: white;
+            padding: 40px 60px;
+            margin-top: 50px;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: auto;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .footer-left {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-width: 200px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-logo img {
+            height: 50px;
+            transition: transform 0.3s ease;
+        }
+
+        .footer-logo img:hover {
+            transform: scale(1.05);
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 15px;
+            font-size: 25px;
+            margin-left: 15px;
+        }
+
+        .footer-social a {
+            color: white;
+            transition: transform 0.3s ease, color 0.3s ease;
+            text-decoration: none;
+        }
+
+        .footer-social a:hover {
+            transform: scale(1.2);
+            color: #299E63;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+
+        .footer-column {
+            min-width: 150px;
+        }
+
+        .footer-column h4 {
+            margin-bottom: 20px;
+            color: #299E63;
+            font-size: 18px;
+        }
+
+        .footer-column ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-column li {
+            margin-bottom: 12px;
+        }
+
+        .footer-column a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease, padding-left 0.3s ease;
+        }
+
+        .footer-column a:hover {
+            color: #299E63;
+            padding-left: 5px;
+        }
+
+        .footer-contact {
+            min-width: 200px;
+        }
+
+        .footer-contact p {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-contact i {
+            width: 20px;
+            color: #299E63;
+        }
+
+        .footer-copyright {
+            border-top: 1px solid #495057;
+            margin-top: 30px;
+            padding-top: 20px;
+            text-align: center;
+            color: #adb5bd;
+        }
+
+        /* Footer Responsive Design */
+        @media (max-width: 1024px) {
+            footer {
+                padding: 35px 40px;
+            }
+
+            .footer-container {
+                gap: 35px;
+            }
+
+            .footer-links {
+                gap: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            footer {
+                padding: 30px 25px;
+            }
+
+            .footer-container {
+                flex-direction: column;
+                gap: 30px;
+                text-align: center;
+            }
+
+            .footer-left {
+                align-items: center;
+                min-width: auto;
+            }
+
+            .footer-social {
+                margin-left: 0;
+                justify-content: center;
+            }
+
+            .footer-links {
+                justify-content: center;
+                gap: 30px;
+            }
+
+            .footer-column {
+                min-width: 120px;
+                text-align: center;
+            }
+
+            .footer-contact {
+                min-width: auto;
+                text-align: center;
+            }
+
+            .footer-contact p {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 600px) {
+            footer {
+                padding: 25px 20px;
+            }
+
+            .footer-container {
+                gap: 25px;
+            }
+
+            .footer-logo img {
+                height: 40px;
+            }
+
+            .footer-social {
+                font-size: 22px;
+                gap: 12px;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 25px;
+                align-items: center;
+            }
+
+            .footer-column {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .footer-column h4 {
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+
+            .footer-column a {
+                font-size: 14px;
+            }
+
+            .footer-contact {
+                width: 100%;
+            }
+
+            .footer-contact p {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            footer {
+                padding: 20px 15px;
+                margin-top: 30px;
+            }
+
+            .footer-container {
+                gap: 20px;
+            }
+
+            .footer-logo img {
+                height: 35px;
+            }
+
+            .footer-social {
+                font-size: 20px;
+                gap: 10px;
+            }
+
+            .footer-links {
+                gap: 20px;
+            }
+
+            .footer-column h4 {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+
+            .footer-column li {
+                margin-bottom: 8px;
+            }
+
+            .footer-column a {
+                font-size: 13px;
+            }
+
+            .footer-contact p {
+                font-size: 13px;
+                margin: 8px 0;
+            }
+
+            .footer-copyright {
+                margin-top: 20px;
+                padding-top: 15px;
+            }
+
+            .footer-copyright p {
+                font-size: 12px;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 360px) {
+            footer {
+                padding: 15px 10px;
+            }
+
+            .footer-logo img {
+                height: 30px;
+            }
+
+            .footer-social {
+                font-size: 18px;
+            }
+
+            .footer-column h4 {
+                font-size: 14px;
+            }
+
+            .footer-column a {
+                font-size: 12px;
+            }
+
+            .footer-contact p {
+                font-size: 12px;
+            }
+        }
+
         .modal-content {
             position: relative;
             background-color: #ffffff;
@@ -473,10 +774,31 @@
         }
 
         /* Responsive Design */
+        @media (max-width: 1200px) {
+            .navbar {
+                padding: 18px 35px;
+                gap: 25px;
+            }
+
+            .navbar-content {
+                gap: 25px;
+            }
+
+            .nav-links {
+                gap: 25px;
+                margin-right: 25px;
+            }
+
+            .logo img {
+                height: 45px;
+            }
+        }
+
         @media (max-width: 1024px) {
             .navbar {
                 padding: 15px 30px;
                 gap: 20px;
+                min-height: 70px;
             }
 
             .navbar-content {
@@ -486,6 +808,20 @@
             .nav-links {
                 gap: 20px;
                 margin-right: 20px;
+            }
+
+            .logo img {
+                height: 42px;
+            }
+
+            .profile {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
+
+            .profile img {
+                width: 32px;
+                height: 32px;
             }
         }
 
@@ -500,19 +836,27 @@
             .navbar-content {
                 flex-wrap: wrap;
                 gap: 15px;
+                width: 100%;
             }
 
             .mobile-menu-toggle {
                 display: block;
                 order: 2;
+                margin-left: auto;
             }
 
             .logo {
                 order: 1;
+                flex-shrink: 0;
+            }
+
+            .logo img {
+                height: 40px;
             }
 
             .profile-container {
                 order: 3;
+                flex-shrink: 0;
             }
 
             .nav-links {
@@ -539,6 +883,7 @@
                 border-radius: 8px;
                 margin-bottom: 8px;
                 transition: all 0.3s ease;
+                font-size: 15px;
             }
 
             .nav-links a:last-child {
@@ -571,8 +916,9 @@
             }
 
             .profile {
-                padding: 6px 10px;
+                padding: 8px 12px;
                 font-size: 14px;
+                min-width: auto;
             }
 
             .profile img {
@@ -592,16 +938,21 @@
 
             .profile-dropdown-item {
                 padding: 14px 16px;
+                font-size: 14px;
             }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 600px) {
             .navbar {
-                padding: 12px 15px;
+                padding: 12px 16px;
+            }
+
+            .navbar-content {
+                gap: 12px;
             }
 
             .logo img {
-                height: 40px;
+                height: 36px;
             }
 
             .profile span {
@@ -614,30 +965,52 @@
                 width: 46px;
                 height: 46px;
                 justify-content: center;
+                min-width: 46px;
             }
 
-            .modal-dialog {
-                margin: 5% auto;
-                max-width: 350px;
+            .profile img {
+                width: 30px;
+                height: 30px;
             }
 
-            .modal-header {
-                padding: 20px;
-            }
-
-            .modal-body {
-                padding: 24px 20px;
-            }
-
-            .modal-footer {
-                padding: 16px 20px;
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .btn {
-                width: 100%;
+            .nav-links {
                 padding: 12px;
+                margin: 12px 0 0 0;
+            }
+
+            .nav-links a {
+                padding: 12px 10px;
+                font-size: 14px;
+            }
+
+            .dropdown-content a {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 10px 12px;
+            }
+
+            .logo img {
+                height: 32px;
+            }
+
+            .profile {
+                width: 42px;
+                height: 42px;
+            }
+
+            .profile img {
+                width: 26px;
+                height: 26px;
+            }
+
+            .mobile-menu-toggle {
+                font-size: 20px;
+                padding: 6px;
             }
         }
 
@@ -849,106 +1222,65 @@
     </main>
 
     <!-- Footer -->
-    <footer style="background-color: #2c3e43; color: white; padding: 40px 60px; margin-top: 50px;">
-        <div
-            style="display: flex; justify-content: space-between; max-width: 1200px; margin: auto; flex-wrap: wrap; gap: 40px;">
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
             <!-- Left: Logo + Social -->
-            <div style="display: flex; flex-direction: column; gap: 15px; min-width: 200px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <img src="{{ asset('assets/images/Masyarakat/logoputih.png') }}" alt="TuNetic Logo"
-                        style="height: 50px;">
+            <div class="footer-left">
+                <div class="footer-logo">
+                    <img src="{{ asset('assets/images/Masyarakat/logoputih.png') }}" alt="TuNetic Logo">
                 </div>
-                <div style="display: flex; gap: 15px; font-size: 25px; margin-left: 15px;">
-                    <a href="#" style="color: white; transition: transform 0.3s ease;"
-                        onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                <div class="footer-social">
+                    <a href="#" aria-label="Facebook">
                         <i class="fab fa-facebook"></i>
                     </a>
-                    <a href="#" style="color: white; transition: transform 0.3s ease;"
-                        onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                    <a href="#" aria-label="Instagram">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    <a href="#" style="color: white; transition: transform 0.3s ease;"
-                        onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                    <a href="#" aria-label="Twitter">
                         <i class="fab fa-twitter"></i>
                     </a>
                 </div>
             </div>
 
             <!-- Middle & Right -->
-            <div style="display: flex; gap: 60px; flex-wrap: wrap;">
+            <div class="footer-links">
                 <!-- Middle 1 -->
-                <div style="min-width: 150px;">
-                    <h4 style="margin-bottom: 20px; color: #299E63;">TuNetic</h4>
-                    <ul style="list-style: none; padding: 0; margin: 0;">
-                        <li style="margin-bottom: 12px;">
-                            <a href="#" style="color: white; text-decoration: none; transition: color 0.3s ease;"
-                                onmouseover="this.style.color='#299E63'" onmouseout="this.style.color='white'">
-                                Tentang Kami
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 12px;">
-                            <a href="#" style="color: white; text-decoration: none; transition: color 0.3s ease;"
-                                onmouseover="this.style.color='#299E63'" onmouseout="this.style.color='white'">
-                                Layanan
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 12px;">
-                            <a href="#" style="color: white; text-decoration: none; transition: color 0.3s ease;"
-                                onmouseover="this.style.color='#299E63'" onmouseout="this.style.color='white'">
-                                TPS
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 12px;">
-                            <a href="#" style="color: white; text-decoration: none; transition: color 0.3s ease;"
-                                onmouseover="this.style.color='#299E63'" onmouseout="this.style.color='white'">
-                                Jadwal
-                            </a>
-                        </li>
-                        <li style="margin-bottom: 12px;">
-                            <a href="#" style="color: white; text-decoration: none; transition: color 0.3s ease;"
-                                onmouseover="this.style.color='#299E63'" onmouseout="this.style.color='white'">
-                                Edukasi
-                            </a>
-                        </li>
+                <div class="footer-column">
+                    <h4>TuNetic</h4>
+                    <ul>
+                        <li><a href="#">Tentang Kami</a></li>
+                        <li><a href="#">Layanan</a></li>
+                        <li><a href="#">TPS</a></li>
+                        <li><a href="#">Jadwal</a></li>
+                        <li><a href="#">Edukasi</a></li>
                     </ul>
                 </div>
 
                 <!-- Middle 2 -->
-                <div style="min-width: 150px;">
-                    <h4 style="margin-bottom: 20px; color: #299E63;">Layanan</h4>
-                    <ul style="list-style: none; padding: 0; margin: 0;">
-                        <li style="margin-bottom: 12px;">
-                            <a href="#" style="color: white; text-decoration: none; transition: color 0.3s ease;"
-                                onmouseover="this.style.color='#299E63'" onmouseout="this.style.color='white'">
-                                Jemput Sampah
-                            </a>
-                        </li>
+                <div class="footer-column">
+                    <h4>Layanan</h4>
+                    <ul>
+                        <li><a href="#">Jemput Sampah</a></li>
                         @php
                             $laporRoute = $currentRole === 'petugas' ? '/petugas/lapor' : '/masyarakat/lapor';
                         @endphp
-                        <li style="margin-bottom: 12px;">
-                            <a href="{{ url($laporRoute) }}"
-                                style="color: white; text-decoration: none; transition: color 0.3s ease;"
-                                onmouseover="this.style.color='#299E63'" onmouseout="this.style.color='white'">
-                                Lapor Sampah
-                            </a>
-                        </li>
+                        <li><a href="{{ url($laporRoute) }}">Lapor Sampah</a></li>
                     </ul>
                 </div>
 
                 <!-- Right -->
-                <div style="min-width: 200px;">
-                    <h4 style="margin-bottom: 20px; color: #299E63;">Contact</h4>
-                    <p style="margin: 10px 0;"><i class="fas fa-map-marker-alt"></i> Semarang, Indonesia</p>
-                    <p style="margin: 10px 0;"><i class="fas fa-envelope"></i> TuNetic@gmail.com</p>
-                    <p style="margin: 10px 0;"><i class="fas fa-phone"></i> +62 123 456 789</p>
+                <div class="footer-column footer-contact">
+                    <h4>Contact</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> Semarang, Indonesia</p>
+                    <p><i class="fas fa-envelope"></i> TuNetic@gmail.com</p>
+                    <p><i class="fas fa-phone"></i> +62 123 456 789</p>
                 </div>
             </div>
         </div>
 
         <!-- Copyright -->
-        <div
-            style="border-top: 1px solid #495057; margin-top: 30px; padding-top: 20px; text-align: center; color: #adb5bd;">
+        <div class="footer-copyright">
             <p>&copy; 2024 TuNetic. All rights reserved.</p>
         </div>
     </footer>

@@ -687,7 +687,6 @@
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
     <script>
         // Variabel global
-        // Variabel global
         let map;
         let marker;
         let watchId = null;
@@ -702,6 +701,27 @@
         let isGpsLocationReady = false;
         let pendingRouteDrawing = null;
         let isTpsVisible = false;
+
+
+        // Tambahkan di bagian atas file JavaScript Anda, setelah deklarasi variabel global
+
+        // Replace the existing OSRM_SERVERS declaration with this updated version
+        const OSRM_SERVERS = [{
+                url: '//router.project-osrm.org/route/v1',
+                name: 'Project OSRM (Utama)',
+                timeout: 8000,
+                profile: 'driving'
+            },
+            {
+                url: '//routing.openstreetmap.de/routed-car/route/v1',
+                name: 'OpenStreetMap DE',
+                timeout: 10000,
+                profile: 'driving'
+            }
+        ];
+
+        let currentServerIndex = 0;
+        let isRoutingInProgress = false;
 
         // ===== DEBOUNCE FUNCTION =====
         function debounce(func, wait) {
@@ -1120,7 +1140,7 @@
         }
 
         // ===== RESPONSIVE ROUTE DRAWING =====
-        // Perbaiki fungsi drawResponsiveRoute
+        // Fungsi utama untuk routing dengan fallback
         function drawResponsiveRoute(tpsPoints) {
             // Hapus rute lama jika ada
             if (routeControl) {
@@ -1175,8 +1195,8 @@
                 return;
             }
 
+            // Setup waypoints
             const waypoints = [L.latLng(currentPosition.lat, currentPosition.lng)];
-
             tpsPoints.forEach(tps => {
                 waypoints.push(L.latLng(tps.latitude, tps.longitude));
             });
@@ -1185,28 +1205,66 @@
                 return;
             }
 
+            // Optimasi waypoints jika terlalu banyak
+            const optimizedWaypoints = optimizeWaypoints(waypoints);
+
+            // Reset server index dan mulai routing
+            currentServerIndex = 0;
+            isRoutingInProgress = true;
+
+            // Tampilkan loading indicator
+            showRoutingStatus('Mencari rute terbaik...', 'loading');
+
+            // Mulai proses routing dengan fallback
+            tryRoutingWithServer(optimizedWaypoints, currentPosition, tpsPoints);
+        }
+        // Fungsi untuk mencoba routing dengan server tertentu
+        function tryRoutingWithServer(waypoints, currentPosition, tpsPoints) {
+            if (currentServerIndex >= OSRM_SERVERS.length) {
+                console.warn('Semua server OSRM gagal, menggunakan rute sederhana sebagai fallback');
+                isRoutingInProgress = false;
+                showRoutingStatus('Menggunakan rute sederhana', 'warning');
+                drawSimpleRoute(currentPosition, tpsPoints);
+                return;
+            }
+
+            const server = OSRM_SERVERS[currentServerIndex];
+            console.log(`Mencoba server ke-${currentServerIndex + 1}: ${server.name}`);
+
+            // Update status
+            showRoutingStatus(`Mencoba ${server.name}...`, 'loading');
+
+            // Hapus kontrol routing sebelumnya jika ada
+            if (routeControl) {
+                map.removeControl(routeControl);
+                routeControl = null;
+            }
+
             const isMobile = window.innerWidth <= 767;
             const lineWeight = isMobile ? 4 : 6;
             const whiteLineWeight = isMobile ? 1 : 2;
 
-            // Variable untuk mendeteksi timeout
+            // Setup timeout untuk server ini
             let routeTimedOut = false;
-            const timeoutDuration = 15000; // 15 detik
             let routeTimeout = setTimeout(function() {
                 routeTimedOut = true;
-                console.warn('OSRM request timed out, menggunakan rute sederhana sebagai fallback');
+                console.warn(
+                    `Server ${server.name} timeout setelah ${server.timeout}ms, mencoba server berikutnya...`);
 
-                // Hapus kontrol routing yang mungkin sedang loading
+                // Hapus kontrol routing yang timeout
                 if (routeControl) {
                     map.removeControl(routeControl);
                     routeControl = null;
                 }
 
-                // Gambar rute sederhana sebagai fallback
-                drawSimpleRoute(currentPosition, tpsPoints);
-            }, timeoutDuration);
+                // Coba server berikutnya
+                currentServerIndex++;
+                if (isRoutingInProgress) {
+                    tryRoutingWithServer(waypoints, currentPosition, tpsPoints);
+                }
+            }, server.timeout);
 
-            // Coba gunakan OSRM terlebih dahulu
+            // Buat routing control dengan server saat ini
             routeControl = L.Routing.control({
                 waypoints: waypoints,
                 routeWhileDragging: false,
@@ -1225,49 +1283,173 @@
                     }]
                 },
                 createMarker: function() {
-                    return null;
+                    return null; // Jangan buat marker tambahan
                 },
                 router: L.Routing.osrmv1({
-                    serviceUrl: '/api/osrm-proxy/route/v1',
-                    profile: 'driving',
+                    serviceUrl: server.url,
+                    profile: server.profile,
                     useHints: false,
                     geometryOnly: false,
                     suppressDemoServerWarning: true,
-                    timeout: 12000 // 12 detik timeout (lebih rendah dari timeoutDuration)
+                    timeout: server.timeout - 1000 // Timeout sedikit lebih pendek dari wrapper timeout
                 })
             }).addTo(map);
 
-            // Jika rute ditemukan, batalkan timeout dan gunakan rute OSRM
+            // Handler ketika rute berhasil ditemukan
             routeControl.on('routesfound', function(e) {
-                clearTimeout(routeTimeout); // Batalkan timeout fallback
+                clearTimeout(routeTimeout);
 
-                if (!routeTimedOut) { // Hanya proses jika belum timeout
+                if (!routeTimedOut && isRoutingInProgress) {
                     const routes = e.routes;
-                    console.log('Rute dari armada ke TPS ditemukan:', routes);
+                    console.log(`✅ Rute berhasil ditemukan menggunakan: ${server.name}`);
+                    console.log('Detail rute:', routes);
+
+                    isRoutingInProgress = false;
                     isRouteVisible = true;
                     updateRouteButtonText();
+
+                    // Tampilkan status berhasil
+                    showRoutingStatus(`Rute ditemukan via ${server.name}`, 'success');
+
+                    // Simpan informasi server yang berhasil untuk penggunaan berikutnya
+                    localStorage.setItem('lastSuccessfulOSRMServer', currentServerIndex.toString());
                 }
             });
 
-            // Jika terjadi error routing, gunakan rute sederhana
+            // Handler ketika terjadi error routing
             routeControl.on('routingerror', function(e) {
-                console.warn('Routing error:', e.error);
-
-                // Batalkan timeout fallback karena sudah ada error yang tertangkap
+                console.warn(`❌ Routing error dari ${server.name}:`, e.error);
                 clearTimeout(routeTimeout);
 
-                // Hapus kontrol routing yang error
-                if (routeControl && !routeTimedOut) {
-                    map.removeControl(routeControl);
-                    routeControl = null;
+                if (!routeTimedOut && isRoutingInProgress) {
+                    // Hapus kontrol routing yang error
+                    if (routeControl) {
+                        map.removeControl(routeControl);
+                        routeControl = null;
+                    }
 
-                    // Gambar rute sederhana sebagai fallback
-                    drawSimpleRoute(currentPosition, tpsPoints);
+                    // Coba server berikutnya
+                    currentServerIndex++;
+                    tryRoutingWithServer(waypoints, currentPosition, tpsPoints);
                 }
             });
         }
 
-        // Fungsi untuk menggambar rute sederhana sebagai fallback
+        // Fungsi untuk mengoptimalkan waypoints (batasi jumlah untuk performa)
+        function optimizeWaypoints(waypoints) {
+            const MAX_WAYPOINTS = 8; // Batasi maksimal waypoints
+
+            if (waypoints.length <= MAX_WAYPOINTS) {
+                return waypoints;
+            }
+
+            console.log(`Mengoptimalkan waypoints dari ${waypoints.length} menjadi ${MAX_WAYPOINTS}`);
+
+            // Ambil start point
+            const startPoint = waypoints[0];
+            let remainingPoints = waypoints.slice(1);
+
+            // Jika terlalu banyak, ambil yang terdekat menggunakan algoritma sederhana
+            const optimized = [startPoint];
+            let currentPos = startPoint;
+
+            // Nearest neighbor selection
+            while (optimized.length < MAX_WAYPOINTS && remainingPoints.length > 0) {
+                let nearestIndex = 0;
+                let shortestDistance = calculateDistance(currentPos, remainingPoints[0]);
+
+                for (let i = 1; i < remainingPoints.length; i++) {
+                    const distance = calculateDistance(currentPos, remainingPoints[i]);
+                    if (distance < shortestDistance) {
+                        shortestDistance = distance;
+                        nearestIndex = i;
+                    }
+                }
+
+                const nearest = remainingPoints.splice(nearestIndex, 1)[0];
+                optimized.push(nearest);
+                currentPos = nearest;
+            }
+
+            return optimized;
+        }
+
+        // Fungsi helper untuk menghitung jarak
+        function calculateDistance(point1, point2) {
+            const R = 6371; // Radius bumi dalam km
+            const dLat = (point2.lat - point1.lat) * Math.PI / 180;
+            const dLng = (point2.lng - point1.lng) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        // Fungsi untuk menampilkan status routing
+        function showRoutingStatus(message, type = 'info') {
+            const statusContainer = document.getElementById('status-container');
+            if (!statusContainer) return;
+
+            // Hapus status lama
+            const oldStatus = statusContainer.querySelector('.routing-status');
+            if (oldStatus) {
+                oldStatus.remove();
+            }
+
+            // Tentukan class berdasarkan type
+            let alertClass = 'alert-info';
+            let icon = 'fas fa-info-circle';
+
+            switch (type) {
+                case 'loading':
+                    alertClass = 'alert-primary';
+                    icon = 'fas fa-spinner fa-spin';
+                    break;
+                case 'success':
+                    alertClass = 'alert-success';
+                    icon = 'fas fa-check-circle';
+                    break;
+                case 'warning':
+                    alertClass = 'alert-warning';
+                    icon = 'fas fa-exclamation-triangle';
+                    break;
+                case 'error':
+                    alertClass = 'alert-danger';
+                    icon = 'fas fa-times-circle';
+                    break;
+            }
+
+            // Buat elemen status
+            const statusElement = document.createElement('div');
+            statusElement.className = `alert ${alertClass} mt-2 p-2 routing-status`;
+            statusElement.innerHTML = `<small><i class="${icon} me-1"></i> ${message}</small>`;
+
+            statusContainer.appendChild(statusElement);
+
+            // Auto remove untuk status success/warning/error setelah beberapa detik
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    if (statusElement && statusElement.parentNode) {
+                        statusElement.remove();
+                    }
+                }, type === 'success' ? 3000 : 5000);
+            }
+        }
+
+        // Fungsi untuk mendapatkan server terbaik berdasarkan riwayat
+        function getPreferredServerIndex() {
+            const saved = localStorage.getItem('lastSuccessfulOSRMServer');
+            if (saved !== null) {
+                const index = parseInt(saved);
+                if (index >= 0 && index < OSRM_SERVERS.length) {
+                    return index;
+                }
+            }
+            return 0; // Default ke server pertama
+        }
+
+        // Modifikasi fungsi drawSimpleRoute untuk menampilkan info yang lebih baik
         function drawSimpleRoute(currentPosition, tpsPoints) {
             // Hapus rute sederhana yang sudah ada jika ada
             if (window.simplePath) {
@@ -1282,40 +1464,44 @@
 
             // Buat polyline sederhana
             window.simplePath = L.polyline(coordinates, {
-                color: 'blue',
+                color: 'orange',
                 weight: 4,
-                opacity: 0.7,
-                dashArray: '10, 10' // Garis putus-putus untuk menunjukkan ini bukan rute optimal
+                opacity: 0.8,
+                dashArray: '10, 10' // Garis putus-putus
             }).addTo(map);
-
-            // // Tambahkan popup ke garis untuk memberi tahu pengguna
-            // window.simplePath.bindPopup('Rute sederhana (bukan rute jalan sebenarnya)').openPopup();
 
             isRouteVisible = true;
             updateRouteButtonText();
 
-            // Tampilkan pesan dalam UI
+            // Tampilkan pesan fallback
+            showRoutingStatus('Menggunakan rute sederhana (garis lurus)', 'warning');
+        }
+
+        // Fungsi untuk membatalkan routing yang sedang berjalan
+        function cancelRouting() {
+            isRoutingInProgress = false;
+            currentServerIndex = 0;
+
+            if (routeControl) {
+                map.removeControl(routeControl);
+                routeControl = null;
+            }
+
+            // Hapus status loading
             const statusContainer = document.getElementById('status-container');
             if (statusContainer) {
-                const routeNote = document.createElement('div');
-                routeNote.className = 'alert alert-info mt-2 p-2';
-                routeNote.innerHTML =
-                    '<small><i class="fas fa-info-circle me-1"></i> Menggunakan rute sederhana karena rute jalan tidak tersedia</small>';
-
-                // Hapus notifikasi lama jika ada
-                const oldNote = statusContainer.querySelector('.alert-info');
-                if (oldNote) {
-                    oldNote.remove();
+                const loadingStatus = statusContainer.querySelector('.routing-status');
+                if (loadingStatus) {
+                    loadingStatus.remove();
                 }
-
-                statusContainer.appendChild(routeNote);
-
-                // Hapus pesan setelah 8 detik
-                setTimeout(() => {
-                    routeNote.remove();
-                }, 8000);
             }
         }
+
+        // Inisialisasi: Gunakan server terbaik berdasarkan riwayat
+        document.addEventListener('DOMContentLoaded', function() {
+            currentServerIndex = getPreferredServerIndex();
+            console.log(`Server OSRM yang akan digunakan pertama kali: ${OSRM_SERVERS[currentServerIndex].name}`);
+        });
 
         // ===== RESPONSIVE BUTTON TEXT UPDATES =====
         function updateRouteButtonText() {

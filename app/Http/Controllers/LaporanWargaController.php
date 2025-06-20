@@ -41,7 +41,7 @@ class LaporanWargaController extends Controller
             'longitude' => 'required|numeric|between:-180,180',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'deskripsi' => 'required|string',
-            'status' => 'integer|in:0,1,2', // 0: Pending, 1: Diproses, 2: Selesai
+            // 'status' => 'integer|in:1,2,3', // 0: Pending, 1: Diproses, 2: Selesai
         ]);
 
         // Pembersihan teks untuk menghapus aksara Jawa (dan karakter lainnya jika perlu)
@@ -54,12 +54,10 @@ class LaporanWargaController extends Controller
         }
 
         $laporan = LaporanWarga::create($validatedData);
-        return redirect()->back()->with('success', 'Laporan berhasil dikirim!');
+        return redirect()->route('masyarakat.detailRiwayat', ['id' => $laporan->id])
+            ->with('success', 'Laporan berhasil dikirim!');
 
         // Cari TPS terdekat berdasarkan latitude & longitude laporan
-        $nearestTps = $this->findNearestTps($request->latitude, $request->longitude);
-
-        return redirect()->route('lapor.detailRiwayat', ['id' => $laporan->id])->with('success', 'Laporan warga berhasil disimpan');
 
 
     }
@@ -70,18 +68,18 @@ class LaporanWargaController extends Controller
      */
     public function show($id)
     {
-        $lapor = LaporanWarga::findOrFail($id);
+        $laporan = LaporanWarga::findOrFail($id);
 
         // Cek apakah latitude dan longitude ada
-        if ($lapor->latitude && $lapor->longitude) {
-            $latitude = $lapor->latitude;
-            $longitude = $lapor->longitude;
+        if ($laporan->latitude && $laporan->longitude) {
+            $latitude = $laporan->latitude;
+            $longitude = $laporan->longitude;
 
             // Panggil fungsi getLocationName untuk mendapatkan nama lokasi
-            $lapor->lokasi = $this->getLocationName($latitude, $longitude);
+            $laporan->lokasi = $this->getLocationName($latitude, $longitude);
         }
 
-        return view('masyarakat.detailRiwayat', compact('lapor'));
+        return view('masyarakat.detailRiwayat', compact('laporan'));
     }
 
 
@@ -99,7 +97,7 @@ class LaporanWargaController extends Controller
             'longitude' => 'sometimes|numeric|between:-180,180',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'deskripsi' => 'sometimes|string',
-            'status' => 'integer|in:0,1,2',
+            'status' => 'integer|in:0,1,2,3',
         ]);
 
         // Pembersihan teks untuk menghapus aksara Jawa (dan karakter lainnya jika perlu)
@@ -118,6 +116,11 @@ class LaporanWargaController extends Controller
             $path = $request->file('gambar')->store('laporan_warga', 'public');
             $validatedData['gambar'] = asset('storage/' . $path);
         }
+
+        if (isset($validatedData['status']) && $validatedData['status'] == 3) {
+            $validatedData['tanggal_diangkut'] = now(); // Isi otomatis waktu sekarang
+        }
+
 
         $laporan->update($validatedData);
         return response()->json($laporan, 200);
@@ -253,4 +256,11 @@ class LaporanWargaController extends Controller
             "desa" => $nearestTps->village ? $nearestTps->village->name : null // Ambil nama desa
         ];
     }
+
+    public function detailRiwayat($id)
+    {
+        $laporan = LaporanWarga::findOrFail($id);
+        return view('masyarakat.detailRiwayat', compact('laporan'));
+    }
+
 }

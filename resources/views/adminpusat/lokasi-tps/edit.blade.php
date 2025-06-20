@@ -137,23 +137,28 @@
 
                                         <div class="form-group">
                                             <label for="tipe">Kategori TPS <span class="text-danger">*</span></label>
-                                            <select class="form-control @error('tipe') is-invalid @enderror" id="tipe"
-                                                name="tipe" required>
+                                            <select
+                                                class="form-control select2-searchable @error('tipe') is-invalid @enderror"
+                                                id="tipe" name="tipe" required>
                                                 <option value="">-- Pilih Kategori --</option>
                                                 <option value="TPS"
-                                                    {{ old('tipe', $lokasiTps->tipe) == 'TPS' ? 'selected' : '' }}>TPS
-                                                    (Tempat Pembuangan Sampah)</option>
+                                                    {{ old('tipe', $lokasiTps->tipe) == 'TPS' ? 'selected' : '' }}>
+                                                    TPS (Tempat Pembuangan Sampah)
+                                                </option>
                                                 <option value="TPST"
-                                                    {{ old('tipe', $lokasiTps->tipe) == 'TPST' ? 'selected' : '' }}>TPST
-                                                    (Tempat Pembuangan Sampah Terpadu)</option>
+                                                    {{ old('tipe', $lokasiTps->tipe) == 'TPST' ? 'selected' : '' }}>
+                                                    TPST (Tempat Pembuangan Sampah Terpadu)
+                                                </option>
                                                 <option value="TPA"
-                                                    {{ old('tipe', $lokasiTps->tipe) == 'TPA' ? 'selected' : '' }}>TPA
-                                                    (Tempat Pembuangan Akhir)</option>
+                                                    {{ old('tipe', $lokasiTps->tipe) == 'TPA' ? 'selected' : '' }}>
+                                                    TPA (Tempat Pembuangan Akhir)
+                                                </option>
                                             </select>
                                             @error('tipe')
                                                 <span class="invalid-feedback">{{ $message }}</span>
                                             @enderror
                                         </div>
+
 
                                         <div class="form-group">
                                             <label for="province_id">Provinsi <span class="text-danger">*</span></label>
@@ -397,6 +402,12 @@
                     placeholder: '-- Pilih Desa/Kelurahan --',
                     minimumInputLength: 0
                 });
+
+                $('#tipe').select2({
+                    ...select2Config,
+                    placeholder: '-- Pilih Kategori --',
+                    minimumInputLength: 0
+                });
             }
 
             // Initialize Select2 on page load
@@ -517,13 +528,13 @@
                             // }).addTo(map);
 
                             // userLocationMarker.bindPopup(`
-                            //     <b>📍 Lokasi Anda</b><br>
-                            //     Koordinat: ${userLat.toFixed(6)}, ${userLng.toFixed(6)}<br>
-                            //     Akurasi: ±${Math.round(accuracy)} meter<br>
-                            //     <button onclick="useMyLocation(${userLat}, ${userLng})" class="btn btn-sm btn-primary mt-2">
-                            //         Gunakan Lokasi Ini
-                            //     </button>
-                            // `);
+                        //     <b>📍 Lokasi Anda</b><br>
+                        //     Koordinat: ${userLat.toFixed(6)}, ${userLng.toFixed(6)}<br>
+                        //     Akurasi: ±${Math.round(accuracy)} meter<br>
+                        //     <button onclick="useMyLocation(${userLat}, ${userLng})" class="btn btn-sm btn-primary mt-2">
+                        //         Gunakan Lokasi Ini
+                        //     </button>
+                        // `);
 
                             // // Tambahkan circle untuk menunjukkan akurasi
                             // L.circle([userLat, userLng], {

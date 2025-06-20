@@ -1,41 +1,49 @@
 @extends('components.navbar')
 
 @section('content')
-    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <div class="detail-container">
         <h2>Detail Laporan</h2>
         <p>Ikuti perkembangan Status Laporan Anda yang Tertera di Bawah ini</p>
 
         <div class="detail-card">
-            <img src="{{ $lapor->gambar }}" alt="Gambar Sampah">
+            <img src="{{ $laporan->gambar }}" alt="Gambar Sampah">
             <div class="detail-info">
-                <h3>{{ $lapor->judul }}</h3>
+                <h3>{{ $laporan->judul }}</h3>
                 <div><i class="fas fa-calendar-days icon"></i>
-                    {{ \Carbon\Carbon::parse($lapor->created_at)->translatedFormat('d F Y') }}
+                    {{ \Carbon\Carbon::parse($laporan->created_at)->translatedFormat('d F Y') }}
                 </div>
                 <div>
                     <i class="fas fa-location-dot icon"></i>
-                    {{ $lapor->lokasi ?? 'Lokasi tidak tersedia' }}
+                    {{ $laporan->lokasi ?? 'Lokasi tidak tersedia' }}
                 </div>
                 <div>
-                    <i class="fas fa-comment icon"></i> {{ $lapor->deskripsi ?? '-' }}
+                    <i class="fas fa-comment icon"></i> {{ $laporan->deskripsi ?? '-' }}
                 </div>
 
-                @if($lapor->status == 1)
-                    <span class="status belum"><i class="fas fa-circle-exclamation icon-status"></i> Belum diangkut</span>
-                @elseif($lapor->status == 2)
-                    <span class="status sedang"><i class="fas fa-spinner icon-status"></i> Sedang proses</span>
-                @elseif($lapor->status == 3)
-                    <span class="status belum"><i class="fas fa-circle-xmark icon-status"></i> Ditolak</span>
-                @elseif($lapor->status == 4)
-                    <span class="status selesai"><i class="fas fa-circle-check icon-status"></i> Sudah diangkut</span>
+                @if($laporan->status == 0)
+                    <div class="status-item belum">
+                        <i class="fas fa-circle-exclamation"></i> Belum diangkut
+                    </div>
+                @elseif($laporan->status == 1)
+                    <div class="status-item sedang">
+                        <i class="fas fa-clock"></i> Sedang proses
+                    </div>
+                @elseif($laporan->status == 2)
+                    <div class="status-item belum">
+                        <i class="fas fa-circle-xmark"></i> Ditolak
+                    </div>
+                @elseif($laporan->status == 3)
+                    <div class="status-item selesai">
+                        <i class="fas fa-check-circle"></i> Sudah diangkut
+                    </div>
                 @endif
 
-                @if($lapor->status == 2 && !empty($lapor->tanggal_diangkut))
+                @if($laporan->status == 3 && !empty($laporan->tanggal_diangkut))
                     <p><strong>Diangkut pada:</strong>
-                        {{ \Carbon\Carbon::parse($lapor->tanggal_diangkut)->translatedFormat('d F Y, H:i') }}
+                        {{ \Carbon\Carbon::parse($laporan->tanggal_diangkut)->translatedFormat('d F Y, H:i') }}
                     </p>
                 @endif
             </div>
@@ -80,12 +88,10 @@
             .detail-card img {
                 width: 100%;
                 max-height: 500px;
-                /* Maksimal tinggi yang diinginkan */
                 object-fit: cover;
                 border-radius: 8px;
                 margin-bottom: 20px;
             }
-
 
             .detail-info h3 {
                 font-size: 1.8rem;
@@ -118,30 +124,36 @@
                 margin-bottom: 12px;
             }
 
-            .icon-status {
+            .status-item {
+                font-size: 1rem;
                 margin-left: 20px;
-                font-size: 20px;
-                margin-bottom: 20px;
-                margin-right: 10px;
-            }
-
-            .status {
-                font-weight: 600;
+                margin-top: 15px;
+                margin-bottom: 15px;
+                font-family: 'Red Hat Text', sans-serif;
                 display: inline-block;
-                margin-top: 12px;
-                font-size: 1.2rem;
+                padding: 8px 12px;
+                border-radius: 9px;
+                font-weight: 500;
             }
 
-            .status.belum {
+            .status-item i {
+                margin-right: 6px;
+                font-size: 14px;
+            }
+
+            .status-item.belum {
                 color: #dc3545;
+                background-color: #ffeaea;
             }
 
-            .status.sedang {
-                color: #FFB800;
+            .status-item.sedang {
+                color: #ff8c00;
+                background: rgba(255, 140, 0, 0.1);
             }
 
-            .status.selesai {
+            .status-item.selesai {
                 color: #299E63;
+                background: rgba(41, 158, 99, 0.1);
             }
         </style>
 @endsection

@@ -19,6 +19,7 @@ use App\Http\Controllers\PenugasanPetugasController;
 use App\Http\Controllers\RuteController;
 use App\Http\Controllers\RuteTpsController;
 use App\Http\Controllers\SampahController;
+use App\Http\Controllers\LaporSampahController;
 use App\Http\Controllers\LaporanWargaController;
 use App\Http\Controllers\LaporanTpsController;
 use App\Http\Controllers\TrackingArmadaController;
@@ -33,7 +34,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LaporanWargaAdminController;
 
 use App\Http\Controllers\JadwalRuteController;
-
+use App\Http\Controllers\OsrmProxyController;
 use App\Models\Role;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Auth;
@@ -347,6 +348,8 @@ Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
 // ===================
 Route::resource('laporan-warga', LaporanWargaController::class);
 Route::resource('laporan-tps', LaporanTpsController::class);
+Route::get('/masyarakat/riwayat/{id}', [LaporanWargaController::class, 'detailRiwayat'])->name('masyarakat.detailRiwayat');
+Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
 
 
 
@@ -429,19 +432,19 @@ Route::group(['prefix' => 'tpst/jadwal-rute'], function () {
 // Routes untuk pengguna biasa yang ingin menjadi petugas
 Route::middleware(['auth'])->prefix('masyarakat')->name('masyarakat.')->group(function () {
     Route::get('/jadi-petugas/form', [JadiPetugasController::class, 'JadipetugasForm'])
-         ->name('jadi-petugas.form');
-         
+        ->name('jadi-petugas.form');
+
     Route::post('/jadi-petugas/submit', [JadiPetugasController::class, 'submitPetugasRequest'])
-         ->name('jadi-petugas.submit');
-         
+        ->name('jadi-petugas.submit');
+
     Route::get('/jadi-petugas/success', [JadiPetugasController::class, 'success'])
-         ->name('jadi-petugas.success');
+        ->name('jadi-petugas.success');
 });
 
 // Route untuk data wilayah
-    Route::get('/get-regencies/{province_id}', [JadiPetugasController::class, 'getRegencies'])->name('get.regencies');
-    Route::get('/get-districts/{regency_id}', [JadiPetugasController::class, 'getDistricts'])->name('get.districts');
-    Route::get('/get-villages/{district_id}', [JadiPetugasController::class, 'getVillages'])->name('get.villages');
+Route::get('/get-regencies/{province_id}', [JadiPetugasController::class, 'getRegencies'])->name('get.regencies');
+Route::get('/get-districts/{regency_id}', [JadiPetugasController::class, 'getDistricts'])->name('get.districts');
+Route::get('/get-villages/{district_id}', [JadiPetugasController::class, 'getVillages'])->name('get.villages');
 
 
 // Route Perhitungan sampah admin pusat
@@ -463,6 +466,7 @@ Route::prefix('pusat')->name('adminpusat.')->middleware(['auth'])->group(functio
 //     Route::put('/petugas/{id}', [JadiPetugasController::class, 'update'])->name('jadi-petugas.update');
 //     Route::delete('/petugas/{id}', [JadiPetugasController::class, 'destroy'])->name('jadi-petugas.destroy');
 // });
+
 Route::resource('petugas', PetugasController::class);
 Route::put('/petugas/{id}/update', [PetugasController::class, 'update'])->name('petugas.profile.update');
 Route::put('/petugas/{id}/update-status', [PetugasController::class, 'updateStatus'])->name('petugas.updateStatus');
@@ -473,3 +477,20 @@ Route::put('/verifikasi-user/{id}', [VerifyUserController::class, 'approve'])->n
 Route::prefix('pusat')->name('adminpusat.')->middleware(['auth'])->group(function () {
     Route::resource('perhitungan-sampah', \App\Http\Controllers\SampahAdminPusatController::class);
 });
+
+// Tambahkan route Lapor Sampah di sini
+Route::prefix('petugas/lapor')->name('petugas.')->middleware('auth')->group(function () {
+    Route::get('/', [LaporSampahController::class, 'index'])->name('lapor.index');
+    Route::get('/create', [LaporSampahController::class, 'create'])->name('lapor.create');
+    Route::post('/', [LaporSampahController::class, 'store'])->name('lapor.store');
+    Route::get('/{lapor}', [LaporSampahController::class, 'show'])->name('lapor.show');
+    Route::get('/{lapor}/edit', [LaporSampahController::class, 'edit'])->name('lapor.edit');
+    Route::put('/{lapor}', [LaporSampahController::class, 'update'])->name('lapor.update');
+    Route::delete('/{lapor}', [LaporSampahController::class, 'destroy'])->name('lapor.destroy');
+    Route::get('/{lapor}/bukti', [LaporSampahController::class, 'buktiForm'])->name('lapor.bukti-form');
+
+    // Route khusus untuk submit bukti
+    Route::post('/{id}/submit-bukti', [LaporSampahController::class, 'submitBukti'])->name('lapor.submit-bukti');
+});
+
+Route::get('/osrm-route', [OsrmProxyController::class, 'getRoute']);
