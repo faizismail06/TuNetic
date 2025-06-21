@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\URL;
 
 use Exception;
 use PDOException;
@@ -39,5 +40,8 @@ class AppServiceProvider extends ServiceProvider
         config(['mail.mailers.smtp.encryption' => 'tls']);
         config(['mail.mailers.smtp.username' => 'pbltunetic@gmail.com']);
         config(['mail.mailers.smtp.password' => 'cyrykpprqfupgmwa']);
+        if (str_contains(config('app.url'), 'https://')) {
+            URL::forceScheme('https');
+        }
     }
 }
