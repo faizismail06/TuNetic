@@ -70,6 +70,7 @@ class LaporSampahController extends Controller
 
         $request->validate([
             'bukti_gambar' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'keterangan_bukti' => 'required|string|max:500',
         ]);
 
         // Hapus gambar lama jika ada
@@ -199,8 +200,13 @@ class LaporSampahController extends Controller
 
     public function laporanSampah(Request $request)
     {
+        $petugas = auth()->user()->petugas;
+
+        if (!$petugas) {
+            return back()->with('error', 'Akun Anda tidak terdaftar sebagai petugas.');
+        }
         // Query dasar (bisa filter kalau mau, contoh by status atau search)
-        $query = LaporanWarga::query();
+        $query = LaporanWarga::where('id_petugas', $petugas->id);
 
         // Contoh filter pencarian
         if ($request->has('search') && !empty($request->search)) {
