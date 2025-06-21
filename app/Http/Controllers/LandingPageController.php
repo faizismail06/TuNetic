@@ -55,7 +55,7 @@ class LandingPageController extends Controller
     private function getImageUrl($artikel)
     {
         if ($artikel->gambar && Storage::exists('public/' . $artikel->gambar)) {
-            return asset('storage/' . $artikel->gambar);
+            return asset($artikel->gambar);
         }
         return asset('assets/images/default-article.jpg');
     }

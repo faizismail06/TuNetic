@@ -21,6 +21,7 @@ class PetugasSeeder extends Seeder
 
         Petugas::create([
             'user_id' => $user->id,
+            'username' => 'petugas1', // ← tambahkan ini
             'email' => $user->email,
             'name' => $user->name,
             'password' => $user->password, // bisa pakai ulang password-nya
@@ -41,6 +42,7 @@ class PetugasSeeder extends Seeder
 
         Petugas::create([
             'user_id' => $user->id,
+            'username' => 'petugas2', // ← tambahkan ini
             'email' => $user->email,
             'name' => $user->name,
             'password' => $user->password, // bisa pakai ulang password-nya

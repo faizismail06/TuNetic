@@ -58,7 +58,7 @@
                                 <label for="sim_petugas">SIM Petugas</label>
                                 <div>
                                     @if ($petugas->sim_image)
-                                        <img src="{{ asset('storage/' . $petugas->sim_image) }}" alt="SIM Petugas" class="img-thumbnail" style="max-width: 250px;">
+                                        <img src="{{ asset($petugas->sim_image) }}" alt="SIM Petugas" class="img-thumbnail" style="max-width: 250px;">
                                     @else
                                         <p>Tidak ada gambar SIM</p>
                                     @endif
@@ -69,9 +69,30 @@
                                 <textarea class="form-control" id="alasan_bergabung" rows="3" readonly>{{ $petugas->alasan_bergabung ?? '' }}</textarea>
                             </div>
                             <div class="row mt-4">
-                                <div class="col-12">
-                                    <button type="button" class="btn btn-success">Setujui</button>
-                                    <button type="button" class="btn btn-danger ml-2">Tolak</button>
+                                <div class="col-12 d-flex gap-2">
+                                    <!-- @if ($petugas->status !== 'Disetujui' && $petugas->status !== 'Ditolak')
+                                        <form action="{{ route('verifikasi.user', $petugas->user_id) }}" method="POST" onsubmit="return confirm('Setujui petugas ini?')">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="btn btn-success btn-sm mr-2">Setujui</button>
+                                        </form>
+
+                                        <button type="button" class="btn btn-danger btn-sm btn-tolak mr-2">Tolak</button>
+                                    @endif -->
+
+                                    @if ($petugas->status !== 'Disetujui' && $petugas->status !== 'Ditolak')
+                                    <button type="button" class="btn btn-success btn-sm mr-2 btn-setujui">Setujui</button>
+
+                                    <form id="form-verifikasi" action="{{ route('verifikasi.user', $petugas->user_id) }}" method="POST" style="display: none;">
+                                        @csrf
+                                        @method('PUT')
+                                    </form>
+
+                                    <button type="button" class="btn btn-danger btn-sm btn-tolak mr-2">Tolak</button>
+                                @endif
+
+
+                                    <a href="{{ route('manage-petugas.index') }}" class="btn btn-secondary btn-sm ml-2">Kembali</a>
                                 </div>
                             </div>
                         </div>
@@ -99,3 +120,83 @@
         }
     </style>
 @endsection
+
+@push('js')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnSetujui = document.querySelector('.btn-setujui');
+        const btnTolak = document.querySelector('.btn-tolak');
+
+        // Jika tombol Setujui ditekan
+        if (btnSetujui) {
+            btnSetujui.addEventListener('click', function () {
+                Swal.fire({
+                    title: 'Yakin menyetujui?',
+                    text: 'Petugas akan disetujui dan email verifikasi akan dikirim.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Setujui',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('form-verifikasi').submit();
+                    }
+                });
+            });
+        }
+
+        // Jika tombol Tolak ditekan
+        if (btnTolak) {
+            btnTolak.addEventListener('click', function () {
+                Swal.fire({
+                    title: 'Yakin menolak?',
+                    text: 'Petugas akan ditolak dan tidak dapat diverifikasi.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Tolak',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        updateStatus('Ditolak');
+                    }
+                });
+            });
+        }
+
+        function updateStatus(status) {
+            fetch("{{ route('petugas.updateStatus', $petugas->id) }}", {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Berhasil',
+                        text: `Status diubah ke ${status}`,
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = "{{ route('manage-petugas.index') }}";
+                    });
+                } else {
+                    Swal.fire('Gagal', data.message ?? 'Terjadi kesalahan.', 'error');
+                }
+            }).catch(err => {
+                Swal.fire('Gagal', 'Terjadi kesalahan server.', 'error');
+            });
+        }
+    });
+</script>
+@endpush
+

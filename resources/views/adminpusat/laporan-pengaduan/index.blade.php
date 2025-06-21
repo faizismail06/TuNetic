@@ -65,13 +65,15 @@
                                                 @endphp
 
                                                 @if ($status == 0)
-                                                    <span class="badge bg-danger">Ditolak</span>
+                                                    <span class="badge bg-secondary">Belum Diangkut</span>
                                                 @elseif ($status == 1)
-                                                    <span class="badge bg-warning text-dark">Diproses</span>
+                                                    <span class="badge bg-warning text-dark">Sedang Proses</span>
                                                 @elseif ($status == 2)
-                                                    <span class="badge bg-success">Selesai</span>
+                                                    <span class="badge bg-danger">Ditolak</span>
+                                                @elseif ($status == 3)
+                                                    <span class="badge bg-success">Sudah Diangkut</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Tidak diketahui</span>
+                                                    <span class="badge bg-default text-dark">Tidak diketahui</span>
                                                 @endif
                                             </td>
                                             <td>

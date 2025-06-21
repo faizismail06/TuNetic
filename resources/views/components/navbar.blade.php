@@ -34,6 +34,7 @@
 
         /* Navbar Base Styles */
         ..navbar {
+            position: fixed;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -51,6 +52,10 @@
             min-height: 80px;
             transition: transform 0.3s ease-in-out;
             /* Sudah ada */
+        }
+
+        .navbar-hide {
+            top: -100%;
         }
 
         .navbar-content {
@@ -281,6 +286,7 @@
         }
 
         .profile-dropdown.show {
+            display: block;
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
@@ -1075,7 +1081,7 @@
                     }
                 @endphp
                 <a href="{{ url($homeUrl) }}">
-                    <img src="{{ asset('assets/images/Masyarakat/logo.png') }}" alt="Logo">
+                    <img src="{{ asset('assets/images/Masyarakat/Logo.png') }}" alt="Logo">
                 </a>
             </div>
 
@@ -1228,7 +1234,7 @@
             <!-- Left: Logo + Social -->
             <div class="footer-left">
                 <div class="footer-logo">
-                    <img src="{{ asset('assets/images/Masyarakat/logoputih.png') }}" alt="TuNetic Logo">
+                    <img src="{{ asset('assets/images/Masyarakat/LogoPutih.png') }}" alt="TuNetic Logo">
                 </div>
                 <div class="footer-social">
                     <a href="#" aria-label="Facebook">
@@ -1551,11 +1557,15 @@
                 const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
                 if (scrollTop > lastScrollTop && scrollTop > 100) {
-                    // Scrolling down & past threshold
-                    navbar.style.transform = 'translateY(-100%)';
+                    // // Scrolling down & past threshold
+                    // navbar.style.transform = 'translateY(-100%)';
+                    // Scroll ke bawah, sembunyikan navbar
+                    navbar.classList.add('navbar-hide');
                 } else {
-                    // Scrolling up
-                    navbar.style.transform = 'translateY(0)';
+                    // // Scrolling up
+                    // navbar.style.transform = 'translateY(0)';
+                    // Scroll ke atas, tampilkan navbar
+                    navbar.classList.remove('navbar-hide');
                 }
 
                 lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
@@ -1570,8 +1580,8 @@
 
             // Preload important images
             const importantImages = [
-                "{{ asset('assets/images/Masyarakat/logo.png') }}",
-                "{{ asset('assets/images/Masyarakat/logoputih.png') }}",
+                "{{ asset('assets/images/Masyarakat/Logo.png') }}",
+                "{{ asset('assets/images/Masyarakat/LogoPutih.png') }}",
                 // "{{ asset('assets/images/icons/user1.png') }}"
             ];
 

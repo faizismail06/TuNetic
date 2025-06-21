@@ -183,9 +183,8 @@
                 </div>
                 <div class="col-md-5">
                     <select name="tugas[]" class="form-control" required>
-                        <option value="1">Driver</option>
-                        <option value="2">Picker</option>
-                        ${tugas}
+                        <option value="1" ${tugas == 'Driver' ? 'selected' : ''}>Driver</option>
+                        <option value="2" ${tugas == 'Picker' ? 'selected' : ''}>Picker</option>
                     </select>
                 </div>
                 <div class="col-md-2">

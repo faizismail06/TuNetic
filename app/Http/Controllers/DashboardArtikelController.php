@@ -198,7 +198,7 @@ class DashboardArtikelController extends Controller
     public function getImageUrl($artikel)
     {
         if ($artikel->gambar && Storage::exists('public/' . $artikel->gambar)) {
-            return asset('storage/' . $artikel->gambar);
+            return asset($artikel->gambar);
         }
         
         // Return default image jika gambar tidak ada
@@ -247,7 +247,7 @@ class DashboardArtikelController extends Controller
             
             // Get image URL
             if ($artikel->gambar && Storage::exists('public/' . $artikel->gambar)) {
-                $artikel->gambar_url = asset('storage/' . $artikel->gambar);
+                $artikel->gambar_url = asset($artikel->gambar);
             } else {
                 $artikel->gambar_url = asset('assets/images/default-article.jpg');
             }

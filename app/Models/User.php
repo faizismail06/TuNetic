@@ -64,7 +64,7 @@ class User extends Authenticatable implements MustVerifyEmail
     // Relasi ke petugas
     public function petugas()
     {
-        return $this->hasOne(Petugas::class);
+        return $this->hasOne(Petugas::class,'user_id');
     }
 
     // Accessor untuk gambar profil

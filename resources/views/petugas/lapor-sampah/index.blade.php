@@ -31,7 +31,7 @@
                     <div class="row">
                         <div class="col-md-3 col-12 mb-3 mb-md-0">
                             @if($laporan->gambar)
-                                <img src="{{ asset('storage/' . $laporan->gambar) }}" alt="Foto Sampah"
+                                <img src="{{ asset($laporan->gambar) }}" alt="Foto Sampah"
                                     class="img-fluid rounded" style="height: 150px; width: 100%; object-fit: cover;">
                             @else
                                 <div class="d-flex align-items-center justify-content-center bg-light rounded"
@@ -64,13 +64,13 @@
                             </div>
 
                             <div class="mb-3">
-                                @if($laporan->status == 1)
+                                @if($laporan->status == 3)
                                     <span style="color: #299e63; font-weight: 500;">
                                         <i class="fas fa-check-circle me-2"></i> Sudah diangkut
                                     </span>
                                     @if($laporan->bukti_foto)
                                         <div class="mt-2">
-                                            <a href="{{ asset('storage/' . $laporan->bukti_foto) }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                            <a href="{{ asset($laporan->bukti_foto) }}" target="_blank" class="btn btn-sm btn-outline-success">
                                                 <i class="fas fa-eye me-1"></i> Lihat Bukti
                                             </a>
                                         </div>
@@ -82,7 +82,7 @@
                                 @endif
                             </div>
 
-                            @if($laporan->status == 0)
+                            @if($laporan->status == 1)
                             <button type="button" class="btn px-4 py-2" style="background-color: #ffb800; color: #fff; border: none; font-weight: 500; border-radius: 8px;"
                                     data-bs-toggle="modal" data-bs-target="#buktiModal{{ $laporan->id }}">
                                 Kirim Bukti
@@ -108,7 +108,7 @@
                                         <label for="fileInput{{ $laporan->id }}" class="form-label">Pilih Foto Bukti:</label>
                                         <input type="file"
                                                class="form-control"
-                                               name="bukti_foto"
+                                               name="bukti_gambar"
                                                id="fileInput{{ $laporan->id }}"
                                                accept="image/*"
                                                required

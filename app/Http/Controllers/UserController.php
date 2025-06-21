@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+
 use Spatie\Permission\Models\Role;
 use App\Models\Province;
 use App\Models\Regency;
@@ -58,9 +60,9 @@ class UserController extends Controller
      */
     public function create()
     {
-        $roles = Role::all();
-        return view('users.create', compact('roles'));
+        return view('users.create');
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -69,50 +71,50 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
-            'email' => 'required|string|email:rfc|unique:users',
-            'role' => 'nullable',
-            'no_telepon' => 'required|integer',
-            'province_id'  => 'required|exists:reg_provinces,id',
-            'regency_id'  => 'required|exists:reg_regencies,id',
-            'district_id'  => 'required|exists:reg_districts,id',
-            'village_id'  => 'required|exists:reg_villages,id',
-            'level' => 'required|integer|in:1,2,3,4',
-            'verified' => 'nullable|string',
+{
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|string',
+        'email' => 'required|string|email:rfc|unique:users',
+        'password' => 'required|string|min:6',
+        'no_telepon' => 'nullable|integer',
+        'province_id' => 'nullable|exists:reg_provinces,id',
+        'regency_id' => 'nullable|exists:reg_regencies,id',
+        'district_id' => 'nullable|exists:reg_districts,id',
+        'village_id' => 'nullable|exists:reg_villages,id',
+        'level' => 'required|integer|in:1,2,3,4',
+        'verified' => 'nullable|string',
+    ]);
+
+    if ($validator->fails()) {
+        Log::error('Validasi gagal:', $validator->errors()->toArray());
+
+        toastr()->error('Pengguna gagal ditambah </br> Periksa kembali data anda');
+        return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
+    }
+
+    try {
+        $data = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'province_id' => $request->province_id,
+            'regency_id' => $request->regency_id,
+            'district_id' => $request->district_id,
+            'village_id' => $request->village_id,
+            'level' => $request->level,
+            'email_verified_at' => !blank($request->verified) ? now() : null
         ]);
 
-        if ($validator->fails()) {
-            toastr()->error('Perngguna gagal ditambah </br> Periksa kembali data anda');
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-        ;
-        try {
-            $data = User::create(
-                [
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'password' => Hash::make($request->password),
-                    'province_id' => $request->province_id,
-                    'regency_id' => $request->regency_id,
-                    'district_id' => $request->district_id,
-                    'village_id' => $request->village_id,
-                    'level' => $request->level,
-                    'email_verified_at' => !blank($request->verified) ? now() : null
-                ]
-            );
-            $data->assignRole(!blank($request->role) ? $request->role : array());
-            toastr()->success('Pengguna baru berhasil disimpan');
-            return redirect()->route('manage-user.index');
-        } catch (\Throwable $th) {
-            dd($th);
-            toastr()->warning('Terdapat masalah diserver');
-            return redirect()->route('manage-user.index');
-        }
+        toastr()->success('Pengguna baru berhasil disimpan');
+        return redirect()->route('manage-user.index');
+    } catch (\Throwable $th) {
+        dd($th);
+        toastr()->warning('Terdapat masalah di server');
+        return redirect()->route('manage-user.index');
     }
+}
 
     public function storePublic(Request $request)
     {
@@ -221,7 +223,11 @@ class UserController extends Controller
             }
             $user->update($update_data);
 
-            $user->syncRoles(!blank($request->role) ? $request->role : array());
+            if (!blank($request->role)) {
+            $user->syncRoles([$request->role]); // pastikan dalam bentuk array
+            } else {
+            $user->syncRoles([]); // kosongkan role jika tidak dipilih
+            }
             toastr()->success('Pengguna berhasil diperbarui');
             return redirect()->route('manage-user.index');
         } catch (\Throwable $th) {
@@ -238,6 +244,16 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
+
+            toastr()->success('Pengguna berhasil dihapus');
+        } catch (\Throwable $th) {
+            toastr()->error('Terjadi kesalahan saat menghapus pengguna');
+        }
+
+        return redirect()->route('manage-user.index');
     }
+
 }

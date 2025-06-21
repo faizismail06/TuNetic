@@ -149,7 +149,7 @@
                         <div class="row">
                             <div class="col-md-3 col-12 mb-3 mb-md-0">
                                 @if($laporan->gambar)
-                                    <img src="{{ asset('storage/' . $laporan->gambar) }}" alt="Foto Sampah"
+                                    <img src="{{ asset($laporan->gambar) }}" alt="Foto Sampah"
                                         class="img-fluid rounded" style="height: 150px; width: 100%; object-fit: cover;">
                                 @else
                                     <div class="d-flex align-items-center justify-content-center bg-light rounded"
@@ -190,7 +190,7 @@
                                         </span>
                                         @if($laporan->bukti_foto)
                                             <div class="mt-2">
-                                                <a href="{{ asset('storage/' . $laporan->bukti_foto) }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                                <a href="{{ asset($laporan->bukti_foto) }}" target="_blank" class="btn btn-sm btn-outline-success">
                                                     <i class="fas fa-eye me-1"></i> Lihat Bukti
                                                 </a>
                                             </div>
