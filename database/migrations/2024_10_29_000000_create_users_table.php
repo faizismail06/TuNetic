@@ -23,7 +23,7 @@ return new class extends Migration {
             $table->char('province_id', 2)->nullable(); // Sesuai dengan tipe data di reg_provinces
             $table->char('regency_id', 4)->nullable(); // Sesuai dengan tipe data di reg_regencies
             $table->char('district_id', 7)->nullable(); // Sesuai dengan tipe data di reg_districts
-            $table->char('village_id', 10)->nullable(); // Sesuai dengan tipe data di reg_villages
+            $table->char('village_id', 10)->nullable(); // Sesuai den   gan tipe data di reg_villages
 
             $table->string('alamat')->nullable();
             // $table->integer('role')->default(0);
