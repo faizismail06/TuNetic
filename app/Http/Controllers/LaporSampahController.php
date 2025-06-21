@@ -68,7 +68,7 @@ class LaporSampahController extends Controller
             ->where('id_petugas', $petugas->id)
             ->firstOrFail();
 
-        $request->validate([
+        $validatedData = $request->validate([
             'bukti_gambar' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'keterangan_bukti' => 'required|string|max:500',
         ]);
@@ -85,6 +85,13 @@ class LaporSampahController extends Controller
         // Ubah status dan catat waktu selesai
         $laporan->status = 3; // Sudah Diangkut
         $laporan->waktu_selesai = now();
+
+        if ($laporan->status == 3){
+            $laporan->keterangan_bukti = $validatedData['keterangan_bukti'] ?? null;
+        } else {
+            $laporan->keterangan_bukti = null;
+        }
+
         $laporan->save();
 
         return redirect()->route('petugas.lapor.index')->with('success', 'Laporan berhasil diselesaikan dan bukti diunggah.');

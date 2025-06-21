@@ -134,9 +134,9 @@ class LaporanWargaAdminController extends Controller
         // Tambahan: logika status → waktu & alasan
         if ($validatedData['status'] == 1 && !$laporan->waktu_diambil) {
             $laporan->waktu_diambil = now();
-        } elseif ($validatedData['status'] == 2 && !$laporan->waktu_selesai) {
+        } elseif ($validatedData['status'] == 3 && !$laporan->waktu_selesai) {
             $laporan->waktu_selesai = now();
-        } elseif ($validatedData['status'] == 0) {
+        } elseif ($validatedData['status'] == 2) {
             $laporan->waktu_diambil = null;
             $laporan->waktu_selesai = null;
 
