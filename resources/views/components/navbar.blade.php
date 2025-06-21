@@ -1075,7 +1075,7 @@
                     }
                 @endphp
                 <a href="{{ url($homeUrl) }}">
-                    <img src="{{ asset('assets/images/Masyarakat/logo.png') }}" alt="Logo">
+                    <img src="{{ asset('assets/images/Masyarakat/Logo.png') }}" alt="Logo">
                 </a>
             </div>
 
@@ -1228,7 +1228,7 @@
             <!-- Left: Logo + Social -->
             <div class="footer-left">
                 <div class="footer-logo">
-                    <img src="{{ asset('assets/images/Masyarakat/logoputih.png') }}" alt="TuNetic Logo">
+                    <img src="{{ asset('assets/images/Masyarakat/LogoPutih.png') }}" alt="TuNetic Logo">
                 </div>
                 <div class="footer-social">
                     <a href="#" aria-label="Facebook">
@@ -1570,8 +1570,8 @@
 
             // Preload important images
             const importantImages = [
-                "{{ asset('assets/images/Masyarakat/logo.png') }}",
-                "{{ asset('assets/images/Masyarakat/logoputih.png') }}",
+                "{{ asset('assets/images/Masyarakat/Logo.png') }}",
+                "{{ asset('assets/images/Masyarakat/LogoPutih.png') }}",
                 // "{{ asset('assets/images/icons/user1.png') }}"
             ];
 
