@@ -8,13 +8,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class LaporSampahController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request) 
+    public function index(Request $request)
     {
         // Query dasar
         $query = LaporanWarga::query();
@@ -22,9 +23,9 @@ class LaporSampahController extends Controller
         // Filter pencarian
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('judul', 'like', '%'.$search.'%')
-                ->orWhere('deskripsi', 'like', '%'.$search.'%');
+            $query->where(function ($q) use ($search) {
+                $q->where('judul', 'like', '%' . $search . '%')
+                    ->orWhere('deskripsi', 'like', '%' . $search . '%');
             });
         }
 
@@ -83,7 +84,7 @@ class LaporSampahController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(LaporanSampah $lapor)
+    public function show(LaporanWarga $lapor)
     {
         return view('petugas.lapor.show', compact('lapor'));
     }
@@ -91,7 +92,7 @@ class LaporSampahController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(LaporanSampah $lapor)
+    public function edit(LaporanWarga $lapor)
     {
         return view('petugas.lapor.edit', compact('lapor'));
     }
@@ -99,7 +100,7 @@ class LaporSampahController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, LaporanSampah $lapor)
+    public function update(Request $request, LaporanWarga $lapor)
     {
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
@@ -126,18 +127,18 @@ class LaporSampahController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(LaporanSampah $lapor)
+    public function destroy(LaporanWarga $lapor)
     {
         // Hapus foto laporan jika ada
         if ($lapor->foto && Storage::disk('public')->exists($lapor->foto)) {
             Storage::disk('public')->delete($lapor->foto);
         }
-        
+
         // Hapus bukti foto jika ada
         if ($lapor->bukti_foto && Storage::disk('public')->exists($lapor->bukti_foto)) {
             Storage::disk('public')->delete($lapor->bukti_foto);
         }
-        
+
         $lapor->delete();
 
         return redirect()->route('petugas.lapor.index')->with('success', 'Laporan sampah berhasil dihapus');
@@ -146,10 +147,10 @@ class LaporSampahController extends Controller
     /**
      * Show the form for submitting proof of waste collection.
      */
-    public function buktiForm(LaporanSampah $lapor)
+    public function buktiForm(LaporanWarga $lapor)
     {
         // Pastikan laporan belum diangkut
-        if ($laporan->status == 1) { // sudah diangkut
+        if ($lapor->status == 1) { // sudah diangkut
             return redirect()->back()->with('error', 'Laporan sudah diangkut');
         }
 
@@ -163,7 +164,7 @@ class LaporSampahController extends Controller
     {
         // Cari laporan berdasarkan ID
         $laporan = LaporanWarga::findOrFail($id);
-        
+
         // Validasi bahwa laporan belum diangkut
         if ($laporan->status == 1) {
             return redirect()->route('petugas.lapor.index')->with('error', 'Laporan sudah diangkut');
@@ -265,7 +266,7 @@ class LaporSampahController extends Controller
             }
         } catch (\Exception $e) {
             // Log error jika diperlukan
-            \Log::error('Error getting location name: ' . $e->getMessage());
+            Log::error('Error getting location name: ' . $e->getMessage());
             return "Lokasi tidak dapat diakses";
         }
 
@@ -290,9 +291,9 @@ class LaporSampahController extends Controller
         // Contoh filter pencarian
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('judul', 'like', '%'.$search.'%')
-                ->orWhere('deskripsi', 'like', '%'.$search.'%');
+            $query->where(function ($q) use ($search) {
+                $q->where('judul', 'like', '%' . $search . '%')
+                    ->orWhere('deskripsi', 'like', '%' . $search . '%');
             });
         }
 

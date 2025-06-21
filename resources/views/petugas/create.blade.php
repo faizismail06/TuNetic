@@ -9,7 +9,7 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('petugas.index') }}">Data Petugas</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('manage-petugas.index') }}">Data Petugas</a></li>
                         <li class="breadcrumb-item active">Tambah</li>
                     </ol>
                 </div>
@@ -68,7 +68,7 @@
 
                                 <div class="form-group">
                                     <label for="email">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email">
+                                    <input type="email" class="form-control" id="email" name="email" required>
                                 </div>
 
                                 <div class="form-group">
@@ -98,20 +98,32 @@
                                         <option value="Petugas">Petugas</option>
                                         </select>
                                 </div>
-
-                                <div class="form-group">
-                                    <label for="foto_diri">Foto Diri</label>
+                                {{-- Tampilkan foto SIM jika sudah ada --}}
+                                @if(isset($petugas) && $petugas->sim_image)
+                                    <div class="form-group">
+                                        <label>Foto SIM Saat Ini:</label><br>
+                                        <img src="{{ asset(rawurlencode($petugas->sim_image)) }}" alt="Foto SIM" width="120" class="img-thumbnail mb-2">
+                                        <p class="text-muted mt-2"><small>{{ $petugas->sim_image }}</small></p>
+                                    </div>
+                                @endif
+                                    <div class="form-group">
+                                    <label for="sim_image">Upload Foto SIM</label>
                                     <div class="input-group">
                                         <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="foto_diri" name="foto_diri">
-                                            <label class="custom-file-label" for="foto_diri">Pilih Foto</label>
+                                            <input type="file" class="custom-file-input" id="sim_image" name="sim_image" onchange="previewImage(event)">
+                                            <label class="custom-file-label" for="sim_image">Pilih Foto</label>
                                         </div>
                                     </div>
                                     <small class="form-text text-muted">Rasio 1:1 dan ukuran kurang dari 2MB.</small>
                                 </div>
 
+                                {{-- PREVIEW GAMBAR YANG BARU DIPILIH --}}
+                                <div class="mt-3">
+                                    <img id="simImagePreview" src="#" alt="Preview Foto SIM" style="display: none;" width="120" class="img-thumbnail">
+                                </div>
+
                                 <button type="submit" class="btn btn-success">Simpan</button>
-                                <a href="{{ route('petugas.index') }}" class="btn btn-secondary ml-2">Batal</a>
+                                <a href="{{ route('manage-petugas.index') }}" class="btn btn-secondary ml-2">Batal</a>
                             </form>
 
                         </div>
@@ -123,17 +135,28 @@
 @endsection
 
 @push('css')
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const preview = document.getElementById('simImagePreview');
+            const file = input.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+
     <style>
         .custom-file-label::after {
             content: "Pilih";
         }
     </style>
-@endpush
 
-@push('js')
-    <script>
-        $(document).ready(function () {
-            bsCustomFileInput.init();
-        });
-    </script>
+
 @endpush
