@@ -39,7 +39,7 @@
                                         <td class="align-middle text-center">{{ $loop->iteration }}</td>
                                         <td class="align-middle text-center">{{ Str::limit($artikel->judul_artikel, 60) }}</td>
                                         <td class="text-center">
-                                            <img src="{{ asset('storage/' . $artikel->gambar) }}" alt="Thumbnail"
+                                            <img src="{{ asset($artikel->gambar) }}" alt="Thumbnail"
                                                 style="max-height: 80px; max-width: 120px; object-fit: cover;">
                                         </td>
                                         <td class="align-middle text-center">

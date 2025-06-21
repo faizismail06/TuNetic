@@ -18,7 +18,7 @@
                     <div class="card border-0 shadow-sm h-100 article-card">
                         <div class="row g-0">
                             <div class="col-md-5">
-                                <img src="{{ asset('storage/' . $artikel->gambar) }}" class="img-fluid rounded-start h-100" alt="{{ $artikel->judul_artikel }}" style="object-fit: cover;">
+                                <img src="{{ asset($artikel->gambar) }}" class="img-fluid rounded-start h-100" alt="{{ $artikel->judul_artikel }}" style="object-fit: cover;">
                             </div>
                             <div class="col-md-7 d-flex flex-column">
                                 <div class="card-body">

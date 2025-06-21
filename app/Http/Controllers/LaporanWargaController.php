@@ -54,7 +54,7 @@ class LaporanWargaController extends Controller
 
         if ($request->hasFile('gambar')) {
             $path = $request->file('gambar')->store('laporan_warga', 'public');
-            $validatedData['gambar'] = asset('storage/' . $path);
+            $validatedData['gambar'] = asset($path);
         }
 
         // Mapping ke kolom kategori di DB
@@ -107,7 +107,7 @@ class LaporanWargaController extends Controller
                 Storage::disk('public')->delete(str_replace(asset('storage/'), '', $laporan->gambar));
             }
             $path = $request->file('gambar')->store('laporan_warga', 'public');
-            $validatedData['gambar'] = asset('storage/' . $path);
+            $validatedData['gambar'] = asset($path);
         }
         if (isset($validatedData['status']) && $validatedData['status'] == 3) {
             $validatedData['tanggal_diangkut'] = now();

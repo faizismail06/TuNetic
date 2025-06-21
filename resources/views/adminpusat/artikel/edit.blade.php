@@ -46,7 +46,7 @@
 
                         <div id="upload-box"
                             style="border: 2px solid #28a745; padding: 20px; text-align: center; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px;">
-                            <img id="preview-image" src="{{ asset('storage/' . $artikel->gambar) }}" alt="Preview Gambar"
+                            <img id="preview-image" src="{{ asset($artikel->gambar) }}" alt="Preview Gambar"
                                 style="max-height: 100%; max-width: 100%; object-fit: contain;" />
                         </div>
 

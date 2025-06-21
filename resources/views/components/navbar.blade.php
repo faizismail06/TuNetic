@@ -34,6 +34,7 @@
 
         /* Navbar Base Styles */
         ..navbar {
+            position: fixed;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -51,6 +52,10 @@
             min-height: 80px;
             transition: transform 0.3s ease-in-out;
             /* Sudah ada */
+        }
+
+        .navbar-hide {
+            top: -100%;
         }
 
         .navbar-content {
@@ -281,6 +286,7 @@
         }
 
         .profile-dropdown.show {
+            display: block;
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
@@ -1551,11 +1557,15 @@
                 const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
                 if (scrollTop > lastScrollTop && scrollTop > 100) {
-                    // Scrolling down & past threshold
-                    navbar.style.transform = 'translateY(-100%)';
+                    // // Scrolling down & past threshold
+                    // navbar.style.transform = 'translateY(-100%)';
+                    // Scroll ke bawah, sembunyikan navbar
+                    navbar.classList.add('navbar-hide');
                 } else {
-                    // Scrolling up
-                    navbar.style.transform = 'translateY(0)';
+                    // // Scrolling up
+                    // navbar.style.transform = 'translateY(0)';
+                    // Scroll ke atas, tampilkan navbar
+                    navbar.classList.remove('navbar-hide');
                 }
 
                 lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;

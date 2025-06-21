@@ -117,7 +117,7 @@ class LaporanWargaAdminController extends Controller
             }
             // Simpan gambar baru
             $path = $request->file('gambar')->store('laporan_warga', 'public');
-            $validatedData['gambar'] = 'storage/' . $path; // Simpan path relatif
+            $validatedData['gambar'] = $path; // Simpan path relatif
         } elseif ($request->input('clear_gambar')) { // Tambahkan input tersembunyi/checkbox di form untuk menghapus gambar
             if ($laporan->gambar) {
                 Storage::disk('public')->delete(Str::after($laporan->gambar, 'storage/'));

@@ -472,7 +472,7 @@
                                     <!-- Article Image -->
                                     <div class="col-md-5">
                                         @if($artikel->gambar)
-                                            <img src="{{ asset('storage/' . $artikel->gambar) }}"
+                                            <img src="{{ asset($artikel->gambar) }}"
                                                 class="img-fluid rounded-start h-100" alt="{{ $artikel->judul_artikel }}"
                                                 style="object-fit: cover;">
                                         @else
@@ -1085,7 +1085,7 @@
                                     <!-- Article Image -->
                                     <div class="col-md-5">
                                         @if($artikel->gambar)
-                                            <img src="{{ asset('storage/' . $artikel->gambar) }}"
+                                            <img src="{{ asset($artikel->gambar) }}"
                                                 class="img-fluid rounded-start h-100" alt="{{ $artikel->judul_artikel }}"
                                                 style="object-fit: cover;">
                                         @else
