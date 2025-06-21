@@ -490,7 +490,6 @@ Route::prefix('pusat')->name('adminpusat.')->middleware(['auth'])->group(functio
 // });
 
 // Route::resource('petugas', PetugasController::class);
-Route::put('/petugas/{id}/update', [PetugasController::class, 'update'])->name('petugas.profile.update');
 Route::put('/petugas/{id}/update-status', [PetugasController::class, 'updateStatus'])->name('petugas.updateStatus');
 Route::delete('/petugas/{id}', [PetugasController::class, 'destroy'])->name('petugas.destroy');
 Route::put('/verifikasi-user/{id}', [VerifyUserController::class, 'approve'])->name('verifikasi.user');
