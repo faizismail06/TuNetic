@@ -40,7 +40,7 @@
                                             style="width: 150px; height: 150px; overflow: hidden; background-color: #f8f9fa; cursor: pointer;"
                                             id="profile-image-clickable">
                                             @if ($user && $user->gambar)
-                                                <img id="profile-preview" src="{{ asset($user->gambar) }}"
+                                                <img id="profile-preview" src="{{ asset('storage/profile/' . $user->gambar) }}"
                                                     class="img-fluid w-100 h-100" style="object-fit: cover;" alt="Foto Profil">
                                             @else
                                                 <div id="profile-preview"
