@@ -64,7 +64,7 @@
                             </div>
 
                             <div class="mb-3">
-                                @if($laporan->status == 1)
+                                @if($laporan->status == 3)
                                     <span style="color: #299e63; font-weight: 500;">
                                         <i class="fas fa-check-circle me-2"></i> Sudah diangkut
                                     </span>
@@ -82,7 +82,7 @@
                                 @endif
                             </div>
 
-                            @if($laporan->status == 0)
+                            @if($laporan->status == 1)
                             <button type="button" class="btn px-4 py-2" style="background-color: #ffb800; color: #fff; border: none; font-weight: 500; border-radius: 8px;"
                                     data-bs-toggle="modal" data-bs-target="#buktiModal{{ $laporan->id }}">
                                 Kirim Bukti
@@ -108,7 +108,7 @@
                                         <label for="fileInput{{ $laporan->id }}" class="form-label">Pilih Foto Bukti:</label>
                                         <input type="file"
                                                class="form-control"
-                                               name="bukti_foto"
+                                               name="bukti_gambar"
                                                id="fileInput{{ $laporan->id }}"
                                                accept="image/*"
                                                required

@@ -359,6 +359,18 @@ Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
 // ===================
 // LAPORAN
 // ===================
+
+Route::resource('pusat/laporan-warga', LaporanWargaController::class);
+Route::resource('laporan-tps', LaporanTpsController::class);
+Route::get('/masyarakat/riwayat/{id}', [LaporanWargaController::class, 'detailRiwayat'])->name('masyarakat.detailRiwayat');
+// Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
+
+
+
+// ===================
+// LAPORAN WARGA ADMIN
+// ===================
+
 Route::prefix('pusat/laporan-pengaduan')->name('laporan.')->group(function () {
     Route::get('/', [LaporanWargaAdminController::class, 'index'])->name('index');
     Route::get('/{id}', [LaporanWargaAdminController::class, 'show'])->name('show');
@@ -366,16 +378,6 @@ Route::prefix('pusat/laporan-pengaduan')->name('laporan.')->group(function () {
     Route::delete('/{id}', [LaporanWargaAdminController::class, 'destroy'])->name('destroy');
     Route::post('/{id}/tugaskan', [LaporanWargaAdminController::class, 'tugaskan'])->name('tugaskan');
 });
-Route::resource('pusat/laporan-warga', LaporanWargaController::class);
-Route::resource('laporan-tps', LaporanTpsController::class);
-Route::get('/masyarakat/riwayat/{id}', [LaporanWargaController::class, 'detailRiwayat'])->name('masyarakat.detailRiwayat');
-Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
-
-
-
-// ===================
-// LAPORAN WARGA ADMIN
-// ===================
 
 // ===================
 // PERHITUNGAN SAMPAH
@@ -481,16 +483,16 @@ Route::get('/get-villages/{district_id}', [JadiPetugasController::class, 'getVil
 // Tambahkan route Lapor Sampah di sini
 Route::prefix('petugas/lapor')->name('petugas.')->middleware('auth')->group(function () {
     Route::get('/', [LaporSampahController::class, 'index'])->name('lapor.index');
-    Route::get('/create', [LaporSampahController::class, 'create'])->name('lapor.create');
-    Route::post('/', [LaporSampahController::class, 'store'])->name('lapor.store');
-    Route::get('/{lapor}', [LaporSampahController::class, 'show'])->name('lapor.show');
-    Route::get('/{lapor}/edit', [LaporSampahController::class, 'edit'])->name('lapor.edit');
-    Route::put('/{lapor}', [LaporSampahController::class, 'update'])->name('lapor.update');
-    Route::delete('/{lapor}', [LaporSampahController::class, 'destroy'])->name('lapor.destroy');
-    Route::get('/{lapor}/bukti', [LaporSampahController::class, 'buktiForm'])->name('lapor.bukti-form');
+    Route::post('/{id}/submit-bukti', [LaporSampahController::class, 'submitBukti'])->name('lapor.submit-bukti');
+    // Route::get('/create', [LaporSampahController::class, 'create'])->name('lapor.create');
+    // Route::post('/', [LaporSampahController::class, 'store'])->name('lapor.store');
+    // Route::get('/{lapor}', [LaporSampahController::class, 'show'])->name('lapor.show');
+    // Route::get('/{lapor}/edit', [LaporSampahController::class, 'edit'])->name('lapor.edit');
+    // Route::put('/{lapor}', [LaporSampahController::class, 'update'])->name('lapor.update');
+    // Route::delete('/{lapor}', [LaporSampahController::class, 'destroy'])->name('lapor.destroy');
+    // Route::get('/{lapor}/bukti', [LaporSampahController::class, 'buktiForm'])->name('lapor.bukti-form');
 
     // Route khusus untuk submit bukti
-    Route::post('/{id}/submit-bukti', [LaporSampahController::class, 'submitBukti'])->name('lapor.submit-bukti');
 });
 
 Route::get('/osrm-route', [OsrmProxyController::class, 'getRoute']);

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\LaporanWarga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
@@ -14,12 +15,19 @@ class LaporSampahController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request) 
+    public function index(Request $request)
     {
-        // Query dasar
-        $query = LaporanWarga::query();
+        $petugas = auth()->user()->petugas;
 
-        // Filter pencarian
+        if (!$petugas) {
+            return redirect()->back()->with('error', 'Akun Anda tidak terdaftar sebagai petugas!');
+        }
+
+        // Ambil laporan milik petugas yang sedang login dan status sedang diproses (1)
+        $query = LaporanWarga::where('id_petugas', $petugas->id)
+                            ->where('status', 1);
+
+        // Filter pencarian (judul & deskripsi)
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -28,15 +36,15 @@ class LaporSampahController extends Controller
             });
         }
 
-        // Filter status
-        if ($request->has('status') && !empty($request->status)) {
+        // Filter status tambahan (jika dibutuhkan)
+        if ($request->has('status') && $request->status !== '') {
             $query->where('status', $request->status);
         }
 
-        // Ambil data + pagination
+        // Ambil data paginasi
         $laporSampah = $query->latest()->paginate(10);
 
-        // Tambahkan alamat hasil reverse geocoding ke setiap item
+        // Tambahkan alamat hasil reverse geocoding
         $laporSampah->getCollection()->transform(function ($laporan) {
             $laporan->alamat = $this->getLocationName($laporan->latitude, $laporan->longitude);
             return $laporan;
@@ -45,148 +53,55 @@ class LaporSampahController extends Controller
         return view('petugas.lapor-sampah.index', compact('laporSampah'));
     }
 
-    /**
-     * Show the form for creating a new resource.
+        /**
+     * Submit proof of waste collection.
      */
-    public function create()
+    public function submitBukti(Request $request, $id)
     {
-        return view('petugas.lapor-sampah.create');
-    }
+        $petugas = auth()->user()->petugas;
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $lat = $request->latitude;
-        $lon = $request->longitude;
-
-        // Panggil fungsi getLocationName untuk mendapatkan alamat yang lebih terstruktur
-        $alamat = null;
-        if ($lat && $lon) {
-            $alamat = $this->getLocationName($lat, $lon);
+        if (!$petugas) {
+            return redirect()->back()->with('error', 'Akun Anda tidak terdaftar sebagai petugas!');
         }
 
-        LaporanWarga::create([
-            'judul' => $request->judul,
-            'latitude' => $lat,
-            'longitude' => $lon,
-            'deskripsi' => $request->deskripsi,
-            'gambar' => $request->gambar,
-            'status' => 0,
-            'alamat' => $alamat, // ← disimpan di database
+        $laporan = LaporanWarga::where('id', $id)
+            ->where('id_petugas', $petugas->id)
+            ->firstOrFail();
+
+        $request->validate([
+            'bukti_gambar' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        return redirect()->back()->with('success', 'Laporan berhasil dikirim!');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(LaporanSampah $lapor)
-    {
-        return view('petugas.lapor.show', compact('lapor'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(LaporanSampah $lapor)
-    {
-        return view('petugas.lapor.edit', compact('lapor'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, LaporanSampah $lapor)
-    {
-        $validated = $request->validate([
-            'judul' => 'required|string|max:255',
-            'tanggal' => 'required|date',
-            'alamat' => 'required|string|max:500',
-            'deskripsi' => 'required|string|max:1000',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        // Handle upload foto baru
-        if ($request->hasFile('foto')) {
-            // Hapus foto lama jika ada
-            if ($lapor->foto && Storage::disk('public')->exists($lapor->foto)) {
-                Storage::disk('public')->delete($lapor->foto);
-            }
-            $validated['foto'] = $request->file('foto')->store('laporan-sampah', 'public');
+        // Hapus gambar lama jika ada
+        if ($laporan->gambar) {
+            Storage::disk('public')->delete(Str::after($laporan->gambar, 'storage/'));
         }
 
-        $lapor->update($validated);
+        // Simpan gambar baru
+        $path = $request->file('bukti_gambar')->store('laporan_warga', 'public');
+        $laporan->gambar = 'storage/' . $path;
 
-        return redirect()->route('petugas.lapor.index')->with('success', 'Laporan sampah berhasil diperbarui');
-    }
+        // Ubah status dan catat waktu selesai
+        $laporan->status = 3; // Sudah Diangkut
+        $laporan->waktu_selesai = now();
+        $laporan->save();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(LaporanSampah $lapor)
-    {
-        // Hapus foto laporan jika ada
-        if ($lapor->foto && Storage::disk('public')->exists($lapor->foto)) {
-            Storage::disk('public')->delete($lapor->foto);
-        }
-        
-        // Hapus bukti foto jika ada
-        if ($lapor->bukti_foto && Storage::disk('public')->exists($lapor->bukti_foto)) {
-            Storage::disk('public')->delete($lapor->bukti_foto);
-        }
-        
-        $lapor->delete();
-
-        return redirect()->route('petugas.lapor.index')->with('success', 'Laporan sampah berhasil dihapus');
+        return redirect()->route('petugas.lapor.index')->with('success', 'Laporan berhasil diselesaikan dan bukti diunggah.');
     }
 
     /**
      * Show the form for submitting proof of waste collection.
      */
-    public function buktiForm(LaporanSampah $lapor)
-    {
-        // Pastikan laporan belum diangkut
-        if ($laporan->status == 1) { // sudah diangkut
-            return redirect()->back()->with('error', 'Laporan sudah diangkut');
-        }
+    // public function buktiForm(LaporanSampah $lapor)
+    // {
+    //     // Pastikan laporan belum diangkut
+    //     if ($laporan->status == 1) { // sudah diangkut
+    //         return redirect()->back()->with('error', 'Laporan sudah diangkut');
+    //     }
 
-        return view('petugas.lapor.bukti', compact('lapor'));
-    }
+    //     return view('petugas.lapor.bukti', compact('lapor'));
+    // }
 
-    /**
-     * Submit proof of waste collection.
-     */
-    public function submitBukti(Request $request, $id)
-    {
-        // Cari laporan berdasarkan ID
-        $laporan = LaporanWarga::findOrFail($id);
-        
-        // Validasi bahwa laporan belum diangkut
-        if ($laporan->status == 1) {
-            return redirect()->route('petugas.lapor.index')->with('error', 'Laporan sudah diangkut');
-        }
-
-        $validated = $request->validate([
-            'bukti_foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'keterangan_bukti' => 'required|string|max:500',
-        ]);
-
-        // Upload bukti foto
-        if ($request->hasFile('bukti_foto')) {
-            $validated['bukti_foto'] = $request->file('bukti_foto')->store('bukti-sampah', 'public');
-        }
-
-        // Update status menjadi sudah diangkut dan tambahkan tanggal penyelesaian
-        $validated['status'] = 1; // 1 = sudah diangkut
-        $validated['tanggal_selesai'] = now();
-
-        $laporan->update($validated);
-
-        return redirect()->route('petugas.lapor.index')->with('success', 'Bukti pengangkutan berhasil dikirim');
-    }
     /**
      * Mengubah latitude dan longitude menjadi alamat jalan menggunakan API OpenStreetMap (Nominatim)
      * dengan format yang lebih terstruktur dan mudah dibaca
