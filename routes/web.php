@@ -98,13 +98,7 @@ Route::prefix('masyarakat/akun')->name('masyarakat.akun.')->middleware('auth')->
     Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
 });
 
-// // Route untuk pengajuan jadi petugas
-// Route::prefix('masyarakat/jadipetugas')->name('masyarakat.jadipetugas.')->middleware('auth')->group(function () {
-//     Route::get('/', [jadipetugasController::class, 'JadiPetugasForm'])->name('form');
-//     Route::post('/', [jadipetugasController::class, 'submitPetugasRequest'])->name('submit');
-// });
 
-// Route::resource('profile', ProfileController::class)->except('destroy');
 Route::resource('pusat/manage-user', UserController::class);
 Route::resource('pusat/manage-role', RoleController::class);
 Route::resource('pusat/manage-menu', MenuController::class);
@@ -112,11 +106,7 @@ Route::resource('pusat/manage-petugas', PetugasController::class);
 Route::resource('pusat/manage-rute', RuteController::class);
 Route::resource('pusat/manage-armada', KelolaArmadaController::class);
 Route::resource('pusat/manage-permission', PermissionController::class)->only('store', 'destroy');
-// Route::get('petugas/{id}/edit', [PetugasController::class, 'edit'])->name('petugas.edit');
-// Route::put('petugas/{id}', [PetugasController::class, 'update'])->name('petugas.update');
-// Route::get('petugas/{id}/detail', [PetugasController::class, 'showDetail'])->name('petugas.detail');
-// Route::get('petugas/create', [PetugasController::class, 'create'])->name('petugas.create');
-// Route::post('petugas', [PetugasController::class, 'destroy'])->name('petugas.destroy');
+
 Route::post('petugas', [PetugasController::class, 'index'])->name('petugas.index');
 Route::get('/rute/{id}/detail', [RuteController::class, 'show'])->name('rute.detail');
 Route::get('/rute/{id_rute}/detail', [RuteController::class, 'detail'])->name('rute.detail');
@@ -133,13 +123,6 @@ Route::resource('armada', ArmadaController::class);
 // ===================
 // PETUGAS
 // ===================
-// Route::resource('petugas', PetugasController::class);
-
-// Route::get('/petugas', [LaporanWargaController::class, 'index']);
-
-// Route::get('/petugas', function () {
-//     return view('petugas.dashboard.home-petugas');
-// });
 
 Route::get('/petugas', [LaporSampahController::class, 'laporanSampah'])->name('petugas.home');
 Route::post('/lapor-sampah/kirim-bukti/{id}', [LaporSampahController::class, 'submitBukti'])->name('lapor-sampah.kirim-bukti');
@@ -235,51 +218,17 @@ Route::patch('pusat/artikel/{id}/status', [ArtikelController::class, 'updateStat
 Route::get('pusat/dbbackup', [DBBackupController::class, 'DBDataBackup']);
 
 
-Route::middleware('auth')->group(function () {
-    Route::get('/masyarakat', [LaporanWargaController::class, 'index']);
-    Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
-    Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview']);
-});
-
-
-// Route publik untuk masyarakat (tidak perlu login)
-Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
-    // Route untuk lapor sampah (publik)
-    Route::get('/lapor', [LaporanWargaController::class, 'create'])->name('lapor');
-    Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
-    // Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
-
-    // Route untuk rute armada (publik)
-    Route::get('/rute-armada', [RuteArmadaController::class, 'index'])->name('rute-armada.index');
-    Route::get('/rute-armada/all-tps', [RuteArmadaController::class, 'showAllTps'])->name('rute-armada.all-tps');
-    Route::get('/rute-armada/jadwal/{id}', [RuteArmadaController::class, 'getJadwalDetail'])->name('rute-armada.jadwal-detail');
-    Route::get('/rute-armada/tracking/{id}', [RuteArmadaController::class, 'getRealtimeTracking'])->name('rute-armada.realtime-tracking');
-});
 
 //  Route Admin TPST
 Route::prefix('tpst')->name('admin_tpst.')->group(function () {
     Route::get('/home', [DashboardController::class, 'indexTpst'])->name('admintpst.dashboard.index');
 });
 
-Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
-Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
-Route::get('/lapor/{id}', [LaporanWargaController::class, 'show'])->name('lapor.detailRiwayat');
 
 Route::get('/get-regencies/{province}', [ProfileController::class, 'getRegencies'])->name('get.regencies');
 Route::get('/get-districts/{regency}', [ProfileController::class, 'getDistricts'])->name('get.districts');
 Route::get('/get-villages/{district}', [ProfileController::class, 'getVillages'])->name('get.villages');
 
-// Halaman Profil untuk Admin TPST
-Route::prefix('tpst')->name('admin_tpst.')->middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'userIndex'])->name('admin_tpst.profile.index');
-    Route::put('/profile', [ProfileController::class, 'userUpdate'])->name('profile.update');
-    Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
-
-    // Dropdown wilayah dinamis
-    Route::get('/get-regencies/{province_id}', [ProfileController::class, 'getRegencies'])->name('get.regencies');
-    Route::get('/get-districts/{regency_id}', [ProfileController::class, 'getDistricts'])->name('get.districts');
-    Route::get('/get-villages/{district_id}', [ProfileController::class, 'getVillages'])->name('get.villages');
-});
 
 Route::prefix('petugas')->name('petugas.')->middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'petugasIndex'])->name('profile.index');
@@ -299,20 +248,7 @@ Route::prefix('petugas/akun')->name('petugas.akun.')->middleware('auth')->group(
 });
 
 
-Route::get('/armada', function () {
-    return view('armada');
-})->name('armada');
 
-Route::get('/lacak', function () {
-    return view('masyarakat.lacak');
-})->name('masyarakat.lacak');
-
-// Route::get('/lapor', function () {
-//     return view('masyarakat.lapor');
-// })->name('lapor');
-
-// Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
-// Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
 Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview'])->middleware('auth');
 
 // ===================
@@ -320,7 +256,7 @@ Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview'])->m
 // ===================
 Route::middleware('auth')->group(function () {
     Route::get('/masyarakat', [LaporanWargaController::class, 'index']);
-    Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
+
     Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview']);
 });
 
@@ -328,28 +264,12 @@ Route::middleware('auth')->group(function () {
 // Route publik untuk masyarakat (tidak perlu login)
 Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
     // Route untuk lapor sampah (publik)
-    // Route::get('/lapor', function () {
-    //     return view('masyarakat.lapor');
-    // })->name('lapor');
+    Route::get('/lapor', [LaporanWargaController::class, 'create'])->name('lapor');
+    Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
+    Route::get('riwayat/{id}', [LaporanWargaController::class, 'detailRiwayat'])->name('detailRiwayat');
+    // Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
 
-
-    Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
-        // Halaman Profil Admin
-        Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
-        Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::post('/profile/upload-photo', [ProfileController::class, 'uploadPhoto'])->name('profile.upload-photo');
-        Route::get('/register', [UserController::class, 'showRegistrationForm'])->name('register');
-        Route::get('/get-regencies/{province_id}', [UserController::class, 'getRegencies']);
-        Route::get('/get-districts/{regency_id}', [UserController::class, 'getDistricts']);
-        Route::get('/get-villages/{district_id}', [UserController::class, 'getVillages']);
-
-        // Tambahkan resource lain di sini jika perlu
-    });
-
-
-
-    // Route::post('/lapor', [LaporanWargaController::class, 'store'])->name('lapor.submit');
-    // Route::get('/lapor/form', [LaporanWargaController::class, 'create'])->name('lapor.form');
+    Route::get('/riwayat', [LaporanWargaController::class, 'allhistory'])->name('lapor.allhistory');
 
     // Route untuk rute armada (publik)
     Route::get('/rute-armada', [RuteArmadaController::class, 'index'])->name('rute-armada.index');
@@ -358,13 +278,16 @@ Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
     Route::get('/rute-armada/tracking/{id}', [RuteArmadaController::class, 'getRealtimeTracking'])->name('rute-armada.realtime-tracking');
 });
 
+
+
+
 // ===================
 // LAPORAN
 // ===================
 
 Route::resource('pusat/laporan-warga', LaporanWargaController::class);
 Route::resource('laporan-tps', LaporanTpsController::class);
-Route::get('/masyarakat/riwayat/{id}', [LaporanWargaController::class, 'detailRiwayat'])->name('masyarakat.detailRiwayat');
+
 // Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
 
 
@@ -456,10 +379,10 @@ Route::group(['prefix' => 'tpst/jadwal-rute'], function () {
 // Routes untuk pengguna biasa yang ingin menjadi petugas
 Route::middleware(['auth'])->prefix('masyarakat')->name('masyarakat.')->group(function () {
     Route::get('/jadi-petugas/form', [JadiPetugasController::class, 'JadipetugasForm'])
-         ->name('jadi-petugas.form');
+        ->name('jadi-petugas.form');
 
     Route::post('/jadi-petugas/submit', [JadiPetugasController::class, 'submitPetugasRequest'])
-         ->name('jadi-petugas.submit');
+        ->name('jadi-petugas.submit');
 
     Route::get('/jadi-petugas/success', [JadiPetugasController::class, 'success'])
         ->name('jadi-petugas.success');
@@ -493,15 +416,6 @@ Route::prefix('pusat')->name('adminpusat.')->middleware(['auth'])->group(functio
 Route::prefix('petugas/lapor')->name('petugas.')->middleware('auth')->group(function () {
     Route::get('/', [LaporSampahController::class, 'index'])->name('lapor.index');
     Route::post('/{id}/submit-bukti', [LaporSampahController::class, 'submitBukti'])->name('lapor.submit-bukti');
-    // Route::get('/create', [LaporSampahController::class, 'create'])->name('lapor.create');
-    // Route::post('/', [LaporSampahController::class, 'store'])->name('lapor.store');
-    // Route::get('/{lapor}', [LaporSampahController::class, 'show'])->name('lapor.show');
-    // Route::get('/{lapor}/edit', [LaporSampahController::class, 'edit'])->name('lapor.edit');
-    // Route::put('/{lapor}', [LaporSampahController::class, 'update'])->name('lapor.update');
-    // Route::delete('/{lapor}', [LaporSampahController::class, 'destroy'])->name('lapor.destroy');
-    // Route::get('/{lapor}/bukti', [LaporSampahController::class, 'buktiForm'])->name('lapor.bukti-form');
-
-    // Route khusus untuk submit bukti
 });
 
 Route::get('/osrm-route', [OsrmProxyController::class, 'getRoute']);

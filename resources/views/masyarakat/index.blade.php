@@ -620,7 +620,7 @@
                                                     </span>
                                                 @endif
 
-                                                <a href="{{ route('laporan.show', $lapor->id) }}" class="btn-detail">
+                                                <a href="{{ route('masyarakat.detailRiwayat', $lapor->id) }}" class="btn-detail">
                                                     Lihat Detail
                                                 </a>
                                             </div>
@@ -631,7 +631,7 @@
                         </div>
 
                         <div class="text-start mt-4">
-                            <a href="{{ route('lapor.riwayat') }}" class="view-all-link">
+                            <a href="{{ route('masyarakat.lapor.allhistory') }}" class="view-all-link">
                                 Lihat Semua
                                 <i class="fas fa-arrow-right"></i>
                             </a>

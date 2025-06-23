@@ -46,6 +46,17 @@
                             <div class="mb-4">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Username *</label>
+                                        <input type="text" class="form-control @error('username') is-invalid @enderror"
+                                            name="username" value="{{ old('username') }}" required>
+                                        @error('username')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
                                         <label class="form-label fw-bold">Nama Lengkap *</label>
                                         <input type="text"
                                             class="form-control @error('nama_lengkap') is-invalid @enderror"

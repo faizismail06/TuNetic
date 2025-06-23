@@ -47,7 +47,7 @@
                         </div>
 
                         <div class="laporan-action">
-                            <a href="{{ route('laporan.show', $lapor->id) }}" class="btn-detail">Lihat Detail</a>
+                            <a href="{{ route('masyarakat.detailRiwayat', $lapor->id) }}" class="btn-detail">Lihat Detail</a>
                         </div>
                     </div>
                 </div>
