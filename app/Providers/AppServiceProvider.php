@@ -30,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         // Handle offline database
+            if (str_contains(config('app.url'), 'https://')) {
+            URL::forceScheme('https');
+        }
 
         //Use bootstrap 4 for pagination css
         Paginator::useBootstrapFour();

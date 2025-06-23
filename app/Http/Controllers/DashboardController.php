@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon; // Import Carbon for date handling clarity
+use Illuminate\Support\Carbon; 
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\LaporanSampahExport;
 
 class DashboardController extends Controller
 {
@@ -111,20 +113,69 @@ class DashboardController extends Controller
         ));
     }
 
-    public function indexTpst() {
+    public function indexTpst(Request $request) {
+        $numPerRute = 2;
+        $rutes = DB::table('rute')->orderBy('id')->take(5)->get();
 
-        $daftarTPST = DB::table('lokasi_tps')
-                        ->where('tipe', 'TPST') // <-- Tambahkan baris ini untuk filter
-                        ->select('id', 'nama_lokasi', 'tipe') // Ambil kolom yang relevan
-                        // ->take(5) // Ambil 5 data pertama (jika masih diperlukan)
-                        ->get();
+        // Ambil filter tanggal dari input user (format YYYY-MM-DD dari input type="date")
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        // Query laporan, filter jika ada tanggal
+        $query = DB::table('laporan_tps')
+            ->join('jadwal_operasional', 'laporan_tps.id_jadwal_operasional', '=', 'jadwal_operasional.id')
+            ->join('armada', 'jadwal_operasional.id_armada', '=', 'armada.id')
+            ->join('rute', 'jadwal_operasional.id_rute', '=', 'rute.id')
+            ->select(
+                'rute.nama_rute',
+                'laporan_tps.total_sampah',
+                'laporan_tps.tanggal_pengangkutan',
+                'armada.jenis_kendaraan',
+                'armada.merk_kendaraan',
+                'armada.no_polisi'
+            );
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('laporan_tps.tanggal_pengangkutan', [$startDate, $endDate]);
+        }
+
+        $allLaporan = $query->orderBy('rute.id')->orderBy('laporan_tps.tanggal_pengangkutan', 'desc')->get();
+
+        // Data chart per rute (contoh, bisa disesuaikan)
+        $chartLabels = [];
+        $chartData = [];
+        $chartColors = ['#4285F4', '#34A853', '#0F9D58', '#DB4437', '#F4B400'];
+        $armadaDetails = [];
+        foreach ($rutes as $i => $rute) {
+            $laporans = $allLaporan->where('nama_rute', $rute->nama_rute)->take($numPerRute)->values();
+            for ($j = 0; $j < $numPerRute; $j++) {
+                $lap = $laporans[$j] ?? null;
+                $chartLabels[] = $rute->nama_rute . '_' . ($j + 1);
+                $chartData[] = $lap ? $lap->total_sampah : 0;
+                $armadaDetails[] = $lap ? [
+                    'jenis_kendaraan' => $lap->jenis_kendaraan,
+                    'merk_kendaraan' => $lap->merk_kendaraan,
+                    'no_polisi' => $lap->no_polisi,
+                    'tanggal' => $lap->tanggal_pengangkutan,
+                    'total_sampah' => $lap->total_sampah
+                ] : [
+                    'jenis_kendaraan' => '-',
+                    'merk_kendaraan' => '-',
+                    'no_polisi' => '-',
+                    'tanggal' => '-',
+                    'total_sampah' => 0
+                ];
+            }
+        }
+
+        // Untuk daftar TPST
+        $daftarTPST = DB::table('lokasi_tps')->where('tipe', 'TPST')->get();
         $halfCount = ceil($daftarTPST->count() / 2);
         $tpsKolom1 = $daftarTPST->take($halfCount);
         $tpsKolom2 = $daftarTPST->slice($halfCount);
 
         return view('admintpst.dashboard.index', compact(
-            'tpsKolom1', 'tpsKolom2'
+            'tpsKolom1', 'tpsKolom2', 'chartLabels', 'chartData', 'chartColors', 'armadaDetails', 'allLaporan', 'startDate', 'endDate', 'numPerRute'
         ));
-
     }
 }

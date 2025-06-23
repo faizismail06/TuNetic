@@ -17,9 +17,24 @@
 <div class="content">
     <div class="container-fluid">
         <div class="row">
-
             {{-- Grafik Timbulan Sampah --}}
             <div class="col-12"> {{-- Grafik dibuat memenuhi lebar --}}
+                <form method="GET" class="mb-3">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label>Tanggal Mulai</label>
+                            <input type="date" name="start_date" class="form-control" value="{{ $startDate }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label>Tanggal Akhir</label>
+                            <input type="date" name="end_date" class="form-control" value="{{ $endDate }}">
+                        </div>
+                        <div class="col-md-3 align-self-end">
+                            <button class="btn btn-success" type="submit">Filter</button>
+                            <a href="{{ route('admin_tpst.admintpst.dashboard.index') }}" class="btn btn-warning text-white">Reset</a>
+                        </div>
+                    </div>
+                </form>
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="m-0">Persentase Timbulan Sampah (Kilogram)</h5>
@@ -105,97 +120,74 @@
 @push('js')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    const timbulanLabels = @json($chartLabels);
+    const timbulanData = @json($chartData);
+    const chartColors = @json($chartColors);
+    const numPerRute = {{ $numPerRute }};
+    const armadaDetail = @json($armadaDetails);
 
-        // --- Data Sampah (Contoh - Sesuaikan dengan data dari Controller) ---
-        // Data ini mencoba mereplikasi visualisasi pada gambar.
-        // Label X-Axis dibuat unik untuk setiap bar agar bisa diberi warna berbeda.
-        // Ticks X-Axis akan difilter agar hanya menampilkan label grup (H 1234, dll.)
-        const timbulanLabels = ['H 1234_1', 'H 1234_2', 'H 4567_1', 'H 4567_2', 'H 5678_1', 'H 5678_2', 'H 9881_1', 'H 9881_2', 'H 6874_1', 'H 6874_2'];
-        const timbulanData = [500, 440, 200, 200, 340, 480, 270, 110, 220, 100];
-        const timbulanColors = [
-            '#4285F4', '#4285F4', // TPST 1
-            '#34A853', '#34A853', // TPST 2
-            '#0F9D58', '#0F9D58', // TPST 3
-            '#DB4437', '#DB4437', // TPST 4
-            '#F4B400', '#F4B400', // TPST 5
-        ];
+    const timbulanColors = [];
+    for (let i = 0; i < timbulanLabels.length; i++) {
+        timbulanColors.push(chartColors[Math.floor(i / numPerRute)] ?? '#ccc');
+    }
 
-        // --- Inisialisasi Grafik Timbulan Sampah ---
-        const ctxTimbulan = document.getElementById('timbulanSampahChart').getContext('2d');
-        new Chart(ctxTimbulan, {
-            type: 'bar',
-            data: {
-                labels: timbulanLabels,
-                datasets: [{
-                    label: 'Timbulan Sampah (Kg)',
-                    data: timbulanData,
-                    backgroundColor: timbulanColors,
-                    borderColor: timbulanColors,
-                    borderWidth: 1,
-                    barPercentage: 0.8,    // Lebar bar relatif terhadap kategori
-                    categoryPercentage: 0.6 // Lebar kategori relatif terhadap area
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false // Sembunyikan legenda default karena sudah dibuat manual
-                    },
-                    tooltip: {
-                         callbacks: {
-                            title: function(tooltipItems) {
-                                // Menampilkan label grup (H 1234) sebagai judul tooltip
-                                let label = tooltipItems[0].label;
-                                return label.split('_')[0];
-                            },
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += context.parsed.y + ' Kg';
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            display: false // Hilangkan grid vertikal
-                        },
-                        ticks: {
-                            // Tampilkan hanya label grup (H xxxx) di tengah-tengah grup bar
-                            callback: function(value, index, values) {
-                                const labels = this.getLabels();
-                                if (index % 2 === 0) { // Hanya tampilkan untuk bar pertama di grup
-                                    return labels[index].split('_')[0];
-                                }
-                                return ''; // Sembunyikan label untuk bar kedua
-                            },
-                            autoSkip: false, // Jangan lewati label secara otomatis
-                            maxRotation: 0,  // Jaga label tetap horizontal
-                            minRotation: 0
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        max: 600,
-                        ticks: {
-                            stepSize: 100 // Atur langkah sumbu Y
-                        },
-                        grid: {
-                            drawBorder: false, // Hilangkan border sumbu Y
+    const ctx = document.getElementById('timbulanSampahChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: timbulanLabels,
+            datasets: [{
+                label: 'Timbulan Sampah (Kg)',
+                data: timbulanData,
+                backgroundColor: timbulanColors,
+                borderColor: timbulanColors,
+                borderWidth: 1,
+                barPercentage: 0.8,
+                categoryPercentage: 0.6
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        afterBody: function(context) {
+                            const idx = context[0].dataIndex;
+                            const detail = armadaDetail[idx];
+                            if (!detail) return '';
+                            return [
+                                `Armada: ${detail.jenis_kendaraan} ${detail.merk_kendaraan}`,
+                                `No Polisi: ${detail.no_polisi}`,
+                                `Tanggal: ${detail.tanggal}`
+                            ];
                         }
                     }
                 }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        callback: function(value, index, values) {
+                            const labels = this.getLabels();
+                            if (index % numPerRute === 0) {
+                                return labels[index].split('_')[0];
+                            }
+                            return '';
+                        },
+                        autoSkip: false,
+                        maxRotation: 0,
+                        minRotation: 0
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    max: Math.max(600, Math.max(...timbulanData) + 100),
+                    ticks: { stepSize: 100 },
+                    grid: { drawBorder: false }
+                }
             }
-        });
+        }
     });
 </script>
 @endpush

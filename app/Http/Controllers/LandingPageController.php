@@ -28,7 +28,7 @@ class LandingPageController extends Controller
 
         // Tambahan statistik
         $jumlahPengguna = DB::table('users')->count();
-        $jumlahSampah = DB::table('laporan_tps')->pluck('total_sampah'); // ganti 'berat' jika pakai volume
+        $jumlahSampah = DB::table('laporan_tps')->pluck('total_sampah')->sum(); // ganti 'berat' jika pakai volume
         $jumlahTpsAktif = DB::table('lokasi_tps')->count();
         $namaTpsAktif = DB::table('lokasi_tps')->pluck('nama_lokasi');
         $daftar_tps = DB::table('lokasi_tps')->paginate(6); // atau pakai get() kalau tidak mau paginate
