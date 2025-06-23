@@ -58,7 +58,7 @@
                                 <label for="sim_petugas">SIM Petugas</label>
                                 <div>
                                     @if ($petugas->sim_image)
-                                        <img src="{{ asset($petugas->sim_image) }}" alt="SIM Petugas" class="img-thumbnail" style="max-width: 250px;">
+                                        <img src="{{ asset('storage/' . $petugas->sim_image) }}" alt="SIM Petugas" class="img-thumbnail" style="max-width: 250px;">
                                     @else
                                         <p>Tidak ada gambar SIM</p>
                                     @endif
