@@ -409,15 +409,20 @@ Route::delete('/petugas/{id}', [PetugasController::class, 'destroy'])->name('pet
 Route::put('/verifikasi-user/{id}', [VerifyUserController::class, 'approve'])->name('verifikasi.user');
 
 
-Route::prefix('pusat')->name('adminpusat.')->middleware(['auth'])->group(function () {
-    Route::resource('perhitungan-sampah', \App\Http\Controllers\SampahAdminPusatController::class);
+// perhitungan sampah admin pusat
+
+Route::prefix('adminpusat')->name('adminpusat.')->group(function () {
+Route::resource('perhitungan-sampah', SampahPusatController::class)->names('perhitungan-sampah');
 });
+
+
 
 // Tambahkan route Lapor Sampah di sini
 Route::prefix('petugas/lapor')->name('petugas.')->middleware('auth')->group(function () {
     Route::get('/', [LaporSampahController::class, 'index'])->name('lapor.index');
     Route::post('/{id}/submit-bukti', [LaporSampahController::class, 'submitBukti'])->name('lapor.submit-bukti');
 });
+
 
 Route::get('/osrm-route', [OsrmProxyController::class, 'getRoute']);
 // Dashboard Artikel Routes

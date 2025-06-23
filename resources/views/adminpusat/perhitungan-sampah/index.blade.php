@@ -1,16 +1,10 @@
 @extends('layouts.app')
 
 @push('css')
+    <!-- CSS DataTables -->
     <link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .gap-2 > * {
-            margin-right: 0.5rem;
-        }
-    </style>
 @endpush
 
 @section('content')
@@ -34,16 +28,14 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between flex-wrap align-items-center">
                     <h5 class="m-0">Perhitungan Sampah</h5>
-                    <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
-                        <a href="{{ route('adminpusat.perhitungan-sampah.create') }}" class="btn btn-sm btn-success">
-                            <i class="fas fa-plus-circle me-2"></i> Tambah Data
-                        </a>
-                    </div>
+                    <a href="{{ route('perhitungan-sampah.create') }}" class="btn btn-sm btn-success mt-2 mt-sm-0">
+                        <i class="fas fa-plus-circle me-2"></i> Tambah Data
+                    </a>
                 </div>
             </div>
 
             <div class="card-body">
-                <!-- Filter Tanggal -->
+                {{-- Filter tanggal --}}
                 <div class="row mb-3">
                     <div class="col-md-3">
                         <input type="date" id="start-date" class="form-control" placeholder="Dari Tanggal">
@@ -53,7 +45,7 @@
                     </div>
                     <div class="col-md-3">
                         <button class="btn btn-sm btn-success" id="filter-date">Filter</button>
-                        <button class="btn btn-sm btn-warning" id="reset-date" style="color: white;">Reset</button>
+                        <button class="btn btn-sm btn-warning text-white" id="reset-date">Reset</button>
                     </div>
                 </div>
 
@@ -73,22 +65,22 @@
                             <tr>
                                 <td class="text-center">{{ $item->id }}</td>
                                 <td class="text-center">{{ $item->jadwalOperasional->armada->no_polisi ?? '-' }}</td>
-                                <td class="text-center">
-                                    {{ \Carbon\Carbon::parse($item->tanggal_pengangkutan)->format('d M Y') }}
-                                </td>
+                                <td class="text-center">{{ \Carbon\Carbon::parse($item->tanggal_pengangkutan)->format('d M Y') }}</td>
                                 <td class="text-center">{{ $item->jadwalOperasional->rute->nama_rute ?? '-' }}</td>
                                 <td class="text-center">{{ number_format($item->total_sampah, 2, '.', '') }}</td>
-                                <td class="text-center gap-2 d-flex justify-content-center">
-                                    <a href="{{ route('adminpusat.perhitungan-sampah.edit', $item->id) }}" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-edit me-2"></i> Edit
-                                    </a>
-                                    <form action="{{ route('adminpusat.perhitungan-sampah.destroy', $item->id) }}" method="POST" class="d-inline delete-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger show_confirm" data-name="{{ $item->id }}">
-                                            <i class="fas fa-trash mr-1"></i>Hapus
-                                        </button>
-                                    </form>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{{ route('perhitungan-sampah.edit', $item->id) }}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit me-1"></i>Edit
+                                        </a>
+                                        <form action="{{ route('perhitungan-sampah.destroy', $item->id) }}" method="POST" class="d-inline delete-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger show_confirm" data-name="{{ $item->id }}">
+                                                <i class="fas fa-trash me-1"></i>Hapus
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -112,97 +104,92 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('plugins/jquery/jquery.min.js') }}"></script>
-<script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
-<script src="{{ asset('plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
-<script src="{{ asset('plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-<script src="{{ asset('plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
-<script src="{{ asset('plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
-<script src="{{ asset('plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="{{ asset('plugins/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
 
-<script>
-    $(function () {
-        var start = '';
-        var end = '';
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-            var tanggal = data[2];
-            if (!tanggal) return true;
+    <script>
+        $(function () {
+            var start = '', end = '';
 
-            var parsedDate = moment(tanggal, 'DD MMM YYYY', true);
-            if (!parsedDate.isValid()) return true;
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                var tanggal = data[2];
+                if (!tanggal) return true;
 
-            var dateFormatted = parsedDate.format('YYYY-MM-DD');
+                var parsedDate = moment(tanggal, 'DD MMM YYYY', true);
+                if (!parsedDate.isValid()) return true;
 
-            return (!start || dateFormatted >= start) && (!end || dateFormatted <= end);
+                var dateFormatted = parsedDate.format('YYYY-MM-DD');
+                return (start === '' || dateFormatted >= start) && (end === '' || dateFormatted <= end);
+            });
+
+            var table = $('#datatable-main').DataTable({
+                responsive: true,
+                autoWidth: false,
+                destroy: true,
+                dom: "<'row mb-2'<'col-sm-6 text-left'l><'col-sm-6 text-right'f>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                footerCallback: function (row, data, startIdx, end, display) {
+                    var api = this.api();
+                    var intVal = i => typeof i === 'string' ? parseFloat(i.replace(/,/g, '')) || 0 : i;
+                    var total = 0;
+                    for (var i = 0; i < display.length; i++) {
+                        total += intVal(api.row(display[i]).data()[4]);
+                    }
+                    $(api.column(4).footer()).html(total.toLocaleString('id-ID', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }) + ' Kg');
+                }
+            });
+
+            $('#filter-date').on('click', function () {
+                start = $('#start-date').val();
+                end = $('#end-date').val();
+                table.draw();
+            });
+
+            $('#reset-date').on('click', function () {
+                $('#start-date').val('');
+                $('#end-date').val('');
+                start = '';
+                end = '';
+                table.draw();
+            });
+
+            // Konfirmasi hapus
+            $(document).on('click', '.show_confirm', function (event) {
+                event.preventDefault();
+                var form = $(this).closest("form");
+                var dataName = $(this).attr("data-name");
+
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data dengan ID " + dataName + " akan dihapus!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal',
+                    customClass: {
+                        confirmButton: 'btn btn-danger',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
         });
-
-        var table = $('#datatable-main').DataTable({
-            responsive: true,
-            autoWidth: false,
-            destroy: true,
-            footerCallback: function (row, data, startIdx, end, display) {
-                var api = this.api();
-
-                var intVal = function (i) {
-                    if (typeof i === 'string') return parseFloat(i.replace(/,/g, '')) || 0;
-                    return typeof i === 'number' ? i : 0;
-                };
-
-                var total = display.reduce(function (acc, idx) {
-                    return acc + intVal(api.row(idx).data()[4]);
-                }, 0);
-
-                $(api.column(4).footer()).html(total.toLocaleString('id-ID', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }) + ' Kg');
-            }
-        });
-
-        $('#filter-date').on('click', function () {
-            start = $('#start-date').val();
-            end = $('#end-date').val();
-            table.draw();
-        });
-
-        $('#reset-date').on('click', function () {
-            $('#start-date').val('');
-            $('#end-date').val('');
-            start = '';
-            end = '';
-            table.draw();
-        });
-    });
-
-    $(document).on('click', '.show_confirm', function (event) {
-        event.preventDefault();
-        var form = $(this).closest("form");
-        var dataName = $(this).data("name");
-
-        Swal.fire({
-            title: 'Apakah Anda yakin?',
-            text: "Data dengan ID " + dataName + " akan dihapus!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal',
-            customClass: {
-                confirmButton: 'btn btn-danger',
-                cancelButton: 'btn btn-success'
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
-                form.submit();
-            }
-        });
-    });
-</script>
+    </script>
 @endpush
