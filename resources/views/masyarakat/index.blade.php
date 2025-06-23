@@ -578,7 +578,7 @@
                                     <div class="row g-3 align-items-center">
                                         <div class="col-4 col-sm-3">
                                             @if ($lapor->gambar)
-                                                <img src="{{ $lapor->gambar }}" class="report-image" alt="Gambar Laporan">
+                                                <img src="{{'storage/laporan_warga/' . $lapor->gambar }}" class="report-image" alt="Gambar Laporan">
                                             @else
                                                 <div
                                                     class="report-image bg-light d-flex align-items-center justify-content-center">

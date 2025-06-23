@@ -69,7 +69,8 @@
 
                         <div class="my-4 text-center">
                             @if ($laporan->gambar)
-                                <img src="{{ asset($laporan->gambar) }}" alt="Foto Laporan"
+                                <!-- <img src="{{ asset( $laporan->gambar) }}" alt="Foto Laporan" -->
+                                <img src="{{ asset('storage/laporan_warga/' . $laporan->gambar) }}" alt="Foto Laporan"
                                     class="img-fluid rounded shadow" style="max-height: 300px;">
                             @else
                                 <p class="text-muted fst-italic">Tidak ada foto tersedia</p>

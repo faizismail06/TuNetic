@@ -9,7 +9,7 @@
         <p>Ikuti perkembangan Status Laporan Anda yang Tertera di Bawah ini</p>
 
         <div class="detail-card">
-            <img src="{{ $laporan->gambar }}" alt="Gambar Sampah">
+            <img src="{{ asset('storage/laporan_warga/' . $laporan->gambar) }}" alt="Gambar Laporan">
             <div class="detail-info">
                 <h3>{{ $laporan->judul }}</h3>
                 <div><i class="fas fa-calendar-days icon"></i>

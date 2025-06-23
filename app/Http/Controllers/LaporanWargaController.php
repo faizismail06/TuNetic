@@ -54,7 +54,7 @@ class LaporanWargaController extends Controller
 
         if ($request->hasFile('gambar')) {
             $path = $request->file('gambar')->store('laporan_warga', 'public');
-            $validatedData['gambar'] = asset($path);
+            $validatedData['gambar'] = basename($path);
         }
 
         // Mapping ke kolom kategori di DB
@@ -104,10 +104,10 @@ class LaporanWargaController extends Controller
         }
         if ($request->hasFile('gambar')) {
             if ($laporan->gambar) {
-                Storage::disk('public')->delete(str_replace(asset('storage/'), '', $laporan->gambar));
+                Storage::disk('public')->delete('laporan_warga/' . $laporan->gambar);
             }
             $path = $request->file('gambar')->store('laporan_warga', 'public');
-            $validatedData['gambar'] = asset($path);
+            $validatedData['gambar'] = basename($path);
         }
         if (isset($validatedData['status']) && $validatedData['status'] == 3) {
             $validatedData['tanggal_diangkut'] = now();
