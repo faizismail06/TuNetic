@@ -173,7 +173,7 @@
                         <div class="row">
                             <div class="col-md-3 col-12 mb-3 mb-md-0">
                                 @if ($laporan->gambar)
-                                    <img src="{{ asset('storage/' . $laporan->gambar) }}" alt="Foto Sampah"
+                                    <img src="{{ asset('storage/laporan_warga/' . $laporan->gambar) }}" alt="Foto Sampah"
                                         class="img-fluid rounded" style="height: 150px; width: 100%; object-fit: cover;">
                                 @else
                                     <div class="d-flex align-items-center justify-content-center bg-light rounded"

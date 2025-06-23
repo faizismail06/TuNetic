@@ -81,7 +81,7 @@ class LaporSampahController extends Controller
 
         // Simpan gambar baru
         $path = $request->file('bukti_gambar')->store('laporan_warga', 'public');
-        $laporan->gambar = 'storage/' . $path;
+        $laporan->gambar = basename($path);
 
         // Ubah status dan catat waktu selesai
         $laporan->status = 3; // Sudah Diangkut
