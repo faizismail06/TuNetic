@@ -69,40 +69,31 @@ class LaporSampahController extends Controller
             ->where('id_petugas', $petugas->id)
             ->firstOrFail();
 
-        $request->validate([
+        $validatedData = $request->validate([
             'bukti_gambar' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'keterangan_bukti' => 'required|string|max:500',
         ]);
 
-        // Handle upload foto baru
-        if ($request->hasFile('foto')) {
-            // Hapus foto lama jika ada
-            if ($lapor->foto && Storage::disk('public')->exists($lapor->foto)) {
-                Storage::disk('public')->delete($lapor->foto);
-            }
-            $validated['foto'] = $request->file('foto')->store('laporan-sampah', 'public');
+        // Hapus gambar lama jika ada
+        if ($laporan->gambar) {
+            Storage::disk('public')->delete(Str::after($laporan->gambar, 'storage/'));
         }
 
-        $lapor->update($validated);
+        // Simpan gambar baru
+        $path = $request->file('bukti_gambar')->store('laporan_warga', 'public');
+        $laporan->gambar = 'storage/' . $path;
 
-        return redirect()->route('petugas.lapor.index')->with('success', 'Laporan sampah berhasil diperbarui');
-    }
+        // Ubah status dan catat waktu selesai
+        $laporan->status = 3; // Sudah Diangkut
+        $laporan->waktu_selesai = now();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(LaporanSampah $lapor)
-    {
-        // Hapus foto laporan jika ada
-        if ($lapor->foto && Storage::disk('public')->exists($lapor->foto)) {
-            Storage::disk('public')->delete($lapor->foto);
+        if ($laporan->status == 3){
+            $laporan->keterangan_bukti = $validatedData['keterangan_bukti'] ?? null;
+        } else {
+            $laporan->keterangan_bukti = null;
         }
 
-        // Hapus bukti foto jika ada
-        if ($lapor->bukti_foto && Storage::disk('public')->exists($lapor->bukti_foto)) {
-            Storage::disk('public')->delete($lapor->bukti_foto);
-        }
-
-        $lapor->delete();
+        $laporan->save();
 
         return redirect()->route('petugas.lapor.index')->with('success', 'Laporan berhasil diselesaikan dan bukti diunggah.');
     }
@@ -248,8 +239,13 @@ class LaporSampahController extends Controller
 
     public function laporanSampah(Request $request)
     {
+        $petugas = auth()->user()->petugas;
+
+        if (!$petugas) {
+            return back()->with('error', 'Akun Anda tidak terdaftar sebagai petugas.');
+        }
         // Query dasar (bisa filter kalau mau, contoh by status atau search)
-        $query = LaporanWarga::query();
+        $query = LaporanWarga::where('id_petugas', $petugas->id);
 
         // Contoh filter pencarian
         if ($request->has('search') && !empty($request->search)) {

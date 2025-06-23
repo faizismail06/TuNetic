@@ -14,7 +14,7 @@
                 <h5 class="m-0 p-2">Template Jadwal</h5>
                 <select id="hariSelector" class="ml-auto align-self-center form-control w-25 mr-2">
                     @foreach ($hariList as $hari)
-                    <option value="{{ $hari }}">{{ $hari }}</option>
+                        <option value="{{ $hari }}">{{ $hari }}</option>
                     @endforeach
                 </select>
                 <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#tambahTemplateModal">
@@ -28,6 +28,12 @@
                     <!-- Data template akan dimuat via AJAX -->
                     <p class="text-muted">Silakan pilih hari untuk melihat template.</p>
                 </div>
+            </div>
+
+            <div class="card-footer">
+                <a href="{{ route('daftar-jadwal.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
             </div>
         </div>
 
@@ -174,58 +180,58 @@
             $('#hariInput').val(hari);
         });
 
-    $('#formTambahTemplate').on('submit', function(e) {
-        e.preventDefault();
+        $('#formTambahTemplate').on('submit', function(e) {
+            e.preventDefault();
 
-        const hari = $('#hariInput').val();
-        const id_armada = $('#id_armada').val();
-        const id_rute = $('#id_rute').val();
-        const petugasSelected = [];
+            const hari = $('#hariInput').val();
+            const id_armada = $('#id_armada').val();
+            const id_rute = $('#id_rute').val();
+            const petugasSelected = [];
 
-        $('#petugas-container input[type="checkbox"]:checked').each(function() {
-            const id = $(this).val();
-            const tugas = $(`select[name="tugas[${id}]"]`).val();
-            if (id && tugas) {
-                petugasSelected.push({
-                    id_petugas: id,
-                    tugas: tugas
-                });
+            $('#petugas-container input[type="checkbox"]:checked').each(function() {
+                const id = $(this).val();
+                const tugas = $(`select[name="tugas[${id}]"]`).val();
+                if (id && tugas) {
+                    petugasSelected.push({
+                        id_petugas: id,
+                        tugas: tugas
+                    });
+                }
+            });
+
+            if (petugasSelected.length === 0) {
+                alert('Pilih minimal 1 petugas.');
+                return;
             }
+
+            const formData = new FormData();
+            formData.append('_token', '{{ csrf_token() }}');
+            formData.append('hari', hari);
+            formData.append('id_armada', id_armada);
+            formData.append('id_rute', id_rute);
+
+            petugasSelected.forEach((petugas, index) => {
+                formData.append(`petugas[${index}][id_petugas]`, petugas.id_petugas);
+                formData.append(`petugas[${index}][tugas]`, petugas.tugas);
+            });
+
+            $.ajax({
+                url: '{{ route('jadwal-template.store') }}',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    $('#tambahTemplateModal').modal('hide');
+                    alert(res.message);
+                    loadTemplates(hari); // reload list
+                },
+                error: function(xhr) {
+                    const msg = xhr.responseJSON?.message ?? 'Terjadi kesalahan saat menyimpan.';
+                    alert(msg);
+                    console.error(xhr.responseJSON ?? xhr);
+                }
+            });
         });
-
-        if (petugasSelected.length === 0) {
-            alert('Pilih minimal 1 petugas.');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('_token', '{{ csrf_token() }}');
-        formData.append('hari', hari);
-        formData.append('id_armada', id_armada);
-        formData.append('id_rute', id_rute);
-
-        petugasSelected.forEach((petugas, index) => {
-            formData.append(`petugas[${index}][id_petugas]`, petugas.id_petugas);
-            formData.append(`petugas[${index}][tugas]`, petugas.tugas);
-        });
-
-        $.ajax({
-            url: '{{ route("jadwal-template.store") }}',
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(res) {
-                $('#tambahTemplateModal').modal('hide');
-                alert(res.message);
-                loadTemplates(hari); // reload list
-            },
-            error: function(xhr) {
-                const msg = xhr.responseJSON?.message ?? 'Terjadi kesalahan saat menyimpan.';
-                alert(msg);
-                console.error(xhr.responseJSON ?? xhr);
-            }
-        });
-    });
     </script>
 @endpush

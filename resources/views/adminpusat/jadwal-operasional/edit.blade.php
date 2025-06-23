@@ -174,7 +174,8 @@
                                     @enderror
                                 </div>
 
-                                <button type="button" class="btn btn-primary mt-3" onclick="nextStep()">Lanjut</button>
+                                <button type="button" class="btn btn-primary mt-3 mr-2" onclick="nextStep()">Lanjut</button>
+                                <a href="{{ route('jadwal-operasional.index') }}" class="btn btn-danger mt-3">Batal</a>
                             </div>
 
                             <!-- STEP 2: Penugasan Petugas -->
@@ -207,8 +208,9 @@
                                 <button type="button" class="btn btn-sm btn-outline-primary mb-3" onclick="tambahPetugas()">+ Tambah Petugas</button>
 
                                 <div class="form-group">
-                                    <button type="button" class="btn btn-secondary" onclick="prevStep()">Kembali</button>
-                                    <button type="submit" class="btn btn-success">Simpan Perubahan</button>
+                                    <button type="button" class="btn btn-secondary mr-2" onclick="prevStep()">Kembali</button>
+                                    <button type="submit" class="btn btn-success mr-2">Simpan Perubahan</button>
+                                    <a href="{{ route('jadwal-operasional.index') }}" class="btn btn-danger">Batal</a>
                                 </div>
                             </div>
                         </form>

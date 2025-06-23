@@ -25,6 +25,7 @@ class LaporanWarga extends Model
         'waktu_diambil',
         'waktu_selesai',
         'alasan_ditolak',
+        'keterangan_bukti',
     ];
 
     protected $casts = [

@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->text('deskripsi');
             $table->integer('status')->default(0);
             $table->string('alasan_ditolak')->nullable();
+            $table->string('keterangan_bukti')->nullable();
             $table->enum('kategori', ['Tumpukan sampah', 'TPS Penuh', 'Bau Menyengat', 'Pembuangan Liar', 'Lainnya'])->default('Tumpukan sampah');
             $table->timestamp('waktu_diambil')->nullable();
             $table->timestamp('waktu_selesai')->nullable();
