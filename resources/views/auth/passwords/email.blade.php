@@ -191,7 +191,7 @@
 
             <div class="auth-left d-none d-xl-flex">
                 <div>
-                  <h2>Lupa Password?</h2>
+                  <h2 style="color: white;">Lupa Password?</h2>
                   <p>Jangan khawatir! Masukkan email Anda dan kami akan mengirimkan tautan untuk mengatur ulang kata sandi Anda.</p>
                    <img src="{{ asset('') }}assets/images/login-images/forgot-password-cover.svg"
                          class="img-fluid" width="350" alt="" />
