@@ -78,8 +78,18 @@
                                     @enderror
                                 </div>
 
+
                                 <!-- Personal Data Section -->
                                 <div class="mb-4">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Username *</label>
+                                        <input type="text" class="form-control @error('username') is-invalid @enderror"
+                                            name="username" value="{{ old('username', $user->username) }}"
+                                            placeholder="Masukkan Username" required>
+                                        @error('username')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Nama Lengkap *</label>
                                         <input type="text"

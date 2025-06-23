@@ -89,17 +89,25 @@ class JadiPetugasController extends Controller
      */
     public function submitPetugasRequest(Request $request)
     {
-        // Validasi user
+        // Validasi user dan cek apakah sudah pernah mendaftar
         $user = auth()->user();
         if ($user->is_petugas) {
             return redirect()->route('home')->with('warning', 'Anda sudah terdaftar sebagai petugas.');
         }
 
-        // Validasi input
+        // Cek apakah user sudah pernah mendaftar sebagai petugas (pending/rejected)
+        $existingPetugas = Petugas::where('user_id', $user->id)->first();
+        if ($existingPetugas) {
+            return redirect()->route('masyarakat.jadi-petugas.form')
+                ->with('warning', 'Anda sudah pernah mendaftar sebagai petugas. Status: ' . $existingPetugas->status);
+        }
+
+        // Validasi input - Username hanya ada di tabel petugas
         $request->validate([
+            'username' => 'required|string|max:255|unique:petugas,username',
             'nama_lengkap' => 'required|string|max:255',
             'no_telepon' => 'required|string|max:20',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id . '|unique:petugas,email',
             'tanggal_lahir' => 'nullable|date',
             'provinsi_id' => 'required|exists:reg_provinces,id',
             'kabupaten_id' => 'required|exists:reg_regencies,id',
@@ -121,7 +129,7 @@ class JadiPetugasController extends Controller
             // Upload foto SIM
             $fotoSimPath = $this->uploadFile($request->file('foto_sim'), 'foto_sim');
 
-            // Update data user
+            // Update data user - tanpa username karena tidak ada di tabel users
             $user->update([
                 'name' => $request->nama_lengkap,
                 'no_telepon' => $request->no_telepon,
@@ -134,18 +142,20 @@ class JadiPetugasController extends Controller
                 'detail_alamat' => $request->detail_alamat,
             ]);
 
-            // Buat data petugas
+            // Buat data petugas dengan mapping field yang benar
             $petugas = Petugas::create([
                 'user_id' => $user->id,
-                'email' => $user->email,
-                'password' => Hash::make($request->password ?? 'default_password'), // Sesuaikan dengan kebutuhan
+                'email' => $request->email,
+                'password' => Hash::make('default_password'), // atau generate password random
+                'username' => $request->username,
                 'name' => $request->nama_lengkap,
-                'no_telepon' => $request->no_telepon,
+                'nomor' => $request->no_telepon, // Sesuaikan dengan field di model
                 'tanggal_lahir' => $request->tanggal_lahir,
-                'foto_diri_path' => $fotoDiriPath,
-                'foto_sim_path' => $fotoSimPath,
+                'alamat' => $request->detail_alamat, // Mapping ke field alamat
+                'sim_image' => $fotoSimPath, // Mapping ke field sim_image
                 'alasan_bergabung' => $request->alasan_bergabung,
-                'detail_alamat' => $request->detail_alamat,
+                'status' => 'pending', // Set status default
+                'role' => 'petugas', // Set role default
                 'email_verified_at' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),
