@@ -8,8 +8,7 @@
     <title>@yield('title', 'TuNetic')</title>
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@400;500;550;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@400;500;550;700&display=swap" rel="stylesheet">
 
     <!-- Bootstrap CSS - TAMBAHAN PENTING -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -1071,12 +1070,12 @@
             <div class="logo">
                 @php
                     use Illuminate\Support\Facades\Auth;
-                    $currentRole = Auth::check() ? Auth::user()->roles->first()->name : 'guest';
+                    $userLevel = Auth::check() ? Auth::user()->level : null;
                     $homeUrl = '/masyarakat'; // default
 
-                    if ($currentRole === 'petugas') {
+                    if ($userLevel == 3) {
                         $homeUrl = '/petugas';
-                    } elseif ($currentRole === 'user') {
+                    } elseif ($userLevel == 4) {
                         $homeUrl = '/masyarakat';
                     }
                 @endphp
@@ -1144,23 +1143,30 @@
                 <div class="profile-container" style="margin-right: 20px;">
                     <div class="profile" id="profileToggle">
                         <span>{{ Auth::user()->name }}</span>
-                        <img src="{{ Auth::user()->gambar ? asset('storage/profile/' . Auth::user()->gambar) : asset('assets/images/icons/user0.png') }}" alt="Profile">
+                        <img src="{{ Auth::user()->gambar ? asset('storage/profile/' . Auth::user()->gambar) : asset('assets/images/icons/user0.png') }}"
+                            alt="Profile">
                         <i class="fas fa-chevron-down" style="font-size: 12px; margin-left: 4px;"></i>
                     </div>
                     <div class="profile-dropdown" id="profileDropdown">
                         <div class="profile-dropdown-header">
                             <div class="user-name">{{ Auth::user()->name }}</div>
-                            <div class="user-role">{{ $currentRole }}</div>
+                            <div class="user-role">
+                                @if ($userLevel == 3)
+                                    petugas
+                                @elseif($userLevel == 4)
+                                    masyarakat
+                                @else
+                                    guest
+                                @endif
+                            </div>
                         </div>
 
                         @php
                             // Dynamic profile route based on user level
-                            // $profileRoute = route('profile.index'); // default route
-
-                            if (Auth::user()->level == 3) {
+                            if ($userLevel == 3) {
                                 $profileRoute = route('petugas.profile.index');
                                 $accountRoute = route('petugas.akun.index');
-                            } elseif (Auth::user()->level == 4) {
+                            } elseif ($userLevel == 4) {
                                 $profileRoute = route('masyarakat.profile.index');
                                 $accountRoute = route('masyarakat.akun.index');
                             }
@@ -1177,7 +1183,7 @@
                         </a>
 
                         {{-- Hanya tampilkan menu "Jadi Petugas" jika user level bukan 3 --}}
-                        @if(Auth::user()->level != 3)
+                        @if ($userLevel != 3)
                             <a href="{{ route('masyarakat.jadi-petugas.form') }}" class="profile-dropdown-item">
                                 <i class="fas fa-user-shield"></i>
                                 Jadi Petugas
@@ -1269,7 +1275,7 @@
                     <ul>
                         <li><a href="#">Jemput Sampah</a></li>
                         @php
-                            $laporRoute = $currentRole === 'petugas' ? '/petugas/lapor' : '/masyarakat/lapor';
+                            $laporRoute = $userLevel == 3 ? '/petugas/lapor' : '/masyarakat/lapor';
                         @endphp
                         <li><a href="{{ url($laporRoute) }}">Lapor Sampah</a></li>
                     </ul>
@@ -1316,13 +1322,13 @@
     @stack('js')
     <script src="{{ asset('') }}dist/js/adminlte.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Mobile menu toggle functionality
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');
             const navLinks = document.getElementById('navLinks');
 
             if (mobileMenuToggle && navLinks) {
-                mobileMenuToggle.addEventListener('click', function (e) {
+                mobileMenuToggle.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     navLinks.classList.toggle('active');
@@ -1339,7 +1345,7 @@
                 });
 
                 // Close mobile menu when clicking outside
-                document.addEventListener('click', function (event) {
+                document.addEventListener('click', function(event) {
                     if (!navLinks.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
                         navLinks.classList.remove('active');
                         const icon = mobileMenuToggle.querySelector('i');
@@ -1349,7 +1355,7 @@
                 });
 
                 // Close mobile menu when window is resized to desktop
-                window.addEventListener('resize', function () {
+                window.addEventListener('resize', function() {
                     if (window.innerWidth > 768) {
                         navLinks.classList.remove('active');
                         const icon = mobileMenuToggle.querySelector('i');
@@ -1364,7 +1370,7 @@
             const profileDropdown = document.getElementById('profileDropdown');
 
             if (profileToggle && profileDropdown) {
-                profileToggle.addEventListener('click', function (e) {
+                profileToggle.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     profileDropdown.classList.toggle('show');
@@ -1381,7 +1387,7 @@
                 });
 
                 // Close dropdown when clicking outside
-                document.addEventListener('click', function (event) {
+                document.addEventListener('click', function(event) {
                     if (!profileToggle.contains(event.target) && !profileDropdown.contains(event.target)) {
                         profileDropdown.classList.remove('show');
                         const chevron = profileToggle.querySelector('.fa-chevron-down');
@@ -1392,7 +1398,7 @@
                 });
 
                 // Close dropdown when pressing Escape key
-                document.addEventListener('keydown', function (event) {
+                document.addEventListener('keydown', function(event) {
                     if (event.key === 'Escape' && profileDropdown.classList.contains('show')) {
                         profileDropdown.classList.remove('show');
                         const chevron = profileToggle.querySelector('.fa-chevron-down');
@@ -1409,7 +1415,7 @@
             const cancelLogout = document.getElementById('cancelLogout');
 
             if (logoutBtn && logoutModal) {
-                logoutBtn.addEventListener('click', function (e) {
+                logoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -1429,7 +1435,7 @@
             }
 
             if (cancelLogout && logoutModal) {
-                cancelLogout.addEventListener('click', function (e) {
+                cancelLogout.addEventListener('click', function(e) {
                     e.preventDefault();
                     logoutModal.style.display = "none";
                     document.body.style.overflow = 'auto'; // Restore scrolling
@@ -1438,7 +1444,7 @@
 
             // Close modal when clicking outside
             if (logoutModal) {
-                logoutModal.addEventListener('click', function (event) {
+                logoutModal.addEventListener('click', function(event) {
                     if (event.target === logoutModal) {
                         logoutModal.style.display = "none";
                         document.body.style.overflow = 'auto'; // Restore scrolling
@@ -1446,7 +1452,7 @@
                 });
 
                 // Close modal when pressing Escape key
-                document.addEventListener('keydown', function (event) {
+                document.addEventListener('keydown', function(event) {
                     if (event.key === 'Escape' && logoutModal.style.display === 'block') {
                         logoutModal.style.display = "none";
                         document.body.style.overflow = 'auto'; // Restore scrolling
@@ -1457,7 +1463,7 @@
             // Smooth scroll for anchor links
             const anchorLinks = document.querySelectorAll('a[href^="#"]');
             anchorLinks.forEach(link => {
-                link.addEventListener('click', function (e) {
+                link.addEventListener('click', function(e) {
                     const targetId = this.getAttribute('href');
                     if (targetId === '#') return;
 
@@ -1475,7 +1481,7 @@
             // Add loading state to forms
             const forms = document.querySelectorAll('form');
             forms.forEach(form => {
-                form.addEventListener('submit', function () {
+                form.addEventListener('submit', function() {
                     const submitButtons = form.querySelectorAll(
                         'button[type="submit"], input[type="submit"]');
                     submitButtons.forEach(button => {
@@ -1605,13 +1611,13 @@
         });
 
         // Global error handler
-        window.addEventListener('error', function (event) {
+        window.addEventListener('error', function(event) {
             console.error('Global error:', event.error);
             // You can send this to your logging service
         });
 
         // Handle uncaught promise rejections
-        window.addEventListener('unhandledrejection', function (event) {
+        window.addEventListener('unhandledrejection', function(event) {
             console.error('Unhandled promise rejection:', event.reason);
             // You can send this to your logging service
         });

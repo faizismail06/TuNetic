@@ -14,17 +14,36 @@ class LoginController extends Controller
 
     protected function redirectTo()
     {
-        $role = Auth::user()->roles->first()->name;
+        $user = Auth::user();
+        $level = $user->level;
 
-        if ($role === 'admin_pusat') {
+        // Level 1: Admin Pusat
+        if ($level == 1) {
             return '/pusat/home';
-        } elseif ($role === 'admin_tpst') {
+        }
+
+        // Level 2: Admin TPST
+        if ($level == 2) {
             return '/tpst/home';
-        } elseif ($role === 'petugas') {
-            return '/petugas';
-        } elseif ($role === 'user') {
+        }
+
+        // Level 3: Petugas - cek apakah user memiliki data petugas
+        if ($level == 3) {
+            if ($user->petugas) {
+                return '/petugas';
+            } else {
+                // Jika level 3 tapi tidak ada data petugas, redirect ke user biasa
+                return '/masyarakat';
+            }
+        }
+
+        // Level 4: User/Masyarakat (default)
+        if ($level == 4) {
             return '/masyarakat';
         }
+
+        // Default fallback untuk level yang tidak terdefinisi
+        return '/masyarakat';
     }
 
     public function __construct()
@@ -60,7 +79,6 @@ class LoginController extends Controller
             Auth::login($user, true);
 
             return redirect($this->redirectTo());
-
         } catch (\Exception $e) {
             return redirect('/login')->with('error', 'Gagal login dengan Google: ' . $e->getMessage());
         }
