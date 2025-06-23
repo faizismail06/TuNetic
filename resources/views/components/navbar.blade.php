@@ -1144,7 +1144,7 @@
                 <div class="profile-container" style="margin-right: 20px;">
                     <div class="profile" id="profileToggle">
                         <span>{{ Auth::user()->name }}</span>
-                        <img src="{{ Auth::user()->gambar ? asset('storage/profile/' . Auth::user()->gambar) : asset('assets/images/icons/user1.png') }}" alt="Profile">
+                        <img src="{{ Auth::user()->gambar ? asset('storage/profile/' . Auth::user()->gambar) : asset('assets/images/icons/user0.png') }}" alt="Profile">
                         <i class="fas fa-chevron-down" style="font-size: 12px; margin-left: 4px;"></i>
                     </div>
                     <div class="profile-dropdown" id="profileDropdown">
@@ -1193,7 +1193,7 @@
             @else
                 <a href="{{ route('login') }}" class="profile">
                     <span>Login</span>
-                    <img src="{{ asset('assets/images/icons/user1.png') }}" alt="Profile">
+                    <img src="{{ asset('assets/images/icons/user0.png') }}" alt="Profile">
                 </a>
             @endif
         </div>

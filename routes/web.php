@@ -479,18 +479,6 @@ Route::prefix('pusat')->name('adminpusat.')->middleware(['auth'])->group(functio
     // Perhatikan: yang penting adalah .create saja, bukan full "adminpusat.perhitungan-sampah.create"
 });
 
-// Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
-// // Routes untuk CRUD petugas (khusus admin)
-// Route::middleware(['auth', 'role:admin'])->group(function () {
-//     Route::get('/petugas', [JadiPetugasController::class, 'index'])->name('jadi-petugas.index');
-//     Route::get('/petugas/create', [JadiPetugasController::class, 'create'])->name('jadi-petugas.create');
-//     Route::post('/petugas', [JadiPetugasController::class, 'store'])->name('jadi-petugas.store');
-//     Route::get('/petugas/{id}', [JadiPetugasController::class, 'show'])->name('jadi-petugas.show');
-//     Route::get('/petugas/{id}/edit', [JadiPetugasController::class, 'edit'])->name('jadi-petugas.edit');
-//     Route::put('/petugas/{id}', [JadiPetugasController::class, 'update'])->name('jadi-petugas.update');
-//     Route::delete('/petugas/{id}', [JadiPetugasController::class, 'destroy'])->name('jadi-petugas.destroy');
-// });
-
 // Route::resource('petugas', PetugasController::class);
 Route::put('/petugas/{id}/update-status', [PetugasController::class, 'updateStatus'])->name('petugas.updateStatus');
 Route::delete('/petugas/{id}', [PetugasController::class, 'destroy'])->name('petugas.destroy');

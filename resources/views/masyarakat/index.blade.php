@@ -6,6 +6,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
 
     <style>
         /* Reset dan Base Styles */
@@ -446,6 +447,42 @@
             .lacak-section {
                 padding: 80px 40px;
             }
+
+            #homepage-map {
+                height: 400px;
+                width: 100%;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            }
+
+            .map-legend {
+                position: absolute;
+                bottom: 20px;
+                right: 20px;
+                background-color: white;
+                padding: 10px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+                z-index: 1000;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                margin-bottom: 5px;
+            }
+
+            .legend-icon {
+                width: 20px;
+                height: 20px;
+                display: inline-block;
+                margin-right: 8px;
+                border-radius: 50%;
+            }
+
+            .truck-icon {
+                font-size: 20px;
+                margin-right: 8px;
+            }
         }
 
         /* Large Desktop Optimization */
@@ -529,7 +566,8 @@
                                 <i class="fas fa-clipboard-list text-muted" style="font-size: 4rem;"></i>
                             </div>
                             <h5 class="text-muted mb-3">Belum Ada Laporan</h5>
-                            <p class="text-muted">Mulai laporkan sampah di sekitar Anda untuk menciptakan lingkungan yang lebih
+                            <p class="text-muted">Mulai laporkan sampah di sekitar Anda untuk menciptakan lingkungan yang
+                                lebih
                                 bersih.</p>
                             <a href="/masyarakat/lapor" class="feature-btn mt-3">Buat Laporan Pertama</a>
                         </div>
@@ -539,10 +577,11 @@
                                 <div class="report-card">
                                     <div class="row g-3 align-items-center">
                                         <div class="col-4 col-sm-3">
-                                            @if($lapor->gambar)
+                                            @if ($lapor->gambar)
                                                 <img src="{{ $lapor->gambar }}" class="report-image" alt="Gambar Laporan">
                                             @else
-                                                <div class="report-image bg-light d-flex align-items-center justify-content-center">
+                                                <div
+                                                    class="report-image bg-light d-flex align-items-center justify-content-center">
                                                     <i class="fas fa-image text-muted"></i>
                                                 </div>
                                             @endif
@@ -558,11 +597,12 @@
 
                                             <div class="report-meta">
                                                 <i class="fas fa-map-marker-alt"></i>
-                                                <span class="text-truncate">{{ $lapor->lokasi ?? 'Lokasi tidak tersedia' }}</span>
+                                                <span
+                                                    class="text-truncate">{{ $lapor->lokasi ?? 'Lokasi tidak tersedia' }}</span>
                                             </div>
 
                                             <div class="d-flex justify-content-between align-items-center mt-3">
-                                                @if($lapor->status == 0)
+                                                @if ($lapor->status == 0)
                                                     <span class="status belum">
                                                         <i class="fas fa-circle-exclamation"></i> Belum diangkut
                                                     </span>
@@ -615,17 +655,254 @@
         <div class="custom-container">
             <div class="text-center text-lg-start">
                 <h2 class="lacak-title">Lacak Armada</h2>
-                <p class="lacak-subtitle">Cek Rute Armada dengan Mudah dan Real-time</p>
+                <p class="lacak-subtitle">Cek Lokasi Armada dan TPS Hari Ini</p>
 
-                <img src="{{ asset('assets/images/Masyarakat/maps-armada-placeholder.png') }}" alt="Peta Lacak Armada"
-                    class="lacak-image">
+                <div class="map-card mb-4">
+                    <div id="homepage-map" style="height: 400px; border-radius: 16px; overflow: hidden;"></div>
+                </div>
 
                 <div class="text-center text-lg-end mt-4">
-                    <a href="{{ route('masyarakat.lacak') }}" class="feature-btn">
-                        Cek Rute Armada
+                    <a href="{{ route('masyarakat.rute-armada.index') }}" class="feature-btn">
+                        <i class="fas fa-route me-1"></i> Detail Rute Lengkap
                     </a>
                 </div>
             </div>
         </div>
     </section>
+
 @endsection
+@push('js')
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi peta dengan lokasi default Jawa Tengah
+            const homepageMap = L.map('homepage-map').setView([-7.056325, 110.454250], 12);
+
+            // Tambahkan tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(homepageMap);
+
+            // Layer untuk marker
+            const markersLayer = L.layerGroup().addTo(homepageMap);
+
+            // Fungsi untuk menampilkan armada dan TPS di peta berdasarkan data jadwal yang sudah ada
+            function showArmadaOnMap() {
+                // Clear markers
+                markersLayer.clearLayers();
+
+                // Array untuk menyimpan semua marker
+                const allMarkers = [];
+
+                // Menggunakan data yang sudah ada dari controller untuk index route
+                const jadwalData = @json($laporanTerbaru ?? []); // Fallback ke array kosong jika tidak ada
+
+                // Dapatkan hari ini dalam bahasa Indonesia
+                const today = new Date().toLocaleDateString('id-ID', {
+                    weekday: 'long'
+                }).toLowerCase();
+
+                // Buat request untuk mendapatkan data
+                fetch('/masyarakat/rute-armada')
+                    .then(response => response.text())
+                    .then(html => {
+                        // Parse data dari atribut script dalam HTML
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+
+                        // Cari script yang berisi data
+                        const scriptElements = doc.querySelectorAll('script');
+                        let armadaData = {};
+                        let allTps = {};
+
+                        for (const script of scriptElements) {
+                            if (script.textContent.includes('const armadaData =')) {
+                                // Extract armadaData
+                                try {
+                                    const match = script.textContent.match(
+                                        /const\s+armadaData\s*=\s*(\{.*?\});/s);
+                                    if (match && match[1]) {
+                                        armadaData = JSON.parse(match[1]);
+                                    }
+                                } catch (e) {
+                                    console.error('Error parsing armadaData:', e);
+                                }
+                            }
+
+                            if (script.textContent.includes('const allTps =')) {
+                                // Extract allTps
+                                try {
+                                    const match = script.textContent.match(/const\s+allTps\s*=\s*(\{.*?\});/s);
+                                    if (match && match[1]) {
+                                        allTps = JSON.parse(match[1]);
+                                    }
+                                } catch (e) {
+                                    console.error('Error parsing allTps:', e);
+                                }
+                            }
+                        }
+
+                        // Tampilkan armada di peta
+                        Object.keys(armadaData).forEach(jadwalId => {
+                            const armada = armadaData[jadwalId];
+
+                            if (armada.last_location) {
+                                const loc = armada.last_location;
+                                // Marker truk
+                                const truckMarker = L.marker([loc.latitude, loc.longitude], {
+                                    icon: L.divIcon({
+                                        className: 'truck-marker',
+                                        html: `<div style="position: relative;">
+                                        <img src="/assets/images/img_truck.png" style="width: 45px; height: auto;">
+                                    </div>`,
+                                        iconSize: [30, 30]
+                                    })
+                                });
+
+                                // Popup dengan informasi terbatas
+                                truckMarker.bindPopup(`
+                                <div style="padding: 10px; min-width: 150px; max-width: 250px;">
+                                    <h6 style="margin-bottom: 10px; font-weight: bold; text-align: center;">${armada.no_polisi}</h6>
+                                    <p style="margin-bottom: 5px;">Status: ${
+                                        armada.status === 0 ? 'Belum Beroperasi' :
+                                        armada.status === 1 ? 'Sedang Beroperasi' : 'Selesai Beroperasi'
+                                    }</p>
+                                </div>
+                            `);
+
+                                markersLayer.addLayer(truckMarker);
+                                allMarkers.push(truckMarker);
+                            }
+                        });
+
+                        // Tampilkan TPS di peta
+                        Object.keys(allTps).forEach(jadwalId => {
+                            const tpsPoints = allTps[jadwalId];
+
+                            tpsPoints.forEach(tps => {
+                                if (tps.latitude && tps.longitude) {
+                                    // Konfigurasi ikon berdasarkan jenis TPS
+                                    const config = {
+                                        'TPS': {
+                                            icon: 'fa-trash',
+                                            color: '#2196f3'
+                                        },
+                                        'TPST': {
+                                            icon: 'fa-recycle',
+                                            color: '#4caf50'
+                                        },
+                                        'TPA': {
+                                            icon: 'fa-industry',
+                                            color: '#ff9800'
+                                        }
+                                    };
+
+                                    // Gunakan jenis TPS default jika tidak ada
+                                    const tpsType =
+                                        'TPS'; // Default ke TPS karena tidak ada jenis dalam data
+                                    const tpsConfig = config[tpsType];
+
+                                    const marker = L.marker([tps.latitude, tps.longitude], {
+                                        icon: L.divIcon({
+                                            className: 'tps-marker',
+                                            html: `<div style="background-color: ${tpsConfig.color}; width: 32px; height: 32px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                                            <i class="fas ${tpsConfig.icon}"></i>
+                                        </div>`,
+                                            iconSize: [32, 32],
+                                            iconAnchor: [16, 32]
+                                        })
+                                    });
+
+                                    // Popup dengan informasi terbatas
+                                    marker.bindPopup(`
+                                    <div style="padding: 10px; min-width: 150px; max-width: 250px;">
+                                        <h6 style="margin-bottom: 10px; font-weight: bold; text-align: center;">${tps.nama}</h6>
+                                        <p style="margin-bottom: 5px;">Alamat: ${tps.alamat || 'Tidak tersedia'}</p>
+                                    </div>
+                                `);
+
+                                    markersLayer.addLayer(marker);
+                                    allMarkers.push(marker);
+                                }
+                            });
+                        });
+
+                        // Fit bounds jika ada marker
+                        if (allMarkers.length > 0) {
+                            try {
+                                const group = L.featureGroup(allMarkers);
+                                homepageMap.fitBounds(group.getBounds().pad(0.1));
+                            } catch (e) {
+                                console.error('Error setting map bounds:', e);
+                                // Fallback: gunakan view default
+                                homepageMap.setView([-7.056325, 110.454250], 12);
+                            }
+                        }
+
+                        // // Tambahkan legenda
+                        // addMapLegend(homepageMap);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        // Fallback dengan geolocation
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                                function(position) {
+                                    homepageMap.setView([position.coords.latitude, position.coords
+                                        .longitude
+                                    ], 13);
+                                },
+                                function(error) {
+                                    console.warn('Error mendapatkan lokasi:', error.message);
+                                }
+                            );
+                        }
+                        // Tambahkan legenda meskipun data gagal dimuat
+                        // addMapLegend(homepageMap);
+                    });
+            }
+
+            // // Fungsi untuk menambahkan legenda
+            // function addMapLegend(map) {
+            //     const legend = L.control({
+            //         position: 'bottomright'
+            //     });
+            //     legend.onAdd = function(map) {
+            //         const div = L.DomUtil.create('div', 'map-legend');
+            //         div.innerHTML = `
+        //         <div class="legend-item">
+        //             <img src="/assets/images/img_truck.png" style="width: 20px; height: auto; margin-right: 8px;">
+        //             <span>Armada Sampah</span>
+        //         </div>
+        //         <div class="legend-item">
+        //             <div class="legend-icon" style="background-color: #2196f3; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">
+        //                 <i class="fas fa-trash"></i>
+        //             </div>
+        //             <span>TPS</span>
+        //         </div>
+        //         <div class="legend-item">
+        //             <div class="legend-icon" style="background-color: #4caf50; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">
+        //                 <i class="fas fa-recycle"></i>
+        //             </div>
+        //             <span>TPST</span>
+        //         </div>
+        //         <div class="legend-item">
+        //             <div class="legend-icon" style="background-color: #ff9800; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">
+        //                 <i class="fas fa-industry"></i>
+        //             </div>
+        //             <span>TPA</span>
+        //         </div>
+        //     `;
+            //         return div;
+            //     };
+            //     legend.addTo(map);
+            // }
+
+            // Panggil fungsi untuk menampilkan data
+            showArmadaOnMap();
+
+            // Refresh data setiap 30 detik
+            setInterval(showArmadaOnMap, 30000);
+        });
+    </script>
+@endpush
