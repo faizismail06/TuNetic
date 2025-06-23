@@ -108,40 +108,40 @@ class LaporSampahController extends Controller
     //         return redirect()->back()->with('error', 'Laporan sudah diangkut');
     //     }
 
-        return view('petugas.lapor.bukti', compact('lapor'));
-    }
+    //     return view('petugas.lapor.bukti', compact('lapor'));
+    // }
 
     /**
      * Submit proof of waste collection.
      */
-    public function submitBukti(Request $request, $id)
-    {
-        // Cari laporan berdasarkan ID
-        $laporan = LaporanWarga::findOrFail($id);
+    // public function submitBukti(Request $request, $id)
+    // {
+    //     // Cari laporan berdasarkan ID
+    //     $laporan = LaporanWarga::findOrFail($id);
 
-        // Validasi bahwa laporan belum diangkut
-        if ($laporan->status == 1) {
-            return redirect()->route('petugas.lapor.index')->with('error', 'Laporan sudah diangkut');
-        }
+    //     // Validasi bahwa laporan belum diangkut
+    //     if ($laporan->status == 1) {
+    //         return redirect()->route('petugas.lapor.index')->with('error', 'Laporan sudah diangkut');
+    //     }
 
-        $validated = $request->validate([
-            'bukti_foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'keterangan_bukti' => 'required|string|max:500',
-        ]);
+    //     $validated = $request->validate([
+    //         'bukti_foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+    //         'keterangan_bukti' => 'required|string|max:500',
+    //     ]);
 
-        // Upload bukti foto
-        if ($request->hasFile('bukti_foto')) {
-            $validated['bukti_foto'] = $request->file('bukti_foto')->store('bukti-sampah', 'public');
-        }
+    //     // Upload bukti foto
+    //     if ($request->hasFile('bukti_foto')) {
+    //         $validated['bukti_foto'] = $request->file('bukti_foto')->store('bukti-sampah', 'public');
+    //     }
 
-        // Update status menjadi sudah diangkut dan tambahkan tanggal penyelesaian
-        $validated['status'] = 1; // 1 = sudah diangkut
-        $validated['tanggal_selesai'] = now();
+    //     // Update status menjadi sudah diangkut dan tambahkan tanggal penyelesaian
+    //     $validated['status'] = 1; // 1 = sudah diangkut
+    //     $validated['tanggal_selesai'] = now();
 
-        $laporan->update($validated);
+    //     $laporan->update($validated);
 
-        return redirect()->route('petugas.lapor.index')->with('success', 'Bukti pengangkutan berhasil dikirim');
-    }
+    //     return redirect()->route('petugas.lapor.index')->with('success', 'Bukti pengangkutan berhasil dikirim');
+    // }
     /**
      * Mengubah latitude dan longitude menjadi alamat jalan menggunakan API OpenStreetMap (Nominatim)
      * dengan format yang lebih terstruktur dan mudah dibaca
