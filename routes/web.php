@@ -256,10 +256,11 @@ Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview'])->m
 // ===================
 Route::middleware('auth')->group(function () {
     Route::get('/masyarakat', [LaporanWargaController::class, 'index']);
-
+    Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
     Route::get('/dashboard', [LaporanWargaController::class, 'dashboardPreview']);
 });
 
+Route::get('/riwayat', [LaporanWargaController::class, 'riwayat'])->name('lapor.riwayat');
 
 // Route publik untuk masyarakat (tidak perlu login)
 Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
@@ -269,7 +270,7 @@ Route::prefix('masyarakat')->name('masyarakat.')->group(function () {
     Route::get('riwayat/{id}', [LaporanWargaController::class, 'detailRiwayat'])->name('detailRiwayat');
     // Route::get('/laporan/{id}', [LaporanWargaController::class, 'show'])->name('laporan.show');
 
-    Route::get('/riwayat', [LaporanWargaController::class, 'allhistory'])->name('lapor.allhistory');
+    // Route::get('/riwayat', [LaporanWargaController::class, 'allhistory'])->name('lapor.allhistory');
 
     // Route untuk rute armada (publik)
     Route::get('/rute-armada', [RuteArmadaController::class, 'index'])->name('rute-armada.index');

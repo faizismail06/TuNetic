@@ -118,7 +118,7 @@ class LaporanWargaController extends Controller
     }
 
     // Riwayat laporan user
-    public function allhistory()
+    public function riwayat()
     {
         $userId = auth()->id();
         $laporan = LaporanWarga::where('id_user', $userId)->latest()->get();

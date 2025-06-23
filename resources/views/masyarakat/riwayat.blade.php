@@ -13,7 +13,7 @@
             @foreach($laporan as $lapor)
                 <div class="laporan-card">
                     <div class="laporan-image">
-                        <img src="{{ $lapor->gambar }}" alt="Gambar Sampah">
+                        <img src="{{'storage/laporan_warga/' . $lapor->gambar }}" alt="Gambar Sampah">
                     </div>
                     <div class="laporan-detail">
                         <div class="laporan-title">{{ $lapor->judul }}</div>
