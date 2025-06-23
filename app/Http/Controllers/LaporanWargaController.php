@@ -29,7 +29,11 @@ class LaporanWargaController extends Controller
     {
         // Sesuaikan dengan enum migrasi
         $kategoriList = collect([
-            'Tumpukan Sampah', 'TPS Penuh', 'Bau Menyengat', 'Pembuangan Liar', 'Lainnya'
+            'Tumpukan Sampah',
+            'TPS Penuh',
+            'Bau Menyengat',
+            'Pembuangan Liar',
+            'Lainnya'
         ]);
         return view('masyarakat.lapor', compact('kategoriList'));
     }
@@ -178,6 +182,12 @@ class LaporanWargaController extends Controller
     public function detailRiwayat($id)
     {
         $laporan = LaporanWarga::findOrFail($id);
+
+        // Tambahkan ini untuk mengambil lokasi
+        if ($laporan->latitude && $laporan->longitude) {
+            $laporan->lokasi = $this->getLocationName($laporan->latitude, $laporan->longitude);
+        }
+
         return view('masyarakat.detailRiwayat', compact('laporan'));
     }
 }
