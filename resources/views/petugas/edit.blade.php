@@ -69,7 +69,7 @@
                                 @if ($petugas->sim_image)
                                     <div class="form-group mb-2">
                                         <label>Foto SIM Saat Ini:</label><br>
-                                        <img src="{{ asset($petugas->sim_image) }}" alt="Foto SIM" width="120" class="img-thumbnail mb-2">
+                                        <img src="{{ asset('storage/' . $petugas->sim_image) }}" alt="Foto SIM" width="120" class="img-thumbnail mb-2">
                                     </div>
                                 @endif
 
