@@ -12,7 +12,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6 text-uppercase">
-                    <h4 class="m-0">Master Data</h4>
+                    <h4 class="m-0">Kelola Petugas</h4>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right"></ol>
@@ -57,8 +57,8 @@
                                             <td>{{ $item->nomor ?? 'N/A' }}</td>
                                             <td>{{ $item->alamat ?? 'N/A' }}</td>
                                             <td>
-                                                <span class="badge 
-                                                    {{ $item->status == 'Disetujui' ? 'badge-success' : 
+                                                <span class="badge
+                                                    {{ $item->status == 'Disetujui' ? 'badge-success' :
                                                     ($item->status == 'Menunggu' ? 'badge-warning' : 'badge-danger') }}">
                                                     {{ $item->status }}
                                                 </span>
