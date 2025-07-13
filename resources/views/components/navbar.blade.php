@@ -1066,6 +1066,13 @@
 
     <!-- Navbar -->
     <div class="navbar">
+        <style>
+            @media screen and (max-width: 768px) {
+                .profile .fa-chevron-down {
+                    display: none !important;
+                }
+            }
+        </style>
         <div class="navbar-content">
             <div class="logo">
                 @php
