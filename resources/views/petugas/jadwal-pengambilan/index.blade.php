@@ -1212,8 +1212,8 @@
             currentServerIndex = 0;
             isRoutingInProgress = true;
 
-            // Tampilkan loading indicator
-            showRoutingStatus('Mencari rute terbaik...', 'loading');
+            // // Tampilkan loading indicator
+            // showRoutingStatus('Mencari rute terbaik...', 'loading');
 
             // Mulai proses routing dengan fallback
             tryRoutingWithServer(optimizedWaypoints, currentPosition, tpsPoints);
@@ -1223,16 +1223,16 @@
             if (currentServerIndex >= OSRM_SERVERS.length) {
                 console.warn('Semua server OSRM gagal, menggunakan rute sederhana sebagai fallback');
                 isRoutingInProgress = false;
-                showRoutingStatus('Menggunakan rute sederhana', 'warning');
+                // showRoutingStatus('Menggunakan rute sederhana', 'warning');
                 drawSimpleRoute(currentPosition, tpsPoints);
                 return;
             }
 
             const server = OSRM_SERVERS[currentServerIndex];
-            console.log(`Mencoba server ke-${currentServerIndex + 1}: ${server.name}`);
+            // console.log(`Mencoba server ke-${currentServerIndex + 1}: ${server.name}`);
 
-            // Update status
-            showRoutingStatus(`Mencoba ${server.name}...`, 'loading');
+            // // Update status
+            // showRoutingStatus(`Mencoba ${server.name}...`, 'loading');
 
             // Hapus kontrol routing sebelumnya jika ada
             if (routeControl) {
@@ -1308,7 +1308,7 @@
                     isRouteVisible = true;
                     updateRouteButtonText();
 
-                    // Tampilkan status berhasil
+                    // // Tampilkan status berhasil
                     // showRoutingStatus(`Rute ditemukan via ${server.name}`, 'success');
 
                     // Simpan informasi server yang berhasil untuk penggunaan berikutnya
@@ -1387,55 +1387,55 @@
         }
 
         // // Fungsi untuk menampilkan status routing
-        // function showRoutingStatus(message, type = 'info') {
-        //     const statusContainer = document.getElementById('status-container');
-        //     if (!statusContainer) return;
+        function showRoutingStatus(message, type = 'info') {
+            const statusContainer = document.getElementById('status-container');
+            if (!statusContainer) return;
 
-        //     // Hapus status lama
-        //     const oldStatus = statusContainer.querySelector('.routing-status');
-        //     if (oldStatus) {
-        //         oldStatus.remove();
-        //     }
+            // Hapus status lama
+            const oldStatus = statusContainer.querySelector('.routing-status');
+            if (oldStatus) {
+                oldStatus.remove();
+            }
 
-        //     // Tentukan class berdasarkan type
-        //     let alertClass = 'alert-info';
-        //     let icon = 'fas fa-info-circle';
+            // Tentukan class berdasarkan type
+            let alertClass = 'alert-info';
+            let icon = 'fas fa-info-circle';
 
-        //     switch (type) {
-        //         case 'loading':
-        //             alertClass = 'alert-primary';
-        //             icon = 'fas fa-spinner fa-spin';
-        //             break;
-        //         case 'success':
-        //             alertClass = 'alert-success';
-        //             icon = 'fas fa-check-circle';
-        //             break;
-        //         case 'warning':
-        //             alertClass = 'alert-warning';
-        //             icon = 'fas fa-exclamation-triangle';
-        //             break;
-        //         case 'error':
-        //             alertClass = 'alert-danger';
-        //             icon = 'fas fa-times-circle';
-        //             break;
-        //     }
+            switch (type) {
+                case 'loading':
+                    alertClass = 'alert-primary';
+                    icon = 'fas fa-spinner fa-spin';
+                    break;
+                case 'success':
+                    alertClass = 'alert-success';
+                    icon = 'fas fa-check-circle';
+                    break;
+                case 'warning':
+                    alertClass = 'alert-warning';
+                    icon = 'fas fa-exclamation-triangle';
+                    break;
+                case 'error':
+                    alertClass = 'alert-danger';
+                    icon = 'fas fa-times-circle';
+                    break;
+            }
 
-        //     // Buat elemen status
-        //     const statusElement = document.createElement('div');
-        //     statusElement.className = `alert ${alertClass} mt-2 p-2 routing-status`;
-        //     statusElement.innerHTML = `<small><i class="${icon} me-1"></i> ${message}</small>`;
+            // Buat elemen status
+            const statusElement = document.createElement('div');
+            statusElement.className = `alert ${alertClass} mt-2 p-2 routing-status`;
+            statusElement.innerHTML = `<small><i class="${icon} me-1"></i> ${message}</small>`;
 
-        //     statusContainer.appendChild(statusElement);
+            statusContainer.appendChild(statusElement);
 
-        //     // Auto remove untuk status success/warning/error setelah beberapa detik
-        //     if (type !== 'loading') {
-        //         setTimeout(() => {
-        //             if (statusElement && statusElement.parentNode) {
-        //                 statusElement.remove();
-        //             }
-        //         }, type === 'success' ? 3000 : 5000);
-        //     }
-        // }
+            // Auto remove untuk status success/warning/error setelah beberapa detik
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    if (statusElement && statusElement.parentNode) {
+                        statusElement.remove();
+                    }
+                }, type === 'success' ? 3000 : 5000);
+            }
+        }
 
         // Fungsi untuk mendapatkan server terbaik berdasarkan riwayat
         function getPreferredServerIndex() {
