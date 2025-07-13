@@ -54,7 +54,7 @@ class RuteArmadaController extends Controller
 
             $selectedDay = $daysMapping[strtolower($today->format('l'))] ?? 'senin';
 
-            // Ambil semua jadwal operasional untuk hari ini
+            // Ambil semua jadwal operasional untuk hari ini dengan status 1 (sedang berjalan)
             $jadwalOperasional = JadwalOperasional::with([
                 'armada',
                 'jadwal',
@@ -62,6 +62,7 @@ class RuteArmadaController extends Controller
                 'rute.ruteTps.lokasi_tps',
                 'penugasanPetugas.petugas.user'
             ])
+                ->where('status', 1) // Hanya status 1 (sedang berjalan)
                 ->whereHas('jadwal', function ($query) use ($selectedDay) {
                     $query->where('hari', $selectedDay);
                 })

@@ -243,11 +243,11 @@
                                 <div class="col-md-8">
                                     <h6 class="fw-bold mb-2">Informasi:</h6>
                                     <ul class="mb-0">
-                                        <li>Jadwal operasional armada sampah untuk hari
+                                        <li>Menampilkan armada sampah yang sedang beroperasi untuk hari
                                             <strong>{{ $selectedDayInfo }}</strong>
                                         </li>
-                                        <li>{{ count($jadwalOperasional) }} armada dijadwalkan beroperasi</li>
-                                        <li>Klik pada marker untuk melihat detail</li>
+                                        <li>{{ count($jadwalOperasional) }} armada sedang beroperasi</li>
+                                        <li>Klik pada marker untuk melihat detail armada</li>
                                     </ul>
                                 </div>
                                 <div class="col-md-4 text-end">
