@@ -114,9 +114,9 @@
         </div>
         <div class="container-fluid position-relative h-100" style="z-index: 2;">
             <div class="row align-items-center h-100">
-                <div class="col-md-6 col-12" style="padding-left: 80px; padding-top: 120px;">
+                <div class="col-md-6 col-12" style="padding-left: 40px; padding-top: 120px;">
                     <h1 class="fw-bold mb-4"
-                        style="font-family: 'Red Hat Text', sans-serif; font-size: 4.5rem; line-height: 1.1; font-weight: 800;">
+                        style="font-family: 'Red Hat Text', sans-serif; font-size: 3.5rem; line-height: 1.1; font-weight: 600;">
                         Siap Bertugas<br />Hari ini?
                     </h1>
                     <p class="mt-4"
@@ -126,8 +126,8 @@
                 </div>
                 <div class="col-md-6 col-12 position-relative" style="height: 100vh;">
                     <div class="position-absolute" style="right: -50px; bottom: 0; width: 100%; height: 100%;">
-                        <img src="{{ asset('assets/images/petugas/petugas.png') }}" alt="Petugas Sampah" class="img-fluid"
-                            style="position: absolute; right: 0; bottom: 0; height: 85%; width: auto; object-fit: contain;">
+                        <img src="{{ asset('assets/images/petugas/petugas.png') }}" alt="Petugas Sampah"
+                            style="position: absolute; right: 0; bottom: 0; height: 65%; width: auto; object-fit: contain;">
                     </div>
                 </div>
             </div>
