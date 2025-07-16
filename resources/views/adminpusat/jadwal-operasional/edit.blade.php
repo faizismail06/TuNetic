@@ -117,61 +117,67 @@
                             <div id="step-1">
                                 <h5>Jadwal Operasional</h5>
 
-                                <div class="form-group">
-                                    <label>Jadwal (Tanggal & Hari)</label>
-                                    <select name="id_jadwal" class="form-control" required>
-                                        @foreach ($jadwals as $jadwal)
-                                            <option value="{{ $jadwal->id }}">{{ $jadwal->hari }}</option>
-                                        @endforeach
-                                    </select>
+                                <div class="row">
+                                    <div class="col-md-6 form-group">
+                                        <label>Hari</label>
+                                        <select name="id_jadwal" class="form-control" required>
+                                            @foreach ($jadwals as $jadwal)
+                                                <option value="{{ $jadwal->id }}">{{ $jadwal->hari }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6 form-group">
+                                        <label for="tanggal">Tanggal</label>
+                                        <input type="date" name="tanggal" class="form-control" required value="{{ old('tanggal', $jadwalOperasional->tanggal ?? '') }}">
+                                    </div>
                                 </div>
 
-                                <div class="form-group">
-                                    <label for="tanggal">Tanggal</label>
-                                    <input type="date" name="tanggal" class="form-control" required value="{{ old('tanggal', $jadwalOperasional->tanggal ?? '') }}">
+                                <div class="row">
+                                    <div class="col-md-6 form-group">
+                                        <label>Armada</label>
+                                        <select name="id_armada" class="form-control">
+                                            @foreach ($armadas as $armada)
+                                                <option value="{{ $armada->id }}"
+                                                    {{ $jadwalOperasional->id_armada == $armada->id ? 'selected' : '' }}>
+                                                    {{ $armada->jenis_kendaraan }} - {{ $armada->no_polisi }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6 form-group">
+                                        <label>Rute</label>
+                                        <select name="id_rute" class="form-control" required>
+                                            @foreach($rutes as $rute)
+                                                <option value="{{ $rute->id }}" {{ $jadwalOperasional->id_rute == $rute->id ? 'selected' : '' }}>
+                                                    {{ $rute->nama_rute }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
 
-                                <div class="form-group">
-                                    <label>Armada</label>
-                                    <select name="id_armada" class="form-control">
-                                        @foreach ($armadas as $armada)
-                                            <option value="{{ $armada->id }}"
-                                                {{ $jadwalOperasional->id_armada == $armada->id ? 'selected' : '' }}>
-                                                {{ $armada->jenis_kendaraan }} - {{ $armada->no_polisi }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 form-group">
+                                        <label>Jam Aktif</label>
+                                        <input type="time" name="jam_aktif" class="form-control" required>
+                                    </div>
 
-                                <div class="form-group">
-                                    <label>Rute</label>
-                                    <select name="id_rute" class="form-control" required>
-                                        @foreach($rutes as $rute)
-                                            <option value="{{ $rute->id }}" {{ $jadwalOperasional->id_rute == $rute->id ? 'selected' : '' }}>
-                                                {{ $rute->nama_rute }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Jam Aktif</label>
-                                    <input type="time" name="jam_aktif" class="form-control" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="status">Status Jadwal</label>
-                                    <select name="status" class="form-control">
-                                        <option value="">-- Pilih Status --</option>
-                                        @foreach (\App\Models\JadwalOperasional::getStatusLabels() as $key => $label)
-                                            <option value="{{ $key }}" {{ old('status', $jadwalOperasional->status ?? '') == $key ? 'selected' : '' }}>
-                                                {{ $label }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('status')
-                                        <span class="invalid-feedback">{{ $message }}</span>
-                                    @enderror
+                                    <div class="col-md-6 form-group">
+                                        <label for="status">Status Jadwal</label>
+                                        <select name="status" class="form-control">
+                                            <option value="">-- Pilih Status --</option>
+                                            @foreach (\App\Models\JadwalOperasional::getStatusLabels() as $key => $label)
+                                                <option value="{{ $key }}" {{ old('status', $jadwalOperasional->status ?? '') == $key ? 'selected' : '' }}>
+                                                    {{ $label }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('status')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
                                 </div>
 
                                 <button type="button" class="btn btn-primary mt-3 mr-2" onclick="nextStep()">Lanjut</button>

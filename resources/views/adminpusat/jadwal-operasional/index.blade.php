@@ -108,8 +108,7 @@
 
                                     <td>
                                         <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-outline-info dropdown-toggle"
-                                                data-toggle="dropdown">
+                                            <button type="button" class="btn btn-outline-info" data-toggle="dropdown" aria-expanded="false">
                                                 <i class="fas fa-cog"></i>
                                             </button>
                                             <div class="dropdown-menu">
@@ -118,11 +117,12 @@
                                                     data-penugasan='@json($item->penugasanPetugas)'>Plotting Petugas</a>
                                                 <a class="dropdown-item"
                                                     href="{{ route('jadwal-operasional.edit', $item->id) }}">Edit</a>
+                                                <div class="dropdown-divider"></div>
                                                 <form method="POST"
                                                     action="{{ route('jadwal-operasional.destroy', $item->id) }}">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <a href="#" class="dropdown-item confirm-button">Hapus</a>
+                                                    <a href="#" class="dropdown-item confirm-button text-danger btn-delete">Hapus</a>
                                                 </form>
                                             </div>
                                         </div>

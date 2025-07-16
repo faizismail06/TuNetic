@@ -91,19 +91,17 @@ $(document).ready(function () {
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-toggle="dropdown">
-                                            <i class="fas fa-cogs"></i> Aksi
+                                        <button type="button" class="btn btn-outline-info" data-toggle="dropdown" aria-expanded="false" style="width: 120px; height: 36px">
+                                            <i class="fas fa-cog"></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item" href="{{ route('daftar-jadwal.edit', $item->id) }}">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </a>
-                                            <form action="{{ route('daftar-jadwal.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
+                                            <a class="dropdown-item"
+                                                href="{{ route('daftar-jadwal.edit', $item->id) }}">Edit</a>
+                                            <div class="dropdown-divider"></div>
+                                            <form action="{{ route('daftar-jadwal.destroy', $item->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="dropdown-item text-danger">
-                                                    <i class="fas fa-trash-alt"></i> Hapus
-                                                </button>
+                                                <a href="#" class="dropdown-item confirm-button text-danger btn-delete">Hapus</a>
                                             </form>
                                         </div>
                                     </div>

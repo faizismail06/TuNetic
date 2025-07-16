@@ -39,23 +39,26 @@
                     @csrf
                     @method('PUT')
 
-                    <div class="form-group">
-                        <label for="hari">Hari</label>
-                        <select name="hari" id="hari" class="form-control" required>
-                            <option value="">-- Pilih Hari --</option>
-                            @foreach (['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] as $day)
-                                <option value="{{ $day }}" {{ $jadwal->hari == $day ? 'selected' : '' }}>{{ $day }}</option>
-                            @endforeach
-                        </select>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="hari">Hari</label>
+                            <select name="hari" id="hari" class="form-control" required>
+                                <option value="">-- Pilih Hari --</option>
+                                @foreach (['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] as $day)
+                                    <option value="{{ $day }}" {{ $jadwal->hari == $day ? 'selected' : '' }}>{{ $day }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="status">Status</label>
+                            <select name="status" id="status" class="form-control" required>
+                                <option value="1" {{ $jadwal->status == 1 ? 'selected' : '' }}>Aktif</option>
+                                <option value="0" {{ $jadwal->status == 0 ? 'selected' : '' }}>Tidak Aktif</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="status">Status</label>
-                        <select name="status" id="status" class="form-control" required>
-                            <option value="1" {{ $jadwal->status == 1 ? 'selected' : '' }}>Aktif</option>
-                            <option value="0" {{ $jadwal->status == 0 ? 'selected' : '' }}>Tidak Aktif</option>
-                        </select>
-                    </div>
 
                     <div class="text-right">
                         <a href="{{ route('daftar-jadwal.index') }}" class="btn btn-secondary">Batal</a>

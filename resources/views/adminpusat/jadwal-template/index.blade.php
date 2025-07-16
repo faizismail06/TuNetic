@@ -153,10 +153,11 @@
                                     </button>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item" href="/jadwal-template/${template.id}/edit">Edit</a>
+                                        <div class="dropdown-divider"></div>
                                         <form action="/jadwal-template/${template.id}" method="POST" onsubmit="return confirm('Yakin hapus template ini?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="dropdown-item confirm-button">Hapus</button>
+                                            <button class="dropdown-item confirm-button text-danger btn-delete">Hapus</button>
                                         </form>
                                     </div>
                                 </div>

@@ -37,7 +37,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="text-right">
                     <a href="{{ route('daftar-jadwal.index') }}" class="btn btn-secondary">Batal</a>
                     <button type="submit" class="btn btn-success">Simpan</button>
                 </div>
