@@ -112,7 +112,7 @@
                         </div>
                         <div class="card-body">
                             <table id="datatable-main" class="table table-bordered table-striped text-sm">
-                                <thead>
+                                <thead class="text-center">
                                     <tr>
                                         <th>No</th>
                                         <th>Nama Lokasi</th>
@@ -128,7 +128,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $item->nama_lokasi }}</td>
-                                            <td>
+                                            <td class="text-center">
                                                 @if ($item->tipe == 'TPS')
                                                     <span class="badge badge-success">TPS</span>
                                                 @elseif($item->tipe == 'TPST')
