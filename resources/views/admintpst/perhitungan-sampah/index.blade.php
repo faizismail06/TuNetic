@@ -17,14 +17,14 @@
 @section('content')
     <div class="content">
         <div class="container-fluid mt-4">
-            @if(session('success'))
+            @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
-            @if(session('error'))
+            @if (session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     {{ session('error') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -79,19 +79,30 @@
                                     </td>
                                     <td class="text-center">{{ $item->jadwalOperasional->rute->nama_rute ?? '-' }}</td>
                                     <td class="text-center">{{ number_format($item->total_sampah, 2, '.', '') }}</td>
-                                    <td class="text-center gap-2 d-flex justify-content-center">
-                                        <a href="{{ route('perhitungan-sampah.edit', $item->id) }}"
-                                            class="btn btn-sm btn-primary">
-                                            <i class="fas fa-edit me-2"></i> Edit
-                                        </a>
-                                        <form action="{{ route('perhitungan-sampah.destroy', $item->id) }}" method="POST"
-                                            class="d-inline delete-form">
+                                    <td class="text-center">
+                                        <div class="btn-group dropdown">
+                                            <button type="button" class="btn btn-sm btn-outline-info"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                                style="width: 135px; height: 40px; border-radius: 5px;">
+                                                <i class="fas fa-cog fa-lg"></i>
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item"
+                                                    href="{{ route('perhitungan-sampah.edit', $item->id) }}">
+                                                    Edit
+                                                </a>
+                                                <div class="dropdown-divider"></div>
+                                                <button type="button" class="dropdown-item text-danger delete-btn"
+                                                    data-id="{{ $item->id }}">
+                                                    Hapus
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <form id="delete-form-{{ $item->id }}"
+                                            action="{{ route('perhitungan-sampah.destroy', $item->id) }}" method="POST"
+                                            style="display: none;">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger show_confirm"
-                                                data-name="{{ $item->id }}">
-                                                <i class="fas fa-trash mr-1"></i>Hapus
-                                            </button>
                                         </form>
                                     </td>
                                 </tr>
@@ -148,13 +159,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
     <script>
-        $(function () {
+        $(function() {
             // Inisialisasi filter tanggal kosong
             var start = '';
             var end = '';
 
             // Tambahkan custom filter DataTables untuk filter tanggal
-            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
                 var tanggal = data[2]; // kolom tanggal (format: DD MMM YYYY)
                 if (!tanggal) return true;
 
@@ -175,11 +186,11 @@
                 responsive: true,
                 autoWidth: false,
                 destroy: true,
-                footerCallback: function (row, data, startIdx, end, display) {
+                footerCallback: function(row, data, startIdx, end, display) {
                     var api = this.api();
 
                     // Fungsi parsing angka
-                    var intVal = function (i) {
+                    var intVal = function(i) {
                         if (typeof i === 'string') {
                             return parseFloat(i.replace(/,/g, '')) || 0;
                         } else if (typeof i === 'number') {
@@ -204,14 +215,14 @@
             });
 
             // Event tombol filter
-            $('#filter-date').on('click', function () {
+            $('#filter-date').on('click', function() {
                 start = $('#start-date').val();
                 end = $('#end-date').val();
                 table.draw();
             });
 
             // Event tombol reset
-            $('#reset-date').on('click', function () {
+            $('#reset-date').on('click', function() {
                 $('#start-date').val('');
                 $('#end-date').val('');
                 start = '';
@@ -221,26 +232,23 @@
         });
 
         // Konfirmasi saat klik tombol hapus
-        $(document).on('click', '.show_confirm', function (event) {
+        $(document).on('click', '.delete-btn', function(event) {
             event.preventDefault();
 
-            var form = $(this).closest("form");
-            var dataName = $(this).attr("data-name");
+            var id = $(this).data('id');
 
             Swal.fire({
                 title: 'Apakah Anda yakin?',
-                text: "Data dengan ID " + dataName + " akan dihapus!",
+                text: "Data dengan ID " + id + " akan dihapus!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Ya, hapus!',
                 cancelButtonText: 'Batal',
-                customClass: {
-                    confirmButton: 'btn btn-danger',
-                    cancelButton: 'btn btn-success' // Hijau
-                },
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#28a745'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    form.submit();
+                    document.getElementById('delete-form-' + id).submit();
                 }
             });
         });

@@ -37,7 +37,8 @@
                                 @foreach ($artikel as $index => $artikel)
                                     <tr>
                                         <td class="align-middle text-center">{{ $loop->iteration }}</td>
-                                        <td class="align-middle text-center">{{ Str::limit($artikel->judul_artikel, 60) }}</td>
+                                        <td class="align-middle text-center">{{ Str::limit($artikel->judul_artikel, 60) }}
+                                        </td>
                                         <td class="text-center">
                                             <img src="{{ asset('storage/' . $artikel->gambar) }}" alt="Thumbnail"
                                                 style="max-height: 80px; max-width: 120px; object-fit: cover;">
@@ -46,7 +47,7 @@
                                             {{ \Carbon\Carbon::parse($artikel->tanggal)->format('d M Y') }}
                                         </td>
                                         <td class="align-middle text-center">
-                                            @if($artikel->status == 1)
+                                            @if ($artikel->status == 1)
                                                 <span class="badge badge-success"
                                                     style="font-size: 0.8rem; padding: 0.5em 1em; border-radius: 0.3rem;">
                                                     Aktif
@@ -59,13 +60,24 @@
                                             @endif
                                         </td>
                                         <td class="align-middle text-center">
-                                            <a href="{{ route('artikel.edit', $artikel->id) }}"
-                                                class="btn btn-sm btn-info mr-1">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </a>
-                                            <button class="btn btn-sm btn-danger btn-delete" data-id="{{ $artikel->id }}">
-                                                <i class="fas fa-trash"></i> Hapus
-                                            </button>
+                                            <div class="btn-group dropdown">
+                                                <button type="button" class="btn btn-sm btn-outline-info"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                                    style="width: 140px; height: 40px; border-radius: 5px;">
+                                                    <i class="fas fa-cog fa-lg"></i>
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('artikel.edit', $artikel->id) }}">
+                                                        Edit
+                                                    </a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <button type="button" class="dropdown-item text-danger btn-delete"
+                                                        data-id="{{ $artikel->id }}">
+                                                        Hapus
+                                                    </button>
+                                                </div>
+                                            </div>
                                             <form id="form-delete-{{ $artikel->id }}"
                                                 action="{{ route('artikel.destroy', $artikel->id) }}" method="POST"
                                                 style="display: none;">
@@ -97,7 +109,7 @@
     <script src="{{ asset('plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
 
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             if (!$.fn.dataTable.isDataTable('#datatable-main')) {
                 $("#datatable-main").DataTable({
                     responsive: true,
@@ -118,7 +130,7 @@
         });
     </script>
     <script>
-        $(document).on('click', '.btn-delete', function (e) {
+        $(document).on('click', '.btn-delete', function(e) {
             e.preventDefault();
             var id = $(this).data('id');
 
@@ -139,14 +151,14 @@
         });
     </script>
 
-    @if(session('success'))
+    @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
-    @if(session('error'))
+    @if (session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
