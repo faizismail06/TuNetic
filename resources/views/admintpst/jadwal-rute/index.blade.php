@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @push('css')
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
     <!-- Leaflet Routing Machine CSS -->
@@ -197,7 +196,7 @@
         }
 
         .form-control,
-        .form-select {
+        .form-control {
             border: 1px solid #ced4da;
             border-radius: 0.25rem;
             padding: 0.375rem 0.75rem;
@@ -205,7 +204,7 @@
         }
 
         .form-control:focus,
-        .form-select:focus {
+        .form-control:focus {
             border-color: #80bdff;
             box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
         }
@@ -284,6 +283,11 @@
             color: white;
             border-radius: 0.5rem 0.5rem 0 0;
             border: none;
+        }
+
+        /* Ensure logout modal has proper z-index */
+        #modal-logout {
+            z-index: 9999 !important;
         }
 
         /* Legend and other map styles - Keep existing */
@@ -390,7 +394,7 @@
         }
 
         .dropdown-menu .form-control,
-        .dropdown-menu .form-select {
+        .dropdown-menu .form-control {
             font-size: 0.875rem;
             border-radius: 0.25rem;
         }
@@ -405,7 +409,7 @@
         }
 
         /* Show entries styling */
-        .form-select[style*="width: auto"] {
+        .form-control[style*="width: auto"] {
             min-width: 70px;
         }
 
@@ -549,7 +553,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <!-- Filter Button -->
                     <div class="btn-group">
-                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown"
                             aria-expanded="false">
                             <i class="fas fa-filter me-2"></i>Filter
                         </button>
@@ -563,7 +567,7 @@
 
                                 <div class="mb-3">
                                     <label for="status" class="form-label">Status</label>
-                                    <select class="form-select form-select-sm" id="status" name="status">
+                                    <select class="form-control form-control-sm" id="status" name="status">
                                         <option value="">Semua Status</option>
                                         <option value="0" {{ $currentStatus == '0' ? 'selected' : '' }}>Belum
                                             Berjalan</option>
@@ -596,7 +600,7 @@
                     <div class="d-flex align-items-center gap-3">
                         <div class="d-flex align-items-center">
                             <label for="per_page" class="me-2 text-muted">Show</label>
-                            <select class="form-select form-select-sm" id="per_page" name="per_page"
+                            <select class="form-control form-control-sm" id="per_page" name="per_page"
                                 onchange="changePerPage()" style="width: auto;">
                                 <option value="5" {{ $currentPerPage == 5 ? 'selected' : '' }}>5</option>
                                 <option value="10" {{ $currentPerPage == 10 ? 'selected' : '' }}>10</option>
@@ -606,9 +610,9 @@
                             <span class="ms-2 text-muted">entries</span>
                         </div>
 
-                        <button type="button" class="btn btn-success btn-sm" onclick="exportData()">
+                        {{-- <button type="button" class="btn btn-success btn-sm" onclick="exportData()">
                             <i class="fas fa-download me-2"></i>Export
-                        </button>
+                        </button> --}}
                     </div>
                 </div>
             </div>
@@ -658,7 +662,7 @@
                                     <td class="text-center">
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-sm btn-outline-info"
-                                                data-bs-toggle="dropdown">
+                                                data-toggle="dropdown">
                                                 <i class="fas fa-cog"></i>
                                             </button>
                                             <div class="dropdown-menu">
@@ -706,7 +710,9 @@
                         <i class="fas fa-truck me-2"></i>
                         Detail Armada
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body" id="armadaDetailContent">
                     <div class="text-center">
@@ -721,42 +727,47 @@
 @endsection
 
 @push('js')
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
     <!-- Leaflet Routing Machine JS -->
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
     <script>
-        // Data dari controller
-        const mapData = @json($mapData);
-        const allTpsForMap = @json($allTpsForMap);
+        $(document).ready(function() {
+            // Manual fallback untuk logout - diperlukan karena konflik Bootstrap
+            $('[data-target="#modal-logout"]').on('click', function(e) {
+                e.preventDefault();
+                $('#modal-logout').modal('show');
+            });
 
-        // Inisialisasi map
-        let map = L.map('map').setView([-7.056325, 110.454250], 15); // Default ke Semarang
+            // Data dari controller
+            const mapData = @json($mapData);
+            const allTpsForMap = @json($allTpsForMap);
 
-        // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+            // Inisialisasi map
+            let map = L.map('map').setView([-7.056325, 110.454250], 15); // Default ke Semarang
 
-        // Variabel untuk menyimpan markers dan routes
-        let armadaMarkers = [];
-        let tpsMarkers = [];
-        let routeLines = [];
-        let routeControl = null;
-        let isRouteVisible = true;
-        let activeJadwalId = null;
+            // Add tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
 
-        // Tambahkan legenda ke peta
-        const legend = L.control({
-            position: 'bottomright'
-        });
+            // Variabel untuk menyimpan markers dan routes
+            let armadaMarkers = [];
+            let tpsMarkers = [];
+            let routeLines = [];
+            let routeControl = null;
+            let isRouteVisible = true;
+            let activeJadwalId = null;
 
-        legend.onAdd = function(map) {
-            const div = L.DomUtil.create('div', 'leaflet-control legend');
-            div.innerHTML = `
+            // Tambahkan legenda ke peta
+            const legend = L.control({
+                position: 'bottomright'
+            });
+
+            legend.onAdd = function(map) {
+                const div = L.DomUtil.create('div', 'leaflet-control legend');
+                div.innerHTML = `
         <h6><strong>Legenda</strong></h6>
         <div class="legend-item">
             <div class="legend-icon legend-truck"></div>
@@ -775,84 +786,86 @@
             <span>Rute</span>
         </div>
     `;
-            return div;
-        };
+                return div;
+            };
 
-        legend.addTo(map);
+            legend.addTo(map);
 
-        // Function untuk inisialisasi peta
-        function initializeMap() {
-            // Clear existing markers and routes
-            clearMapElements();
+            // Function untuk inisialisasi peta
+            function initializeMap() {
+                // Clear existing markers and routes
+                clearMapElements();
 
-            // Add TPS markers
-            addTpsMarkers();
+                // Add TPS markers
+                addTpsMarkers();
 
-            // Add armada markers
-            addArmadaMarkers();
+                // Add armada markers
+                addArmadaMarkers();
 
-            // Fit bounds if there's data
-            if (mapData.length > 0 || allTpsForMap.length > 0) {
-                fitMapBounds();
-            }
-        }
-
-        // Function untuk clear semua element di map
-        function clearMapElements() {
-            armadaMarkers.forEach(marker => map.removeLayer(marker));
-            tpsMarkers.forEach(marker => map.removeLayer(marker));
-            routeLines.forEach(line => map.removeLayer(line));
-
-            if (routeControl) {
-                map.removeControl(routeControl);
-                routeControl = null;
+                // Fit bounds if there's data
+                if (mapData.length > 0 || allTpsForMap.length > 0) {
+                    fitMapBounds();
+                }
             }
 
-            armadaMarkers = [];
-            tpsMarkers = [];
-            routeLines = [];
-        }
+            // Function untuk clear semua element di map
+            function clearMapElements() {
+                armadaMarkers.forEach(marker => map.removeLayer(marker));
+                tpsMarkers.forEach(marker => map.removeLayer(marker));
+                routeLines.forEach(line => map.removeLayer(line));
 
-        // Function untuk add TPS markers
-        function addTpsMarkers() {
-            allTpsForMap.forEach(tps => {
-                const icon = L.divIcon({
-                    html: `<div style="background: ${getTpsColor(tps.tipe)}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>`,
-                    className: 'tps-marker',
-                    iconSize: [20, 20],
-                    iconAnchor: [10, 10]
-                });
+                if (routeControl) {
+                    map.removeControl(routeControl);
+                    routeControl = null;
+                }
 
-                const marker = L.marker([tps.latitude, tps.longitude], {
-                        icon
-                    })
-                    .bindPopup(`
+                armadaMarkers = [];
+                tpsMarkers = [];
+                routeLines = [];
+            }
+
+            // Function untuk add TPS markers
+            function addTpsMarkers() {
+                allTpsForMap.forEach(tps => {
+                    const icon = L.divIcon({
+                        html: `<div style="background: ${getTpsColor(tps.tipe)}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>`,
+                        className: 'tps-marker',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    });
+
+                    const marker = L.marker([tps.latitude, tps.longitude], {
+                            icon
+                        })
+                        .bindPopup(`
                     <div class="popup-header">${tps.nama_lokasi}</div>
                     <div class="popup-content">
                         <p><strong>Jenis:</strong> ${tps.tipe}</p>
                     </div>
                 `)
-                    .addTo(map);
+                        .addTo(map);
 
-                tpsMarkers.push(marker);
-            });
-        }
+                    tpsMarkers.push(marker);
+                });
+            }
 
-        // Function untuk add armada markers
-        function addArmadaMarkers() {
-            mapData.forEach(jadwal => {
-                if (jadwal.last_tracking) {
-                    const icon = L.divIcon({
-                        html: `<div style="background: #ff4757; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;"><i class="fas fa-truck" style="font-size: 10px;"></i></div>`,
-                        className: 'truck-marker',
-                        iconSize: [24, 24],
-                        iconAnchor: [12, 12]
-                    });
+            // Function untuk add armada markers
+            function addArmadaMarkers() {
+                mapData.forEach(jadwal => {
+                    if (jadwal.last_tracking) {
+                        const icon = L.divIcon({
+                            html: `<div style="background: #ff4757; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;"><i class="fas fa-truck" style="font-size: 10px;"></i></div>`,
+                            className: 'truck-marker',
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 12]
+                        });
 
-                    const marker = L.marker([jadwal.last_tracking.latitude, jadwal.last_tracking.longitude], {
-                            icon
-                        })
-                        .bindPopup(`
+                        const marker = L.marker([jadwal.last_tracking.latitude, jadwal.last_tracking
+                                .longitude
+                            ], {
+                                icon
+                            })
+                            .bindPopup(`
                         <div class="popup-header">
                             <i class="fas fa-truck me-2"></i>
                             ${jadwal.armada.no_polisi}
@@ -872,62 +885,62 @@
                             </button>
                         </div>
                     `)
-                        .addTo(map);
+                            .addTo(map);
 
-                    // Tambahkan ID jadwal ke marker untuk referensi
-                    marker.jadwalId = jadwal.id;
-                    armadaMarkers.push(marker);
+                        // Tambahkan ID jadwal ke marker untuk referensi
+                        marker.jadwalId = jadwal.id;
+                        armadaMarkers.push(marker);
+                    }
+                });
+            }
+
+            // Function untuk show rute specific armada dengan routing
+            function showRouteForArmada(jadwalId) {
+                // Clear existing routes
+                clearRoutes();
+
+                // Set jadwal aktif
+                activeJadwalId = jadwalId;
+
+                const jadwal = mapData.find(j => j.id === jadwalId);
+                if (!jadwal || !jadwal.tps_data || jadwal.tps_data.length === 0) {
+                    console.warn('Tidak ada data TPS untuk jadwal ini');
+                    return;
                 }
-            });
-        }
 
-        // Function untuk show rute specific armada dengan routing
-        function showRouteForArmada(jadwalId) {
-            // Clear existing routes
-            clearRoutes();
+                // Buat waypoints dari data TPS yang sudah diurutkan
+                const waypoints = [];
+                let armadaPosition = null;
 
-            // Set jadwal aktif
-            activeJadwalId = jadwalId;
+                // Tambahkan posisi armada sebagai titik awal jika tersedia
+                if (jadwal.last_tracking) {
+                    armadaPosition = L.latLng(jadwal.last_tracking.latitude, jadwal.last_tracking.longitude);
+                    waypoints.push(armadaPosition);
+                }
 
-            const jadwal = mapData.find(j => j.id === jadwalId);
-            if (!jadwal || !jadwal.tps_data || jadwal.tps_data.length === 0) {
-                console.warn('Tidak ada data TPS untuk jadwal ini');
-                return;
-            }
-
-            // Buat waypoints dari data TPS yang sudah diurutkan
-            const waypoints = [];
-            let armadaPosition = null;
-
-            // Tambahkan posisi armada sebagai titik awal jika tersedia
-            if (jadwal.last_tracking) {
-                armadaPosition = L.latLng(jadwal.last_tracking.latitude, jadwal.last_tracking.longitude);
-                waypoints.push(armadaPosition);
-            }
-
-            // Tambahkan semua TPS ke waypoints - data sudah terurut dari controller
-            jadwal.tps_data.forEach(tps => {
-                waypoints.push(L.latLng(tps.latitude, tps.longitude));
-            });
-
-            if (waypoints.length < 2) {
-                alert('Minimal dibutuhkan 2 titik untuk membuat rute');
-                return;
-            }
-
-            // Tambahkan marker urutan TPS (terlepas dari tipe rute yang akan digunakan)
-            jadwal.tps_data.forEach((tps, index) => {
-                const routeMarker = L.divIcon({
-                    html: `<div style="background: ${jadwal.rute.color || '#3388ff'}; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">${tps.urutan || (index + 1)}</div>`,
-                    className: 'route-marker',
-                    iconSize: [25, 25],
-                    iconAnchor: [12, 12]
+                // Tambahkan semua TPS ke waypoints - data sudah terurut dari controller
+                jadwal.tps_data.forEach(tps => {
+                    waypoints.push(L.latLng(tps.latitude, tps.longitude));
                 });
 
-                const marker = L.marker([tps.latitude, tps.longitude], {
-                        icon: routeMarker
-                    })
-                    .bindPopup(`
+                if (waypoints.length < 2) {
+                    alert('Minimal dibutuhkan 2 titik untuk membuat rute');
+                    return;
+                }
+
+                // Tambahkan marker urutan TPS (terlepas dari tipe rute yang akan digunakan)
+                jadwal.tps_data.forEach((tps, index) => {
+                    const routeMarker = L.divIcon({
+                        html: `<div style="background: ${jadwal.rute.color || '#3388ff'}; width: 25px; height: 25px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">${tps.urutan || (index + 1)}</div>`,
+                        className: 'route-marker',
+                        iconSize: [25, 25],
+                        iconAnchor: [12, 12]
+                    });
+
+                    const marker = L.marker([tps.latitude, tps.longitude], {
+                            icon: routeMarker
+                        })
+                        .bindPopup(`
             <div class="popup-header">TPS ${tps.urutan || (index + 1)}: ${tps.nama_lokasi}</div>
             <div class="popup-content">
                 <p><strong>Jenis:</strong> ${tps.tipe}</p>
@@ -936,292 +949,294 @@
             </div>
         `).addTo(map);
 
-                routeLines.push(marker);
-            });
+                    routeLines.push(marker);
+                });
 
-            // Variable untuk mendeteksi timeout
-            let routeTimedOut = false;
-            const timeoutDuration = 15000; // 15 detik
-            let routeTimeout = setTimeout(function() {
-                routeTimedOut = true;
-                console.warn('OSRM request timed out, menggunakan rute sederhana sebagai fallback');
+                // Variable untuk mendeteksi timeout
+                let routeTimedOut = false;
+                const timeoutDuration = 15000; // 15 detik
+                let routeTimeout = setTimeout(function() {
+                    routeTimedOut = true;
+                    console.warn('OSRM request timed out, menggunakan rute sederhana sebagai fallback');
 
-                // Hapus kontrol routing yang mungkin sedang loading
+                    // Hapus kontrol routing yang mungkin sedang loading
+                    if (routeControl) {
+                        map.removeControl(routeControl);
+                        routeControl = null;
+                    }
+
+                    // Gambar rute sederhana sebagai fallback
+                    drawSimpleRouteForArmada(jadwal);
+                }, timeoutDuration);
+
+                // Coba gunakan OSRM terlebih dahulu
+                routeControl = L.Routing.control({
+                    waypoints: waypoints,
+                    routeWhileDragging: false,
+                    showAlternatives: false,
+                    fitSelectedRoutes: true,
+                    show: false, // Jangan tampilkan panel instruksi
+                    lineOptions: {
+                        styles: [{
+                            color: jadwal.rute.color || '#3388ff',
+                            opacity: 0.7,
+                            weight: 6
+                        }, {
+                            color: 'white',
+                            opacity: 0.5,
+                            weight: 2
+                        }]
+                    },
+                    createMarker: function() {
+                        return null; // Jangan buat marker di sepanjang rute
+                    },
+                    router: L.Routing.osrmv1({
+                        serviceUrl: 'https://router.project-osrm.org/route/v1',
+                        profile: 'driving',
+                        useHints: false,
+                        geometryOnly: false,
+                        suppressDemoServerWarning: true,
+                        roundTrip: false,
+                        alternatives: false,
+                        steps: true,
+                        overview: "full",
+                        geometries: "polyline",
+                        timeout: 12000 // 12 detik timeout (lebih rendah dari timeoutDuration)
+                    })
+                }).addTo(map);
+
+                // Jika rute ditemukan, batalkan timeout dan gunakan rute OSRM
+                routeControl.on('routesfound', function(e) {
+                    clearTimeout(routeTimeout); // Batalkan timeout fallback
+
+                    if (!routeTimedOut) { // Hanya proses jika belum timeout
+                        const routes = e.routes;
+                        console.log('Rute dari armada ke TPS ditemukan:', routes);
+
+                        // Fit bounds to route with padding
+                        if (routes.length > 0) {
+                            map.fitBounds(routes[0].bounds, {
+                                padding: [50, 50]
+                            });
+                        }
+
+                        isRouteVisible = true;
+
+                        // Tampilkan notifikasi sukses (opsional)
+                        showNotification('success', 'Rute optimal berhasil dimuat', 3000);
+                    }
+                });
+
+                // Jika terjadi error routing, gunakan rute sederhana
+                routeControl.on('routingerror', function(e) {
+                    console.warn('Routing error:', e.error);
+
+                    // Batalkan timeout fallback karena sudah ada error yang tertangkap
+                    clearTimeout(routeTimeout);
+
+                    // Hapus kontrol routing yang error
+                    if (routeControl && !routeTimedOut) {
+                        map.removeControl(routeControl);
+                        routeControl = null;
+
+                        // Gambar rute sederhana sebagai fallback
+                        drawSimpleRouteForArmada(jadwal);
+                    }
+                });
+            }
+
+            // Fungsi untuk menggambar rute sederhana sebagai fallback
+            function drawSimpleRouteForArmada(jadwal) {
+                // Hapus rute sederhana yang sudah ada jika ada
+                if (window.simplePath) {
+                    map.removeLayer(window.simplePath);
+                }
+
+                const coordinates = [];
+
+                // Mulai dari posisi armada jika tersedia
+                if (jadwal.last_tracking) {
+                    coordinates.push([
+                        parseFloat(jadwal.last_tracking.latitude),
+                        parseFloat(jadwal.last_tracking.longitude)
+                    ]);
+                }
+
+                // Tambahkan semua TPS ke koordinat
+                jadwal.tps_data.forEach(tps => {
+                    coordinates.push([
+                        parseFloat(tps.latitude),
+                        parseFloat(tps.longitude)
+                    ]);
+                });
+
+                if (coordinates.length < 2) {
+                    console.warn('Tidak cukup koordinat untuk membuat rute sederhana');
+                    return;
+                }
+
+                // Buat polyline sederhana dengan warna yang sama seperti rute asli
+                window.simplePath = L.polyline(coordinates, {
+                    color: jadwal.rute.color || '#3388ff',
+                    weight: 4,
+                    opacity: 0.7,
+                    dashArray: '10, 10' // Garis putus-putus untuk menunjukkan ini bukan rute optimal
+                }).addTo(map);
+
+                // Tambahkan popup ke garis untuk memberi tahu pengguna
+                window.simplePath.bindPopup('Rute sederhana (bukan rute jalan sebenarnya)');
+
+                // Fit bounds pada semua titik
+                const bounds = L.latLngBounds(coordinates.map(coord => L.latLng(coord[0], coord[1])));
+                map.fitBounds(bounds, {
+                    padding: [50, 50]
+                });
+
+                isRouteVisible = true;
+                routeLines.push(window.simplePath);
+
+                // Tampilkan pesan notifikasi
+                showNotification('info', 'Menggunakan rute sederhana karena rute jalan tidak tersedia', 5000);
+            }
+
+            // Fungsi helper untuk menampilkan notifikasi
+            function showNotification(type, message, duration = 5000) {
+                // Cek apakah container notifikasi sudah ada
+                let notifContainer = document.getElementById('map-notifications');
+
+                if (!notifContainer) {
+                    // Buat container notifikasi jika belum ada
+                    notifContainer = document.createElement('div');
+                    notifContainer.id = 'map-notifications';
+                    notifContainer.style.cssText =
+                        'position: absolute; top: 10px; right: 10px; z-index: 1000; max-width: 300px;';
+                    document.querySelector('.leaflet-container').appendChild(notifContainer);
+                }
+
+                // Buat elemen notifikasi
+                const notif = document.createElement('div');
+                notif.className = `alert alert-${type} alert-dismissible fade show`;
+                notif.style.cssText = 'margin-bottom: 10px; padding: 10px 15px; font-size: 14px; opacity: 0.9;';
+                notif.innerHTML = `
+        ${message}
+        <button type="button" class="close" style="font-size: 10px; padding: 8px;" onclick="this.parentElement.remove()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    `;
+
+                notifContainer.appendChild(notif);
+
+                // Hapus notifikasi setelah durasi tertentu
+                setTimeout(() => {
+                    notif.remove();
+                }, duration);
+            }
+            // Function untuk toggle visibilitas rute
+            function toggleRouteVisibility() {
+                if (!routeControl) {
+                    return;
+                }
+
+                if (isRouteVisible) {
+                    // Sembunyikan rute
+                    const routingContainer = document.querySelector('.leaflet-routing-container');
+                    if (routingContainer) {
+                        routingContainer.style.display = 'none';
+                    }
+
+                    map.eachLayer(function(layer) {
+                        if (layer instanceof L.Polyline && !(layer instanceof L.Marker)) {
+                            layer.setStyle({
+                                opacity: 0
+                            });
+                        }
+                    });
+
+                    isRouteVisible = false;
+                } else {
+                    // Tampilkan rute
+                    const routingContainer = document.querySelector('.leaflet-routing-container');
+                    if (routingContainer) {
+                        routingContainer.style.display = '';
+                    }
+
+                    map.eachLayer(function(layer) {
+                        if (layer instanceof L.Polyline && !(layer instanceof L.Marker)) {
+                            layer.setStyle({
+                                opacity: 0.7
+                            });
+                        }
+                    });
+
+                    isRouteVisible = true;
+                }
+            }
+
+            // Function untuk membersihkan semua rute
+            function clearRoutes() {
+                routeLines.forEach(line => map.removeLayer(line));
+                routeLines = [];
+
                 if (routeControl) {
                     map.removeControl(routeControl);
                     routeControl = null;
                 }
-
-                // Gambar rute sederhana sebagai fallback
-                drawSimpleRouteForArmada(jadwal);
-            }, timeoutDuration);
-
-            // Coba gunakan OSRM terlebih dahulu
-            routeControl = L.Routing.control({
-                waypoints: waypoints,
-                routeWhileDragging: false,
-                showAlternatives: false,
-                fitSelectedRoutes: true,
-                show: false, // Jangan tampilkan panel instruksi
-                lineOptions: {
-                    styles: [{
-                        color: jadwal.rute.color || '#3388ff',
-                        opacity: 0.7,
-                        weight: 6
-                    }, {
-                        color: 'white',
-                        opacity: 0.5,
-                        weight: 2
-                    }]
-                },
-                createMarker: function() {
-                    return null; // Jangan buat marker di sepanjang rute
-                },
-                router: L.Routing.osrmv1({
-                    serviceUrl: 'https://router.project-osrm.org/route/v1',
-                    profile: 'driving',
-                    useHints: false,
-                    geometryOnly: false,
-                    suppressDemoServerWarning: true,
-                    roundTrip: false,
-                    alternatives: false,
-                    steps: true,
-                    overview: "full",
-                    geometries: "polyline",
-                    timeout: 12000 // 12 detik timeout (lebih rendah dari timeoutDuration)
-                })
-            }).addTo(map);
-
-            // Jika rute ditemukan, batalkan timeout dan gunakan rute OSRM
-            routeControl.on('routesfound', function(e) {
-                clearTimeout(routeTimeout); // Batalkan timeout fallback
-
-                if (!routeTimedOut) { // Hanya proses jika belum timeout
-                    const routes = e.routes;
-                    console.log('Rute dari armada ke TPS ditemukan:', routes);
-
-                    // Fit bounds to route with padding
-                    if (routes.length > 0) {
-                        map.fitBounds(routes[0].bounds, {
-                            padding: [50, 50]
-                        });
-                    }
-
-                    isRouteVisible = true;
-
-                    // Tampilkan notifikasi sukses (opsional)
-                    showNotification('success', 'Rute optimal berhasil dimuat', 3000);
-                }
-            });
-
-            // Jika terjadi error routing, gunakan rute sederhana
-            routeControl.on('routingerror', function(e) {
-                console.warn('Routing error:', e.error);
-
-                // Batalkan timeout fallback karena sudah ada error yang tertangkap
-                clearTimeout(routeTimeout);
-
-                // Hapus kontrol routing yang error
-                if (routeControl && !routeTimedOut) {
-                    map.removeControl(routeControl);
-                    routeControl = null;
-
-                    // Gambar rute sederhana sebagai fallback
-                    drawSimpleRouteForArmada(jadwal);
-                }
-            });
-        }
-
-        // Fungsi untuk menggambar rute sederhana sebagai fallback
-        function drawSimpleRouteForArmada(jadwal) {
-            // Hapus rute sederhana yang sudah ada jika ada
-            if (window.simplePath) {
-                map.removeLayer(window.simplePath);
             }
 
-            const coordinates = [];
+            // Function untuk fit map bounds
+            function fitMapBounds() {
+                let bounds = [];
 
-            // Mulai dari posisi armada jika tersedia
-            if (jadwal.last_tracking) {
-                coordinates.push([
-                    parseFloat(jadwal.last_tracking.latitude),
-                    parseFloat(jadwal.last_tracking.longitude)
-                ]);
-            }
-
-            // Tambahkan semua TPS ke koordinat
-            jadwal.tps_data.forEach(tps => {
-                coordinates.push([
-                    parseFloat(tps.latitude),
-                    parseFloat(tps.longitude)
-                ]);
-            });
-
-            if (coordinates.length < 2) {
-                console.warn('Tidak cukup koordinat untuk membuat rute sederhana');
-                return;
-            }
-
-            // Buat polyline sederhana dengan warna yang sama seperti rute asli
-            window.simplePath = L.polyline(coordinates, {
-                color: jadwal.rute.color || '#3388ff',
-                weight: 4,
-                opacity: 0.7,
-                dashArray: '10, 10' // Garis putus-putus untuk menunjukkan ini bukan rute optimal
-            }).addTo(map);
-
-            // Tambahkan popup ke garis untuk memberi tahu pengguna
-            window.simplePath.bindPopup('Rute sederhana (bukan rute jalan sebenarnya)');
-
-            // Fit bounds pada semua titik
-            const bounds = L.latLngBounds(coordinates.map(coord => L.latLng(coord[0], coord[1])));
-            map.fitBounds(bounds, {
-                padding: [50, 50]
-            });
-
-            isRouteVisible = true;
-            routeLines.push(window.simplePath);
-
-            // Tampilkan pesan notifikasi
-            showNotification('info', 'Menggunakan rute sederhana karena rute jalan tidak tersedia', 5000);
-        }
-
-        // Fungsi helper untuk menampilkan notifikasi
-        function showNotification(type, message, duration = 5000) {
-            // Cek apakah container notifikasi sudah ada
-            let notifContainer = document.getElementById('map-notifications');
-
-            if (!notifContainer) {
-                // Buat container notifikasi jika belum ada
-                notifContainer = document.createElement('div');
-                notifContainer.id = 'map-notifications';
-                notifContainer.style.cssText =
-                    'position: absolute; top: 10px; right: 10px; z-index: 1000; max-width: 300px;';
-                document.querySelector('.leaflet-container').appendChild(notifContainer);
-            }
-
-            // Buat elemen notifikasi
-            const notif = document.createElement('div');
-            notif.className = `alert alert-${type} alert-dismissible fade show`;
-            notif.style.cssText = 'margin-bottom: 10px; padding: 10px 15px; font-size: 14px; opacity: 0.9;';
-            notif.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" style="font-size: 10px; padding: 8px;" onclick="this.parentElement.remove()"></button>
-    `;
-
-            notifContainer.appendChild(notif);
-
-            // Hapus notifikasi setelah durasi tertentu
-            setTimeout(() => {
-                notif.remove();
-            }, duration);
-        }
-        // Function untuk toggle visibilitas rute
-        function toggleRouteVisibility() {
-            if (!routeControl) {
-                return;
-            }
-
-            if (isRouteVisible) {
-                // Sembunyikan rute
-                const routingContainer = document.querySelector('.leaflet-routing-container');
-                if (routingContainer) {
-                    routingContainer.style.display = 'none';
-                }
-
-                map.eachLayer(function(layer) {
-                    if (layer instanceof L.Polyline && !(layer instanceof L.Marker)) {
-                        layer.setStyle({
-                            opacity: 0
-                        });
+                // Add armada positions
+                mapData.forEach(jadwal => {
+                    if (jadwal.last_tracking) {
+                        bounds.push([jadwal.last_tracking.latitude, jadwal.last_tracking.longitude]);
                     }
                 });
 
-                isRouteVisible = false;
-            } else {
-                // Tampilkan rute
-                const routingContainer = document.querySelector('.leaflet-routing-container');
-                if (routingContainer) {
-                    routingContainer.style.display = '';
-                }
-
-                map.eachLayer(function(layer) {
-                    if (layer instanceof L.Polyline && !(layer instanceof L.Marker)) {
-                        layer.setStyle({
-                            opacity: 0.7
-                        });
-                    }
+                // Add TPS positions
+                allTpsForMap.forEach(tps => {
+                    bounds.push([tps.latitude, tps.longitude]);
                 });
 
-                isRouteVisible = true;
-            }
-        }
-
-        // Function untuk membersihkan semua rute
-        function clearRoutes() {
-            routeLines.forEach(line => map.removeLayer(line));
-            routeLines = [];
-
-            if (routeControl) {
-                map.removeControl(routeControl);
-                routeControl = null;
-            }
-        }
-
-        // Function untuk fit map bounds
-        function fitMapBounds() {
-            let bounds = [];
-
-            // Add armada positions
-            mapData.forEach(jadwal => {
-                if (jadwal.last_tracking) {
-                    bounds.push([jadwal.last_tracking.latitude, jadwal.last_tracking.longitude]);
+                if (bounds.length > 0) {
+                    map.fitBounds(bounds, {
+                        padding: [20, 20]
+                    });
                 }
-            });
-
-            // Add TPS positions
-            allTpsForMap.forEach(tps => {
-                bounds.push([tps.latitude, tps.longitude]);
-            });
-
-            if (bounds.length > 0) {
-                map.fitBounds(bounds, {
-                    padding: [20, 20]
-                });
             }
-        }
 
-        function getTpsColor(jenis) {
-            switch (jenis?.toLowerCase()) {
-                case 'tpa':
-                    return '#3742fa';
-                case 'tps':
-                    return '#2ed573';
-                default:
-                    return '#2ed573';
+            function getTpsColor(jenis) {
+                switch (jenis?.toLowerCase()) {
+                    case 'tpa':
+                        return '#3742fa';
+                    case 'tps':
+                        return '#2ed573';
+                    default:
+                        return '#2ed573';
+                }
             }
-        }
 
-        function getStatusColor(status) {
-            switch (status) {
-                case 0:
-                    return 'danger';
-                case 1:
-                    return 'warning';
-                case 2:
-                    return 'success';
-                default:
-                    return 'secondary';
+            function getStatusColor(status) {
+                switch (status) {
+                    case 0:
+                        return 'danger';
+                    case 1:
+                        return 'warning';
+                    case 2:
+                        return 'success';
+                    default:
+                        return 'secondary';
+                }
             }
-        }
 
-        // Function untuk show detail armada
-        function showArmadaDetail(jadwalId) {
-            const modal = new bootstrap.Modal(document.getElementById('armadaDetailModal'));
-            const content = document.getElementById('armadaDetailContent');
+            // Function untuk show detail armada
+            function showArmadaDetail(jadwalId) {
+                $('#armadaDetailModal').modal('show');
+                const content = document.getElementById('armadaDetailContent');
 
-            // Show loading
-            content.innerHTML = `
+                // Show loading
+                content.innerHTML = `
                 <div class="text-center">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -1230,15 +1245,16 @@
                 </div>
             `;
 
-            modal.show();
+                // Show modal setelah content diupdate
+                // Modal sudah terbuka dari awal fungsi
 
-            // Fetch detail - sesuaikan dengan route dari controller
-            fetch(`jadwal-rute/api/armada-detail/${jadwalId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const detail = data.data;
-                        content.innerHTML = `
+                // Fetch detail - sesuaikan dengan route dari controller
+                fetch(`jadwal-rute/api/armada-detail/${jadwalId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const detail = data.data;
+                            content.innerHTML = `
                             <div class="row">
                                 <div class="col-md-6">
                                     <h6 class="text-primary mb-3">
@@ -1293,13 +1309,13 @@
                             </div>
 
                             ${detail.petugas && detail.petugas.length > 0 ? `
-                                                                    <div class="row mt-4">
-                                                                        <div class="col-12">
-                                                                            <h6 class="text-info mb-3">
-                                                                                <i class="fas fa-users me-2"></i>Tim Petugas
-                                                                            </h6>
-                                                                            <div class="row">
-                                                                                ${detail.petugas.map(petugas => `
+                                                                        <div class="row mt-4">
+                                                                            <div class="col-12">
+                                                                                <h6 class="text-info mb-3">
+                                                                                    <i class="fas fa-users me-2"></i>Tim Petugas
+                                                                                </h6>
+                                                                                <div class="row">
+                                                                                    ${detail.petugas.map(petugas => `
                                                 <div class="col-md-6 mb-2">
                                                     <div class="card border-0 bg-light">
                                                         <div class="card-body py-2">
@@ -1309,29 +1325,29 @@
                                                     </div>
                                                 </div>
                                             `).join('')}
+                                                                                </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
-                                                                ` : ''}
+                                                                    ` : ''}
 
                             ${detail.rute.tps_points && detail.rute.tps_points.length > 0 ? `
-                                                                    <div class="row mt-4">
-                                                                        <div class="col-12">
-                                                                            <h6 class="text-primary mb-3">
-                                                                                <i class="fas fa-map-marker-alt me-2"></i>Daftar TPS
-                                                                            </h6>
-                                                                            <div class="table-responsive">
-                                                                                <table class="table table-sm table-bordered">
-                                                                                    <thead class="table-light">
-                                                                                        <tr>
-                                                                                            <th>Urutan</th>
-                                                                                            <th>Nama TPS</th>
-                                                                                            <th>Tipe</th>
-                                                                                            <th>Koordinat</th>
-                                                                                        </tr>
-                                                                                    </thead>
-                                                                                    <tbody>
-                                                                                        ${detail.rute.tps_points.map(tps => `
+                                                                        <div class="row mt-4">
+                                                                            <div class="col-12">
+                                                                                <h6 class="text-primary mb-3">
+                                                                                    <i class="fas fa-map-marker-alt me-2"></i>Daftar TPS
+                                                                                </h6>
+                                                                                <div class="table-responsive">
+                                                                                    <table class="table table-sm table-bordered">
+                                                                                        <thead class="table-light">
+                                                                                            <tr>
+                                                                                                <th>Urutan</th>
+                                                                                                <th>Nama TPS</th>
+                                                                                                <th>Tipe</th>
+                                                                                                <th>Koordinat</th>
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                        <tbody>
+                                                                                            ${detail.rute.tps_points.map(tps => `
                                                         <tr>
                                                             <td class="text-center">${tps.urutan || '-'}</td>
                                                             <td>${tps.nama_lokasi}</td>
@@ -1339,185 +1355,187 @@
                                                             <td>${tps.latitude.toFixed(6)}, ${tps.longitude.toFixed(6)}</td>
                                                         </tr>
                                                     `).join('')}
-                                                                                    </tbody>
-                                                                                </table>
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
-                                                                ` : ''}
+                                                                    ` : ''}
 
                             ${detail.last_tracking ? `
-                                                                    <div class="row mt-4">
-                                                                        <div class="col-12">
-                                                                            <h6 class="text-warning mb-3">
-                                                                                <i class="fas fa-map-marker-alt me-2"></i>Tracking Terakhir
-                                                                            </h6>
-                                                                            <div class="card border-0 bg-light">
-                                                                                <div class="card-body">
-                                                                                    <div class="row">
-                                                                                        <div class="col-md-4">
-                                                                                            <small class="text-muted">Latitude</small>
-                                                                                            <div class="fw-bold">${detail.last_tracking.latitude}</div>
-                                                                                        </div>
-                                                                                        <div class="col-md-4">
-                                                                                            <small class="text-muted">Longitude</small>
-                                                                                            <div class="fw-bold">${detail.last_tracking.longitude}</div>
-                                                                                        </div>
-                                                                                        <div class="col-md-4">
-                                                                                            <small class="text-muted">Waktu Update</small>
-                                                                                            <div class="fw-bold">${detail.last_tracking.timestamp}</div>
+                                                                        <div class="row mt-4">
+                                                                            <div class="col-12">
+                                                                                <h6 class="text-warning mb-3">
+                                                                                    <i class="fas fa-map-marker-alt me-2"></i>Tracking Terakhir
+                                                                                </h6>
+                                                                                <div class="card border-0 bg-light">
+                                                                                    <div class="card-body">
+                                                                                        <div class="row">
+                                                                                            <div class="col-md-4">
+                                                                                                <small class="text-muted">Latitude</small>
+                                                                                                <div class="fw-bold">${detail.last_tracking.latitude}</div>
+                                                                                            </div>
+                                                                                            <div class="col-md-4">
+                                                                                                <small class="text-muted">Longitude</small>
+                                                                                                <div class="fw-bold">${detail.last_tracking.longitude}</div>
+                                                                                            </div>
+                                                                                            <div class="col-md-4">
+                                                                                                <small class="text-muted">Waktu Update</small>
+                                                                                                <div class="fw-bold">${detail.last_tracking.timestamp}</div>
+                                                                                            </div>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
-                                                                ` : `
-                                                                    <div class="row mt-4">
-                                                                        <div class="col-12">
-                                                                            <div class="alert alert-info text-center">
-                                                                                <i class="fas fa-info-circle me-2"></i>
-                                                                                Belum ada data tracking untuk armada ini
+                                                                    ` : `
+                                                                        <div class="row mt-4">
+                                                                            <div class="col-12">
+                                                                                <div class="alert alert-info text-center">
+                                                                                    <i class="fas fa-info-circle me-2"></i>
+                                                                                    Belum ada data tracking untuk armada ini
+                                                                                </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
-                                                                `}
+                                                                    `}
                         `;
-                    } else {
-                        content.innerHTML = `
+                        } else {
+                            content.innerHTML = `
                             <div class="alert alert-danger text-center">
                                 <i class="fas fa-exclamation-triangle me-2"></i>
                                 Gagal memuat detail armada: ${data.message}
                             </div>
                         `;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    console.log('Error Response:', error.response); // jika pakai Axios, ini penting
-                    console.log('Full Error Object:', JSON.stringify(error)); // untuk debugging tambahan
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        console.log('Error Response:', error.response); // jika pakai Axios, ini penting
+                        console.log('Full Error Object:', JSON.stringify(error)); // untuk debugging tambahan
 
-                    content.innerHTML = `
+                        content.innerHTML = `
                         <div class="alert alert-danger text-center">
                             <i class="fas fa-exclamation-triangle me-2"></i>
                             Terjadi kesalahan saat memuat detail armada
                         </div>
                     `;
-                });
-
-        }
-
-        // Function helper untuk status badge class
-        function getStatusBadgeClass(status) {
-            switch (status) {
-                case 0:
-                    return 'status-belum';
-                case 1:
-                    return 'status-sedang';
-                case 2:
-                    return 'status-selesai';
-                default:
-                    return 'status-belum';
-            }
-        }
-
-        // Function untuk export data
-        function exportData() {
-            const params = new URLSearchParams(window.location.search);
-            const exportUrl = `jadwal-rute/export?${params.toString()}`;
-
-            // Show loading
-            const exportBtn = document.querySelector('.btn:contains("Export")') || document.querySelector(
-                '[onclick="exportData()"]');
-            if (exportBtn) {
-                const originalText = exportBtn.innerHTML;
-                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Exporting...';
-                exportBtn.disabled = true;
-
-                fetch(exportUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Convert to CSV and download
-                            const csv = convertToCSV(data.data);
-                            downloadCSV(csv, data.filename + '.csv');
-                        } else {
-                            alert('Gagal export data: ' + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Export error:', error);
-                        alert('Terjadi kesalahan saat export data');
-                    })
-                    .finally(() => {
-                        if (exportBtn) {
-                            exportBtn.innerHTML = originalText;
-                            exportBtn.disabled = false;
-                        }
                     });
-            }
-        }
 
-        // Function untuk convert data ke CSV
-        function convertToCSV(data) {
-            if (data.length === 0) return '';
-
-            const headers = Object.keys(data[0]);
-            const csvRows = [];
-
-            // Add headers
-            csvRows.push(headers.join(','));
-
-            // Add data rows
-            for (const row of data) {
-                const values = headers.map(header => {
-                    const escaped = ('' + row[header]).replace(/"/g, '\\"');
-                    return `"${escaped}"`;
-                });
-                csvRows.push(values.join(','));
             }
 
-            return csvRows.join('\n');
-        }
+            // Function helper untuk status badge class
+            function getStatusBadgeClass(status) {
+                switch (status) {
+                    case 0:
+                        return 'status-belum';
+                    case 1:
+                        return 'status-sedang';
+                    case 2:
+                        return 'status-selesai';
+                    default:
+                        return 'status-belum';
+                }
+            }
 
-        // Function untuk download CSV
-        function downloadCSV(csv, filename) {
-            const blob = new Blob([csv], {
-                type: 'text/csv'
-            });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('hidden', '');
-            a.setAttribute('href', url);
-            a.setAttribute('download', filename);
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }
+            // Function untuk export data
+            function exportData() {
+                const params = new URLSearchParams(window.location.search);
+                const exportUrl = `jadwal-rute/export?${params.toString()}`;
 
-        // Function untuk update tracking real-time
-        function startTrackingUpdates() {
-            setInterval(() => {
-                updateArmadaPositions();
-            }, 30000); // Update setiap 30 detik
-        }
+                // Show loading
+                const exportBtn = document.querySelector('.btn:contains("Export")') || document.querySelector(
+                    '[onclick="exportData()"]');
+                if (exportBtn) {
+                    const originalText = exportBtn.innerHTML;
+                    exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Exporting...';
+                    exportBtn.disabled = true;
 
-        // Function untuk update posisi armada
-        function updateArmadaPositions() {
-            mapData.forEach(jadwal => {
-                if (jadwal.status === 1) { // Hanya update yang sedang berjalan
-                    fetch(`jadwal-rute/api/tracking/${jadwal.id}`)
+                    fetch(exportUrl)
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                // Update marker position
-                                const armadaMarker = armadaMarkers.find(m => m.jadwalId === jadwal.id);
-                                if (armadaMarker) {
-                                    armadaMarker.setLatLng([data.data.latitude, data.data.longitude]);
+                                // Convert to CSV and download
+                                const csv = convertToCSV(data.data);
+                                downloadCSV(csv, data.filename + '.csv');
+                            } else {
+                                alert('Gagal export data: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Export error:', error);
+                            alert('Terjadi kesalahan saat export data');
+                        })
+                        .finally(() => {
+                            if (exportBtn) {
+                                exportBtn.innerHTML = originalText;
+                                exportBtn.disabled = false;
+                            }
+                        });
+                }
+            }
 
-                                    // Update popup content
-                                    const popupContent = `
+            // Function untuk convert data ke CSV
+            function convertToCSV(data) {
+                if (data.length === 0) return '';
+
+                const headers = Object.keys(data[0]);
+                const csvRows = [];
+
+                // Add headers
+                csvRows.push(headers.join(','));
+
+                // Add data rows
+                for (const row of data) {
+                    const values = headers.map(header => {
+                        const escaped = ('' + row[header]).replace(/"/g, '\\"');
+                        return `"${escaped}"`;
+                    });
+                    csvRows.push(values.join(','));
+                }
+
+                return csvRows.join('\n');
+            }
+
+            // Function untuk download CSV
+            function downloadCSV(csv, filename) {
+                const blob = new Blob([csv], {
+                    type: 'text/csv'
+                });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.setAttribute('hidden', '');
+                a.setAttribute('href', url);
+                a.setAttribute('download', filename);
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }
+
+            // Function untuk update tracking real-time
+            function startTrackingUpdates() {
+                setInterval(() => {
+                    updateArmadaPositions();
+                }, 30000); // Update setiap 30 detik
+            }
+
+            // Function untuk update posisi armada
+            function updateArmadaPositions() {
+                mapData.forEach(jadwal => {
+                    if (jadwal.status === 1) { // Hanya update yang sedang berjalan
+                        fetch(`jadwal-rute/api/tracking/${jadwal.id}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    // Update marker position
+                                    const armadaMarker = armadaMarkers.find(m => m.jadwalId === jadwal
+                                        .id);
+                                    if (armadaMarker) {
+                                        armadaMarker.setLatLng([data.data.latitude, data.data
+                                            .longitude]);
+
+                                        // Update popup content
+                                        const popupContent = `
                                         <div class="popup-header">
                                             <i class="fas fa-truck me-2"></i>
                                             ${jadwal.armada.no_polisi}
@@ -1537,95 +1555,94 @@
                                             </button>
                                         </div>
                                     `;
-                                    armadaMarker.setPopupContent(popupContent);
+                                        armadaMarker.setPopupContent(popupContent);
 
-                                    // Update rute jika sedang aktif
-                                    if (routeControl && activeJadwalId === jadwal.id && isRouteVisible) {
-                                        const waypoints = routeControl.getWaypoints();
-                                        if (waypoints.length > 0) {
-                                            waypoints[0].latLng = L.latLng(data.data.latitude, data.data
-                                                .longitude);
-                                            routeControl.setWaypoints(waypoints);
+                                        // Update rute jika sedang aktif
+                                        if (routeControl && activeJadwalId === jadwal.id &&
+                                            isRouteVisible) {
+                                            const waypoints = routeControl.getWaypoints();
+                                            if (waypoints.length > 0) {
+                                                waypoints[0].latLng = L.latLng(data.data.latitude, data
+                                                    .data
+                                                    .longitude);
+                                                routeControl.setWaypoints(waypoints);
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error updating tracking for jadwal', jadwal.id, ':', error);
-                        });
-                }
-            });
-        }
-
-        // Function untuk handle resize map
-        function handleMapResize() {
-            window.addEventListener('resize', function() {
-                setTimeout(() => {
-                    map.invalidateSize();
-                }, 100);
-            });
-        }
-
-        // Function untuk clear route ketika klik di tempat lain
-        function setupMapClickHandler() {
-            map.on('click', function(e) {
-                // Clear routes when clicking on empty space
-                if (e.originalEvent.target === map.getContainer()) {
-                    clearRoutes();
-                }
-            });
-        }
-
-        // Function untuk handle keyboard shortcuts
-        function setupKeyboardShortcuts() {
-            document.addEventListener('keydown', function(e) {
-                // Esc key untuk clear routes
-                if (e.key === 'Escape') {
-                    clearRoutes();
-                }
-
-                // F5 untuk refresh tracking
-                if (e.key === 'F5' && e.ctrlKey) {
-                    e.preventDefault();
-                    updateArmadaPositions();
-                }
-            });
-        }
-
-        // Function untuk handle perubahan per page
-        function changePerPage() {
-            const perPage = document.getElementById('per_page').value;
-            const url = new URL(window.location);
-            url.searchParams.set('per_page', perPage);
-            url.searchParams.delete('page'); // Reset halaman ke 1
-            window.location.href = url.toString();
-        }
-
-        // Function untuk reset filter
-        function resetFilter() {
-            const url = new URL(window.location);
-            // Hapus semua parameter filter
-            url.searchParams.delete('search');
-            url.searchParams.delete('status');
-            url.searchParams.delete('date');
-            url.searchParams.delete('page');
-            // Tutup dropdown
-            const dropdown = bootstrap.Dropdown.getInstance(document.querySelector('[data-bs-toggle="dropdown"]'));
-            if (dropdown) {
-                dropdown.hide();
+                            })
+                            .catch(error => {
+                                console.error('Error updating tracking for jadwal', jadwal.id, ':',
+                                    error);
+                            });
+                    }
+                });
             }
-            window.location.href = url.toString();
-        }
 
-        // // Event listener untuk tombol hide all routes
-        // document.getElementById('hide-all-routes').addEventListener('click', clearRoutes);
+            // Function untuk handle resize map
+            function handleMapResize() {
+                window.addEventListener('resize', function() {
+                    setTimeout(() => {
+                        map.invalidateSize();
+                    }, 100);
+                });
+            }
 
-        // Event listener untuk tombol toggle route
-        // document.getElementById('toggle-route').addEventListener('click', toggleRouteVisibility);
+            // Function untuk clear route ketika klik di tempat lain
+            function setupMapClickHandler() {
+                map.on('click', function(e) {
+                    // Clear routes when clicking on empty space
+                    if (e.originalEvent.target === map.getContainer()) {
+                        clearRoutes();
+                    }
+                });
+            }
 
-        // Initialize everything when document is ready
-        document.addEventListener('DOMContentLoaded', function() {
+            // Function untuk handle keyboard shortcuts
+            function setupKeyboardShortcuts() {
+                document.addEventListener('keydown', function(e) {
+                    // Esc key untuk clear routes
+                    if (e.key === 'Escape') {
+                        clearRoutes();
+                    }
+
+                    // F5 untuk refresh tracking
+                    if (e.key === 'F5' && e.ctrlKey) {
+                        e.preventDefault();
+                        updateArmadaPositions();
+                    }
+                });
+            }
+
+            // Function untuk handle perubahan per page
+            function changePerPage() {
+                const perPage = document.getElementById('per_page').value;
+                const url = new URL(window.location);
+                url.searchParams.set('per_page', perPage);
+                url.searchParams.delete('page'); // Reset halaman ke 1
+                window.location.href = url.toString();
+            }
+
+            // Function untuk reset filter
+            function resetFilter() {
+                const url = new URL(window.location);
+                // Hapus semua parameter filter
+                url.searchParams.delete('search');
+                url.searchParams.delete('status');
+                url.searchParams.delete('date');
+                url.searchParams.delete('page');
+                // Tutup dropdown menggunakan jQuery dan Bootstrap 4
+                $('.dropdown-toggle').dropdown('hide');
+                window.location.href = url.toString();
+            }
+
+            // // Event listener untuk tombol hide all routes
+            // document.getElementById('hide-all-routes').addEventListener('click', clearRoutes);
+
+            // Event listener untuk tombol toggle route
+            // document.getElementById('toggle-route').addEventListener('click', toggleRouteVisibility);
+
+            // Initialize everything when document is ready
             initializeMap();
             handleMapResize();
             setupMapClickHandler();
@@ -1637,6 +1654,7 @@
             console.log('Peta jadwal operasional berhasil dimuat');
             console.log('Data armada:', mapData.length);
             console.log('Data TPS:', allTpsForMap.length);
+
             // Handle dropdown events
             const filterDropdown = document.querySelector('.dropdown-menu');
             if (filterDropdown) {
@@ -1645,17 +1663,16 @@
                     e.stopPropagation();
                 });
             }
-        });
 
-        // Global functions for window access
-        window.exportData = exportData;
-        window.showArmadaDetail = showArmadaDetail;
-        window.showRouteForArmada = showRouteForArmada;
-        window.toggleRouteVisibility = toggleRouteVisibility;
-        window.clearRoutes = clearRoutes;
-        window.updateArmadaPositions = updateArmadaPositions;
-        // Update existing window functions
-        window.changePerPage = changePerPage;
-        window.resetFilter = resetFilter;
+            // Global functions for window access
+            window.exportData = exportData;
+            window.showArmadaDetail = showArmadaDetail;
+            window.showRouteForArmada = showRouteForArmada;
+            window.toggleRouteVisibility = toggleRouteVisibility;
+            window.clearRoutes = clearRoutes;
+            window.updateArmadaPositions = updateArmadaPositions;
+            window.changePerPage = changePerPage;
+            window.resetFilter = resetFilter;
+        }); // End of $(document).ready()
     </script>
 @endpush

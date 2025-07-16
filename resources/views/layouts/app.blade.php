@@ -46,7 +46,7 @@
                     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
                         <img src="{{ asset('dist/img/user2-160x160.jpg') }}" class="user-image img-circle elevation-2"
                             alt="User Image">
-                        
+
                         {{-- Cek apakah ada user login atau tidak --}}
                         <span class="d-none d-md-inline text-white">
                             @auth
@@ -57,12 +57,13 @@
                                 Pengunjung
                             @endauth
                         </span>
-                        </a>
+                    </a>
                     <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
 
                         <li class="user-header text-white" style="background-color: #299e63;">
-                            <img src="{{ asset('dist/img/user2-160x160.jpg') }}" class="img-circle elevation-3" alt="User Image">
-                            
+                            <img src="{{ asset('dist/img/user2-160x160.jpg') }}" class="img-circle elevation-3"
+                                alt="User Image">
+
                             {{-- Cek lagi di sini untuk keamanan --}}
                             <p>
                                 @auth
@@ -72,15 +73,15 @@
                                     Selamat Datang!
                                 @endauth
                             </p>
-                             </li>
+                        </li>
 
                         {{-- Tampilkan footer user (tombol keluar) hanya jika sedang login --}}
                         @auth
-                        <li class="user-footer">
-                            {{-- <a href="{{ route('masyarakat.profile.index') }}" class="btn btn-default btn-flat">Profil</a> --}}
-                            <a href="#" class="btn btn-success btn-flat float-right" data-toggle="modal"
-                                data-target="#modal-logout"><i class="fas fa-sign-out-alt"></i> <span>Keluar</span></a>
-                        </li>
+                            <li class="user-footer">
+                                {{-- <a href="{{ route('masyarakat.profile.index') }}" class="btn btn-default btn-flat">Profil</a> --}}
+                                <a href="#" class="btn btn-success btn-flat float-right" data-toggle="modal"
+                                    data-target="#modal-logout"><i class="fas fa-sign-out-alt"></i> <span>Keluar</span></a>
+                            </li>
                         @endauth
 
                     </ul>
@@ -119,7 +120,7 @@
 
         <aside class="main-sidebar main-sidebar-custom sidebar-dark-info elevation-4">
             <a href="{{ url('/') }}" class="brand-link d-flex justify-content-center align-items-center">
-                
+
                 {{-- Cek juga di sini agar tidak error saat diakses tamu --}}
                 @auth
                     @php
@@ -139,7 +140,7 @@
                     {{-- Tampilkan logo atau teks default jika tamu --}}
                     <span class="brand-text font-weight-bold text-white">TuNetic</span>
                 @endauth
-                </a>
+            </a>
             <div class="sidebar">
                 <nav class="mt-2">
                     {{-- Sidebar hanya tampil jika user login --}}
@@ -225,6 +226,7 @@
         });
     </script>
 
-    @stack('scripts') </body>
+    @stack('scripts')
+</body>
 
 </html>
