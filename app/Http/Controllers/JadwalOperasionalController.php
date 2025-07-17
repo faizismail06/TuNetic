@@ -21,17 +21,28 @@ class JadwalOperasionalController extends Controller
     /**
      * Menampilkan semua jadwal operasional.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $bulan = $request->input('bulan');
+        $tahun = $request->input('tahun');
+
         $jadwals = JadwalOperasional::with([
-            'armada',
-            'jadwal',
-            'rute',
-            'penugasanPetugas.petugas',
-        ])->get();
+                'armada',
+                'jadwal',
+                'rute',
+                'penugasanPetugas.petugas',
+            ])
+            ->when($bulan && $tahun, function ($query) use ($bulan, $tahun) {
+                $query->whereMonth('tanggal', $bulan)
+                    ->whereYear('tanggal', $tahun);
+            })
+            ->get();
+
         $semuaPetugas = Petugas::all(); // untuk dropdown plotting
-        return view('adminpusat/jadwal-operasional.index', compact('jadwals', 'semuaPetugas'));
+
+        return view('adminpusat.jadwal-operasional.index', compact('jadwals', 'semuaPetugas', 'bulan', 'tahun'));
     }
+
 
     // public function simpanPlotting(Request $request, $id)
     // {
@@ -241,5 +252,13 @@ class JadwalOperasionalController extends Controller
                 'error' => $e->getMessage()
             ], 404);
         }
+    }
+
+    public function bulkDelete(Request $request) {
+        JadwalOperasional::whereMonth('tanggal', $request->bulan)
+            ->whereYear('tanggal', $request->tahun)
+            ->delete();
+
+        return back()->with('success', 'Semua jadwal bulan tersebut telah dihapus.');
     }
 }

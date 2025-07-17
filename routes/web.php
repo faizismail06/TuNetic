@@ -156,6 +156,7 @@ Route::resource('jadwal', JadwalController::class);
 Route::get('pusat/jadwal-operasional/{id}/plotting', [JadwalOperasionalController::class, 'plotting'])->name('jadwal-operasional.plotting');
 Route::post('pusat/jadwal-operasional/{id}/plotting', [JadwalOperasionalController::class, 'simpanPlotting'])->name('jadwal-operasional.simpanPlotting');
 Route::get('pusat/jadwal-operasional/{id}/petugas', [JadwalOperasionalController::class, 'getPetugasByJadwal']);
+Route::delete('pusat/jadwal-operasional/bulk-delete', [JadwalOperasionalController::class, 'bulkDelete'])->name('jadwal-operasional.bulk-delete');
 Route::resource('pusat/jadwal-operasional', JadwalOperasionalController::class);
 
 // ===================

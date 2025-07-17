@@ -26,15 +26,50 @@
     <div class="content">
         <div class="container-fluid">
             <div class="card card-success card-outline">
-                <div class="card-header d-flex justify-content-between">
+                <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                     <h5 class="m-0 p-1">Data Jadwal Operasional</h5>
                     <div class="ml-auto">
-                        <a href="{{ route('jadwal-operasional.create') }}" class="btn btn-sm btn-success">
+                        <a href="{{ route('jadwal-operasional.create') }}" class="btn btn-sm btn-success ml-2">
                             <i class="fas fa-plus-circle"></i> Tambah Jadwal
                         </a>
                     </div>
                 </div>
                 <div class="card-body">
+                    <div class="row mb-3">
+                        <form method="GET" class="form-inline mr-2 pt-3">
+                            <select name="bulan" class="form-control mr-2">
+                                <option value="">-- Semua Bulan --</option>
+                                @foreach(range(1, 12) as $m)
+                                    <option value="{{ $m }}" {{ request('bulan') == $m ? 'selected' : '' }}>
+                                        {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <select name="tahun" class="form-control mr-2">
+                                <option value="">-- Semua Tahun --</option>
+                                @foreach(range(date('Y'), date('Y') - 3) as $y)
+                                    <option value="{{ $y }}" {{ request('tahun') == $y ? 'selected' : '' }}>
+                                        {{ $y }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <button type="submit" class="btn btn-primary btn-sm mr-1">Filter</button>
+                            <a href="{{ route('jadwal-operasional.index') }}" class="btn btn-secondary btn-sm">Reset</a>
+                        </form>
+
+                        <form action="{{ route('jadwal-operasional.bulk-delete') }}" method="POST" class="mr-2 pt-3">
+                            @csrf
+                            @method('DELETE')
+                            <input type="hidden" name="bulan" value="{{ request('bulan') }}">
+                            <input type="hidden" name="tahun" value="{{ request('tahun') }}">
+                            <button type="submit" class="btn btn-danger btn-sm pt-2"
+                                onclick="return confirm('Yakin ingin menghapus semua jadwal bulan ini?')">
+                                Hapus Semua Bulan Ini
+                            </button>
+                        </form>
+                    </div>
                     <table id="datatable-main" class="table table-bordered table-striped text-sm">
                         <thead class="text-center">
                             <tr>
