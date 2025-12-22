@@ -1,8 +1,8 @@
 
 <p align="center">
-<a href="https://laravel.com"  target="_blank"><img  src="https://ik.polines.ac.id/wp-content/uploads/2023/11/logo-web.png"  width="360"  alt="Polines Logo"></a> 
-<a  href="https://laravel.com"  target="_blank"><img  src="https://ik.polines.ac.id/wp-content/uploads/2024/02/laravel-logo.jpg"  width="220"  alt="Laravel Logo"></a>
-</p>  
+<img src="public\assets\images\logo\logo-web.png" width="360" alt="Polines Logo">
+<img src="public\assets\images\logo\laravel-logo.png" width="220" alt="Laravel Logo">
+</p>
 
 # TuNetic - Sistem Manajemen Pengelolaan Sampah
 
