@@ -45,7 +45,7 @@
 <body class="hold-transition sidebar-mini layout-fixed">
     <!-- Preloader -->
     {{-- <div class="preloader flex-column justify-content-center align-items-center">
-        <img class="animation__shake" src="{{ asset('') }}dist/img/logo-polines.png" alt="Polines Logo"
+        <img class="animation__shake" src="{{ asset('') }}dist/img/logoputih.png" alt="Polines Logo"
             height="80" width="80">
     </div> --}}
     <div class="wrapper">
@@ -115,10 +115,10 @@
 
         <aside class="main-sidebar main-sidebar-custom sidebar-dark-info elevation-4">
             <a href="{{ url('') }}" class="brand-link">
-                <img src="{{ asset('') }}dist/img/logo-polines.png" alt="Logo Polines"
-                    class="brand-image elevation-3" style="opacity: .8">
+            {{-- <img src="{{ asset('') }}dist/img/logoputih.png" alt="Logo Polines"
+                class="brand-image elevation-3" style="opacity: .8"> --}}
                 <span
-                    class="brand-text font-weight-light "><strong>TuNetic</strong></span>
+                    class="brand-text font-weight-light "><strong>ADMIN PANEL</strong></span>
             </a>
             <div class="sidebar">
                 <nav class="mt-2">

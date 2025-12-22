@@ -10,7 +10,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6 text-uppercase">
-                    <h4 class="m-0">manajemen user</h4>
+                    <h4 class="m-0">kelola tps/tpst</h4>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -25,39 +25,43 @@
                 <div class="col-md-12">
                     <div class="card card-success card-outline">
                         <div class="card-header">
-                            <h3 class="card-title">Data Pengguna</h3>
+                            <h3 class="card-title">Data TPS/TPST</h3>
                             <div class="card-tools">
-                                <a href="{{ route('manage-user.create') }}" class="btn btn-tool"><i
+                                <a href="{{ route('lokasi-tps.create') }}" class="btn btn-tool"><i
                                         class="fas fa-plus-circle"></i></a>
                             </div>
                         </div>
                         <div class="card-body">
                             <table id="datatable-main" class="table table-bordered table-striped">
                                 <thead>
-                                    <th>No</th>
-                                    <th>Nama Pengguna</th>
-                                    <th>Email</th>
-                                    <th>Role Pengguna</th>
+                                    <th>ID</th>
+                                    <th>Nama TPS/TPST</th>
+                                    <th>Provinsi</th>
+                                    <th>Kabupaten</th>
+                                    <th>Kecamatan</th>
+                                    <th>Desa</th>
+                                    <th>Latitude</th>
+                                    <th>Longitude</th>
                                     <th>Aksi</th>
                                 </thead>
                                 <tbody>
-                                    @foreach ($users as $item)
+                                    @foreach ($lokasi as $item)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $item->name }}</td>
-                                            <td>{{ $item->email }}</td>
-                                            <td>
-                                                @foreach ($item->roles->pluck('name') as $role)
-                                                    {{ $role }}
-                                                @endforeach
-                                            </td>
+                                            <td>{{ $item->nama_lokasi }}</td>
+                                            <td>{{ $item->province->name ?? '-'}}</td>
+                                            <td>{{ $item->regency->name }}</td>
+                                            <td>{{ $item->district->name }}</td>
+                                            <td>{{ $item->village->name }}</td>
+                                            <td>{{ $item->latitude }}</td>
+                                            <td>{{ $item->longitude }}</td>
                                             <td>
                                                 <button type="button" class="btn btn-block btn-sm btn-outline-info"
                                                     data-toggle="dropdown"><i class="fas fa-cog"></i>
                                                 </button>
                                                 <div class="dropdown-menu" role="menu">
                                                     <a class="dropdown-item"
-                                                        href="{{ route('manage-user.edit', $item->id) }}">Edit</a>
+                                                        href="{{ route('lokasi-tps.edit', $item->id) }}">Edit</a>
                                                     <a class="dropdown-item" href="#">Hapus</a>
                                                 </div>
                                             </td>

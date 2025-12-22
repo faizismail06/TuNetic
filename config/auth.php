@@ -12,6 +12,10 @@ return [
     | as required, but they're a perfect start for most applications.
     |
     */
+'redirects' => [
+    'login' => '/welcome',
+    'logout' => '/',
+],
 
     'defaults' => [
         'guard' => 'web',

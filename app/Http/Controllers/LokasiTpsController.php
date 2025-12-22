@@ -4,17 +4,56 @@ namespace App\Http\Controllers;
 
 use App\Models\LokasiTps;
 use Illuminate\Http\Request;
+use App\Models\Province;
+use App\Models\Regency;
+use App\Models\District;
+use App\Models\Village;
 
 class LokasiTpsController extends Controller
 {
     /**
      * Menampilkan semua lokasi TPS.
      */
+    // public function index()
+    // {
+    //     $lokasi = LokasiTps::all();
+    //     return response()->json($lokasi, 200);
+    // }
     public function index()
-    {
-        $lokasi = LokasiTps::all();
-        return response()->json($lokasi, 200);
-    }
+{
+    $lokasi = LokasiTps::with(['province', 'regency', 'district', 'village'])->get();
+    return view('lokasi_tps.index', compact('lokasi'));
+}
+
+
+    public function create()
+{
+    $provinces = Province::all();
+    $regencies = Regency::all();
+    $districts = District::all();
+    $villages = Village::all();
+
+    return view('lokasi_tps.create', compact('provinces', 'regencies', 'districts', 'villages'));
+}
+
+public function edit($id)
+{
+    $lokasi = LokasiTps::findOrFail($id);
+
+    $provinces = Province::all();
+
+    // Hanya ambil regency yang sesuai dengan provinsi yang dipilih
+    $regencies = Regency::where('province_id', $lokasi->province_id)->get();
+
+    // Ambil district yang sesuai dengan regency yang dipilih
+    $districts = District::where('regency_id', $lokasi->regency_id)->get();
+
+    // Ambil village yang sesuai dengan district yang dipilih
+    $villages = Village::where('district_id', $lokasi->district_id)->get();
+
+    return view('lokasi_tps.edit', compact('lokasi','provinces','regencies', 'districts', 'villages'));
+}
+
 
     /**
      * Menyimpan lokasi TPS baru.
@@ -40,10 +79,22 @@ class LokasiTpsController extends Controller
      * Menampilkan lokasi TPS berdasarkan ID.
      */
     public function show($id)
-    {
-        $lokasi = LokasiTps::findOrFail($id);
-        return response()->json($lokasi, 200);
-    }
+{
+    $lokasi = LokasiTps::with(['province', 'regency', 'district', 'village'])->findOrFail($id);
+
+    return response()->json([
+        'id' => $lokasi->id,
+        'nama_lokasi' => $lokasi->nama_lokasi,
+        'provinsi' => $lokasi->province->name ?? null,
+        'kabupaten' => $lokasi->regency->name ?? null,
+        'kecamatan' => $lokasi->district->name ?? null,
+        'desa' => $lokasi->village->name ?? null,
+        'latitude' => $lokasi->latitude,
+        'longitude' => $lokasi->longitude,
+    ], 200);
+    
+}
+
 
     /**
      * Memperbarui lokasi TPS berdasarkan ID.
