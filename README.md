@@ -1,65 +1,131 @@
 
 <p align="center">
-<a href="https://laravel.com"  target="_blank"><img  src="https://ik.polines.ac.id/wp-content/uploads/2023/11/logo-web.png"  width="360"  alt="Laravel Logo"></a> 
+<a href="https://laravel.com"  target="_blank"><img  src="https://ik.polines.ac.id/wp-content/uploads/2023/11/logo-web.png"  width="360"  alt="Polines Logo"></a> 
 <a  href="https://laravel.com"  target="_blank"><img  src="https://ik.polines.ac.id/wp-content/uploads/2024/02/laravel-logo.jpg"  width="220"  alt="Laravel Logo"></a>
 </p>  
 
-# PBL Template D3 Teknik Informatika & S.Tr. Teknologi Rekayasa Komputer
+# TuNetic - Sistem Manajemen Pengelolaan Sampah
 
-Repository ini digunakan sebagai template aplikasi dasar yang akan digunakan untuk pelaksanaan <i><b>Project-Based Learning</b></i> pada kedua prodi di atas di Jurusan Teknik Elektro, Politeknik Negeri Semarang.
+Aplikasi berbasis web untuk manajemen pengelolaan sampah yang dikembangkan sebagai bagian dari <i><b>Project-Based Learning</b></i> Jurusan Teknik Elektro, Politeknik Negeri Semarang.
 
-<i>Minimum requirements</i> untuk menjalankan template ini adalah:
-- PHP 8.2
+🌐 **Live Demo**: [https://pbl24250213.informatikapolines.id/](https://pbl24250213.informatikapolines.id/)
+
+## Fitur Utama
+
+- 📍 Manajemen Lokasi TPS (Tempat Pembuangan Sampah)
+- 🚛 Tracking Armada Pengangkut Sampah
+- 📋 Laporan dari Warga dan TPS
+- 🗓️ Penjadwalan Operasional
+- 👥 Manajemen Petugas dan Penugasan
+- 🗺️ Manajemen Rute Pengangkutan
+- 📊 Dashboard Monitoring
+
+## Requirements
+
+- PHP 8.2 atau lebih tinggi
 - Laravel 11
-- MySQL 8.0/MariaDB 10.4
+- MySQL 8.0 / MariaDB 10.4 atau lebih tinggi
+- Composer
+- Node.js & NPM (untuk frontend assets)
 
-Cara menggunakan template ini adalah sebagai berikut:
-1. Dengan menggunakan ``terminal`` atau ``command prompt``, duplikasi template ini menggunakan perintah:
-```
-git clone https://gitlab.com/sukotyasp/pbl-laravel-template.git {project-directory}
-```
-2. Masuk ke ``{project-directory}``, hapus folder **hidden** bernama `` .git``.
-3. Alternatif selain melakukan langkah 1. dan 2., anda dapat mengunduh versi terbaru yang dipublikasikan pada link <a href='https://gitlab.com/sukotyasp/pbl-laravel-template/-/releases'>berikut</a>. Kemudian ``extract`` file yang anda unduh. Buka ``terminal`` atau ``command prompt``, lalu pilih folder hasil ekstrak sebagai folder aktif pada command line.
-4. Install dependency menggunakan composer dengan perintah
+## Instalasi
 
+1. Clone repository ini:
+```bash
+git clone <repository-url> tunetic
+cd tunetic
 ```
+
+2. Install dependency PHP menggunakan Composer:
+```bash
 composer install
 ```
-5. __Copy__ file ``.env.example`` menjadi ``.env``
-6. Buat database sesuai yang anda butuhkan, kemudian sesuaikan entry berikut pada file ``.env``:
+
+3. Install dependency frontend:
+```bash
+npm install
 ```
+
+4. Copy file ``.env.example`` menjadi ``.env``:
+```bash
+cp .env.example .env
+```
+
+5. Generate application key:
+```bash
+php artisan key:generate
+```
+
+6. Buat database baru, kemudian sesuaikan konfigurasi pada file ``.env``:
+6. Buat database baru, kemudian sesuaikan konfigurasi pada file ``.env``:
+```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE={your database}
-DB_USERNAME={your database username}
-DB_PASSWORD={your database password}
+DB_DATABASE=tunetic
+DB_USERNAME=root
+DB_PASSWORD=
 ```
-7. Jalankan perintah berikut:
-```
-php artisan key:generate
+
+7. Jalankan migrasi database dan seeder:
+```bash
 php artisan migrate
 php artisan db:seed
 ```
-8. Jalankan aplikasi menggunakan perintah:
+
+8. Build frontend assets:
+```bash
+npm run build
 ```
+
+9. Jalankan aplikasi:
+```bash
 php artisan serve
 ```
-9. Anda dapat memodifikasi port yang digunakan:
-```
-php artisan serve --port={custom port}
-```
-10. Selesai, anda dapat login menggunakan:
-```
-username: superadmin@gmail.com
-password: adminadmin
-```
-<hr>
 
-Terima Kasih kepada:
-- Kaprodi D3 Teknik Informatika
-- Kaprodi S.Tr. Teknologi Rekayasa Komputer
-- Ketua Jurusan Teknik Elektro, Politeknik Negeri Semarang
-- Task Force PBL D3 Teknik Informatika & S.Tr. Teknologi Rekayasa Komputer
-<hr>
-Modifikasi dari Project: https://github.com/mjumain/RBAC-LARAVEL-9
+Atau dengan custom port:
+```bash
+php artisan serve --port=8080
+```
+
+10. Akses aplikasi di browser: `http://localhost:8000`
+
+## Login Default
+
+```
+Email: superadmin@gmail.com
+Password: adminadmin
+```
+
+## Teknologi yang Digunakan
+
+- **Backend**: Laravel 11, PHP 8.2
+- **Database**: MySQL/MariaDB
+- **Frontend**: Blade Templates, Vite
+- **Authentication**: Laravel Sanctum
+- **Authorization**: Spatie Laravel Permission
+- **Notifications**: PHP Flasher
+
+## Struktur Aplikasi
+
+- `app/Models/` - Model database (Armada, Sampah, LaporanTps, dll)
+- `app/Http/Controllers/` - Controller untuk handling request
+- `app/Http/Middleware/` - Custom middleware
+- `resources/views/` - Blade templates
+- `routes/web.php` - Route definitions
+- `database/migrations/` - Database migrations
+- `database/seeders/` - Database seeders
+
+## Kontribusi
+
+Proyek ini dikembangkan oleh mahasiswa D3 Teknik Informatika & S.Tr. Teknologi Rekayasa Komputer, Politeknik Negeri Semarang.
+
+## Lisensi
+
+Project ini dibuat untuk keperluan pembelajaran dalam program Project-Based Learning.
+
+---
+
+**Politeknik Negeri Semarang**  
+Jurusan Teknik Elektro  
+Program Studi D3 Teknik Informatika & S.Tr. Teknologi Rekayasa Komputer
